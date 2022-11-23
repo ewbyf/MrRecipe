@@ -6,21 +6,13 @@ import Icon from 'react-native-vector-icons/Ionicons'
 
 import Recipes from './screens/Recipes';
 import Favorites from './screens/Favorites';
-import Login from './screens/Login';
+import LoginStack from './routes/LoginStack';
 
 const Tab = createBottomTabNavigator();
 
-export default function MainContainer() {
+export default function NavigationBar() {
   return (
     <View style={styles.appcontainer}>
-      <View style={styles.topbar}>
-        <Text style={styles.topbarTitle}>Mr. Recipe</Text>
-        <TextInput placeholder='Search for Recipe' style={styles.searchbar}></TextInput>
-      </View>
-      <View>
-        {/* Recipes */}
-      </View>
-
       <NavigationContainer>
         <Tab.Navigator initialRouteName='Recipes' screenOptions={({route}) => ({
                 tabBarIcon: ({focused, color, size}) => {
@@ -36,16 +28,33 @@ export default function MainContainer() {
                     else if (routeName == 'Login') {
                         iconName = focused ? 'person-circle' : 'person-circle-outline';
                     }
-                    return <Icon name={iconName} size={size} color={color}/>
+                    return (
+                        focused? (
+                        <View style={{ borderTopWidth: 3, width: '100%', height: '100%', padding: 1, borderColor: '#FFDDA1' }}>
+                            <Icon style={{ alignSelf: "center", justifyContent: "center", alignItems: "center" }} name={iconName} size={size} color={color} />
+                        </View>) :
+                        (
+                            <Icon name={iconName} size={size} color={color}/>
+                        )
+                    )
                 },
+                tabBarActiveBackgroundColor: '#518BFF',
+                tabBarInactiveBackgroundColor: '#518BFF',
+                tabBarActiveTintColor: '#FFDDA1',
+                tabBarInactiveTintColor: 'white',
+                tabBarStyle: {backgroundColor: '#518BFF'},
+                headerStyle: {backgroundColor: '#518BFF'},
+                headerShown: false,
             })}>
 
             <Tab.Screen name={'Recipes'} component={Recipes}/>
             <Tab.Screen name={'Favorites'} component={Favorites}/>
-            <Tab.Screen name={'Login'} component={Login}/>
+            <Tab.Screen name={'Login'} component={LoginStack}/>
 
         </Tab.Navigator>
       </NavigationContainer>
+      <View>
+      </View>
     </View>
   );
 }
@@ -53,43 +62,5 @@ export default function MainContainer() {
 const styles = StyleSheet.create({
   appcontainer: {
     height: '100%',
-  },
-  topbar: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    paddingTop: 20,
-    height: '20%',
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#518BFF',
-  },
-  topbarTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  searchbar: {
-    width: 300,
-    borderWidth: 5,
-    marginTop: 15,
-    borderColor: 'white',
-    borderRadius: 20,
-    padding: 7,
-    backgroundColor: 'white',
-    color: 'black',
-  },
-  navbar: {
-    position: 'absolute',
-    left: 0,
-    bottom: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    height: '10%',
-    width: '100%',
-    backgroundColor: '#518BFF',
   },
 });

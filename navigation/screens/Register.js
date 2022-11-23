@@ -1,21 +1,19 @@
 import { StyleSheet, View, Text, TextInput, Button } from "react-native";
+import Icon from 'react-native-vector-icons/Ionicons'
 
-export default function Login({ navigation }) {
+export default function Register({ navigation }) {
     return (
         <View style={styles.appcontainer}>
             <View style={styles.topbar}>
-                <Text style={styles.topbarTitle}>Login</Text>
+                <Icon name='arrow-back-outline' size={24} color='white' style={styles.backArrow} onPress={() => {navigation.goBack(null)}}/>
+                <Text style={styles.topbarTitle}>Register</Text>
             </View>
             <View style={styles.login}>
                 <Text style={styles.title}>Mr. Recipe</Text>
                 <TextInput placeholder="Username" style={styles.inputField}></TextInput>
                 <TextInput placeholder="Password" style={styles.inputField}></TextInput>
-                <Text>Forgot Password?</Text>
-                <Button title='Login' style={styles.loginButton}/>
-                <View>
-                  <Text>Need an account? </Text>
-                  <Text onPress={() => navigation.navigate('Register')} style={{color: 'blue'}}>Sign up</Text>
-                </View>
+                <TextInput placeholder="Confirm Password" style={styles.inputField}></TextInput>
+                <Button title='Sign up' style={styles.loginButton}/>
             </View>
         </View>
     );
@@ -29,9 +27,15 @@ const styles = StyleSheet.create({
       paddingTop: 30,
       height: '13%',
       width: '100%',
+      flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: '#518BFF',
+    },
+    backArrow: {
+        position: 'absolute',
+        left: 20,
+        top: 42,
     },
     topbarTitle: {
       fontSize: 24,
@@ -59,5 +63,5 @@ const styles = StyleSheet.create({
     },
     loginButton: {
       backgroundColor: '#518BFF',
-    }
+    },
   });

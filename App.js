@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View, TextInput, Image, TouchableHighlight } from 'react-native';
-import MainContainer from './navigation/MainContainer';
+import NavigationBar from './navigation/NavigationBar';
 
 export function App() {
   return (
-    <MainContainer/>
+    <NavigationBar/>
   );
 }
 

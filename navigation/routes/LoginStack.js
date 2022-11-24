@@ -3,7 +3,7 @@ import Login from "../screens/Account/Login";
 import Register from "../screens/Account/Register";
 import Confirmation from "../screens/Account/Confirmation";
 import Password from "../screens/Account/Password";
-
+import ForgotPassword from "../screens/Account/ForgotPassword";
 
 const Stack = createStackNavigator();
 
@@ -14,6 +14,7 @@ export default function LoginStack() {
         })}>
             <Stack.Screen name="LoginScreen" component={Login} />
             <Stack.Screen name="RegisterScreen" component={Register} />
+            <Stack.Screen name="ForgotPasswordScreen" component={ForgotPassword} />
             <Stack.Screen name="ConfirmationScreen" component={Confirmation} />
             <Stack.Screen name="PasswordScreen" component={Password} />
         </Stack.Navigator>

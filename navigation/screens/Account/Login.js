@@ -1,10 +1,10 @@
 import { StyleSheet, View, Text, TextInput, Button } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { firebase } from '../../../config';
 import { TouchableOpacity } from "react-native-gesture-handler";
 
-export default function Login({ navigation }) {
+export default function Login({ navigation }){
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
@@ -25,7 +25,7 @@ export default function Login({ navigation }) {
           <View style={styles.login}>
               <Text style={styles.title}>Mr. Recipe</Text>
               <View style={{flexDirection: 'row'}}>
-                <Icon name='person-outline' size={20} color={'lightgrey'} style={styles.icon}/>
+                <Icon name='mail-outline' size={20} color={'lightgrey'} style={styles.icon}/>
                 <TextInput 
                   placeholder="Email" 
                   style={styles.inputField} 
@@ -44,8 +44,6 @@ export default function Login({ navigation }) {
                   autoCorrect={false}
                 ></TextInput>
               </View>
-      
-              <Text style={{color: '#518BFF', marginBottom: 20}}>Forgot Password?</Text>
           
               <TouchableOpacity onPress={() => loginUser(email, password)} style={styles.loginButton}>
                 <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>Login</Text>
@@ -57,6 +55,8 @@ export default function Login({ navigation }) {
                 <Text>Don't have an account? </Text>
                 <Text onPress={() => navigation.navigate('RegisterScreen')} style={{color: '#518BFF'}}>Sign up</Text>
               </View>
+
+              <Text onPress={() => navigation.navigate('ForgotPasswordScreen')} style={{color: '#518BFF', marginTop: 20}}>Forgot Password?</Text>
           </View>
       </View>
   );
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
       width: 200,
       marginVertical: 5,
       paddingVertical: 7,
-      paddingHorizontal: 20,
+      paddingHorizontal: 25,
       borderColor: '#518BFF',
       borderBottomWidth: 1,
       textAlign: 'center',
@@ -111,5 +111,6 @@ const styles = StyleSheet.create({
       borderRadius: 20,
       alignItems: 'center',
       justifyContent: 'center',
+      marginTop: 20,
     }
   });

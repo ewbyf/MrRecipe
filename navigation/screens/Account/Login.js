@@ -40,11 +40,14 @@ export default function Login({ navigation }){
 
   return (
       <View style={styles.appcontainer}> 
-          <View style={styles.logo}>
-            {/* <Image source={require('../../../assets/icon.png')} /> */}
-          </View>
           <View style={styles.topbar}>
               <Text style={styles.topbarTitle}>Login</Text>
+          </View>
+          <View style={styles.logo}>
+            <Image 
+              style={styles.walter}
+              source={require('../../../assets/walter.jpg')} 
+            /> 
           </View>
           <View style={styles.login}>
               <Text style={styles.title}>Mr. Recipe</Text>
@@ -138,5 +141,14 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: 20,
+    },
+    logo: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    walter: {
+      resizeMode: 'stretch',
+      height: 75,
+      width: 500,
     }
   });

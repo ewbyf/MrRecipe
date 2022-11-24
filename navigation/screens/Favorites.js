@@ -41,10 +41,8 @@ export default function Favorites({ navigation }) {
               <TextInput placeholder='Search for Favorites' style={styles.searchbar}></TextInput>
           </View>
           <View style={{height: '60%', alignItems: 'center', justifyContent: 'center'}}>
-            <View style={styles.signinText}>
-                <Text style={{fontSize: 24, color: '#518BFF'  }}>Login to see favorites</Text>
-                <Text onPress={() => navigation.navigate('Login')} style={{color: '#518BFF'}}>Sign in</Text> 
-            </View>
+            <Text onPress={() => navigation.navigate('Login')} style={{fontSize: 17.5, color: '#518BFF'}}>Sign in</Text> 
+            <Text style={{fontSize: 17.5}}>to view favorites.</Text>
           </View>
       </View>
   );
@@ -84,8 +82,10 @@ const styles = StyleSheet.create({
       borderColor: 'white',
       borderRadius: 20,
       padding: 7,
-      backgroundColor: 'white',
+      backgroundColor: '#518BFF',
       color: 'black',
+      flexDirection: 'row',
+      marginTop: 20
     },
   });
   

@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TextInput, Button } from "react-native";
+import { StyleSheet, View, Text, TextInput, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import Icon from 'react-native-vector-icons/Ionicons'
 
@@ -7,7 +7,7 @@ export default function Register({ navigation }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
 
-  const registerUser = async
+  // const registerUser = async
 
   return (
       <View style={styles.appcontainer}>
@@ -20,8 +20,27 @@ export default function Register({ navigation }) {
               <TextInput placeholder="Name" style={styles.inputField}></TextInput>
               <TextInput placeholder="Username" style={styles.inputField}></TextInput>
               <TextInput placeholder="Email Address" style={styles.inputField}></TextInput>
+              <TextInput
+                  placeholder="Password"
+                  style={styles.inputField}
+                  onChangeText={(password) => {setPassword(password)}}
+                  secureTextEntry={true}
+                  autoCapitalize={false}
+                  autoCorrect={false}
+                ></TextInput>
+                <TextInput
+                  placeholder="Confirm Password"
+                  style={styles.inputField}
+                  onChangeText={(password) => {setPassword(password)}}
+                  secureTextEntry={true}
+                  autoCapitalize={false}
+                  autoCorrect={false}
+                ></TextInput>
 
-              <Button title='Sign up' style={styles.loginButton} onPress={() => navigation.navigate('ConfirmationScreen')}/>
+                <TouchableOpacity style={styles.loginButton}>
+                  <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>Sign up
+                  </Text>
+                </TouchableOpacity>
           </View>
       </View>
   );
@@ -72,5 +91,11 @@ const styles = StyleSheet.create({
     },
     loginButton: {
       backgroundColor: '#518BFF',
-    },
+      width: 200,
+      height: 40,
+      borderRadius: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 20,
+    }
   });

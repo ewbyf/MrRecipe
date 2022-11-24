@@ -1,21 +1,11 @@
-import { StyleSheet, View, Text, TextInput, Button } from "react-native";
+import { StyleSheet, View, Text, TextInput, Alert } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useState, useEffect } from "react";
 import { firebase } from '../../../config';
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { Alert } from "react-native";
 
 export default function ForgotPassword({ navigation }){
   const [email, setEmail] = useState('');
-
-//   useEffect(() => {
-//     const removeMessage = navigation.addListener('foc   us', () => {
-//           setShowMessage(false);
-//     });
-//     return removeMessage;
-//   }, [navigation]);
-
-//   const [showMessage, setShowMessage] = useState(false);
 
   const forgotPassword = async(email) => {
     try {
@@ -56,11 +46,6 @@ export default function ForgotPassword({ navigation }){
           </View>
           <View style={styles.login}>
               <Text style={styles.title}>Mr. Recipe</Text>
-                {/* {showMessage && 
-                <View style={{}}>
-                    <Text style={{color: '#3FE856', fontSize: 16}}>Your password reset email has been sent!</Text>
-                </View>
-                } */}
               <View style={{flexDirection: 'row'}}>
                 <Icon name='mail-outline' size={20} color={'lightgrey'} style={styles.icon}/>
                 <TextInput 
@@ -137,11 +122,4 @@ const styles = StyleSheet.create({
         bottom: '50%',
         marginBottom: -12,
     },
-    resetMessage: {
-        marginVertical: 8,
-        marginHorizontal: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    }
   });

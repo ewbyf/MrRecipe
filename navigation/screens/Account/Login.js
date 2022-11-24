@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TextInput, Button } from "react-native";
+import { StyleSheet, View, Text, TextInput, Button, Alert, Image } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useState, useEffect } from "react";
 import { firebase } from '../../../config';
@@ -13,12 +13,36 @@ export default function Login({ navigation }){
       await firebase.auth().signInWithEmailAndPassword(email, password);
     }
     catch (error) {
-      alert(error.message);
+      switch(error.code) {
+        case 'auth/user-not-found':
+          Alert.alert(
+              "Account Not Found",
+              "No account found for the email you entered.",
+            );
+          break;
+        case 'auth/invalid-email':
+          Alert.alert(
+            "Invalid Email Address",
+            "Please enter a valid email address into the input field.",
+          );
+          break;
+        case 'auth/missing-email':
+          Alert.alert(
+            "Email Address Not Entered",
+            "Please enter your email address into the input field.",
+          );
+          break;
+        default:
+          alert(error.message);
+      }
     }
   }
 
   return (
       <View style={styles.appcontainer}> 
+          <View style={styles.logo}>
+            {/* <Image source={require('../../../assets/icon.png')} /> */}
+          </View>
           <View style={styles.topbar}>
               <Text style={styles.topbarTitle}>Login</Text>
           </View>
@@ -27,10 +51,11 @@ export default function Login({ navigation }){
               <View style={{flexDirection: 'row'}}>
                 <Icon name='mail-outline' size={20} color={'lightgrey'} style={styles.icon}/>
                 <TextInput 
-                  placeholder="Email" 
+                  placeholder="Email address" 
                   style={styles.inputField} 
                   onChangeText={(email) => {setEmail(email)}}
                   autoCapitalize={false}
+                  onSubmitEditing={() => {loginUser(email, password)}}
                 ></TextInput>
               </View>
               <View style={{flexDirection: 'row'}}>
@@ -42,6 +67,7 @@ export default function Login({ navigation }){
                   secureTextEntry={true}
                   autoCapitalize={false}
                   autoCorrect={false}
+                  onSubmitEditing={() => {loginUser(email, password)}}
                 ></TextInput>
               </View>
           

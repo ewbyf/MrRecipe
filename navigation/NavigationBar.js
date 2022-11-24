@@ -8,7 +8,7 @@ import { firebase } from '../config';
 
 // Screens
 import Recipes from './screens/Recipes';
-import Favorites from './screens/Favorites';
+import FavoritesStack from './routes/FavoritesStack';
 import LoginStack from './routes/LoginStack';
 import DashboardStack from './routes/DashboardStack';
 
@@ -72,7 +72,7 @@ export default function NavigationBar() {
               })}>
   
               <Tab.Screen name={'Recipes'} component={Recipes}/>
-              <Tab.Screen name={'Favorites'} component={Favorites}/>
+              <Tab.Screen name={'Favorites'} component={FavoritesStack}/>
               <Tab.Screen name={'Login'} component={LoginStack}/>
   
           </Tab.Navigator>
@@ -121,7 +121,7 @@ export default function NavigationBar() {
             })}>
 
             <Tab.Screen name={'Recipes'} component={Recipes}/>
-            <Tab.Screen name={'Favorites'} component={Favorites}/>
+            <Tab.Screen name={'Favorites'} component={FavoritesStack}/>
             <Tab.Screen name={'Profile'} component={DashboardStack}/>
 
         </Tab.Navigator>

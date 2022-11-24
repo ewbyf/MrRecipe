@@ -1,16 +1,21 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import Login from "../screens/Login";
-import Register from "../screens/Register";
+import Login from "../screens/Account/Login";
+import Register from "../screens/Account/Register";
+import Confirmation from "../screens/Account/Confirmation";
+import Password from "../screens/Account/Password";
+
 
 const Stack = createStackNavigator();
 
 export default function LoginStack() {
     return (
-        <Stack.Navigator initialRouteName="Login" screenOptions={({route}) => ({
+        <Stack.Navigator initialRouteName="LoginScreen" screenOptions={({route}) => ({
             headerShown: false,
         })}>
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Register" component={Register} />
+            <Stack.Screen name="LoginScreen" component={Login} />
+            <Stack.Screen name="RegisterScreen" component={Register} />
+            <Stack.Screen name="ConfirmationScreen" component={Confirmation} />
+            <Stack.Screen name="PasswordScreen" component={Password} />
         </Stack.Navigator>
       );
 }

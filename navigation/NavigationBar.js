@@ -38,7 +38,8 @@ export default function NavigationBar() {
     return (
       <View style={styles.appcontainer}>
         <NavigationContainer>
-          <Tab.Navigator initialRouteName='Recipes' screenOptions={({route}) => ({
+          <Tab.Navigator 
+            initialRouteName='Recipes' screenOptions={({route}) => ({
                   tabBarIcon: ({focused, color, size}) => {
                       let iconName;
                       let routeName = route.name;
@@ -51,6 +52,12 @@ export default function NavigationBar() {
                       }
                       else if (routeName == 'Login') {
                           iconName = focused ? 'person-circle' : 'person-circle-outline';
+                      }
+                      else if (routeName == 'Search') {
+                        iconName = focused ? 'search' : 'search-outline';
+                      }
+                      else if (routeName == 'Post') {
+                        iconName = focused ? 'add' : 'add-outline';
                       }
                       return (
                           focused? (
@@ -72,9 +79,11 @@ export default function NavigationBar() {
               })}>
   
               <Tab.Screen name={'Recipes'} component={Recipes}/>
+              <Tab.Screen name={'Search'} component={FavoritesStack}/>
+              <Tab.Screen name={'Post'} component={FavoritesStack}/>
               <Tab.Screen name={'Favorites'} component={FavoritesStack}/>
               <Tab.Screen name={'Login'} component={LoginStack}/>
-  
+              
           </Tab.Navigator>
         </NavigationContainer>
         <View>
@@ -101,6 +110,12 @@ export default function NavigationBar() {
                     else if (routeName == 'Profile') {
                         iconName = focused ? 'person-circle' : 'person-circle-outline';
                     }
+                    else if (routeName == 'Search') {
+                      iconName = focused ? 'search' : 'search-outline';
+                    }
+                    else if (routeName == 'Post') {
+                      iconName = focused ? 'add' : 'add-outline';
+                    }
                     return (
                         focused? (
                         <View style={{ borderTopWidth: 3, width: '100%', height: '100%', padding: 1, borderColor: '#FFDDA1' }}>
@@ -121,6 +136,8 @@ export default function NavigationBar() {
             })}>
 
             <Tab.Screen name={'Recipes'} component={Recipes}/>
+            <Tab.Screen name={'Search'} component={FavoritesStack}/>
+            <Tab.Screen name={'Post'} component={FavoritesStack}/>
             <Tab.Screen name={'Favorites'} component={FavoritesStack}/>
             <Tab.Screen name={'Profile'} component={DashboardStack}/>
 

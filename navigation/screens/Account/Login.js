@@ -144,12 +144,12 @@ const styles = StyleSheet.create({
       marginTop: 20,
     },
     logo: {
-      alignItems: 'center',
-      justifyContent: 'center',
+      position: 'absolute',
+      top: '13%',
     },
     walter: {
       resizeMode: 'stretch',
-      height: 75,
+      height: 50,
       width: 500,
     }
   });

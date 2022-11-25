@@ -84,40 +84,56 @@ export default function Register({ navigation }) {
               <Icon name='arrow-back-outline' size={24} color='white' style={styles.backArrow} onPress={() => {navigation.goBack(null)}}/>
               <Text style={styles.topbarTitle}>Register</Text>
           </View>
+          
           <View style={styles.register}>
-              <Text style={styles.title}>Create an Account</Text>
-              <TextInput 
-                placeholder="Name"
-                style={styles.inputField}
-                onChangeText={(name) => {setName(name)}}
-                autoCorrect={false}
-                onSubmitEditing={() => {registerUser(email, password, name, username)}}
-              ></TextInput>
-              <TextInput
-                placeholder="Username"
-                style={styles.inputField}
-                onChangeText={(username) => {setUsername(username)}}
-                autoCorrect={false}
-                onSubmitEditing={() => {registerUser(email, password, name, username)}}
-              ></TextInput>
-              <TextInput
-                placeholder="Email Address"
-                style={styles.inputField}
-                keyboardType='email-address'
-                onChangeText={(email) => {setEmail(email)}}
-                autoCapitalize={false}
-                autoCorrect={false}
-                onSubmitEditing={() => {registerUser(email, password, name, username)}}
-              ></TextInput>
-              <TextInput
-                  placeholder="Password"
+              <Text style={styles.title}>Mr. Recipe</Text>
+              <View style={{flexDirection: 'row'}}>
+                <Icon name='person-circle-outline' size={20} color={'lightgrey'} style={styles.icon}/>
+                <TextInput 
+                  placeholder="Name"
                   style={styles.inputField}
-                  onChangeText={(password) => {setPassword(password)}}
-                  secureTextEntry={true}
-                  autoCapitalize={false}
+                  onChangeText={(name) => {setName(name)}}
                   autoCorrect={false}
                   onSubmitEditing={() => {registerUser(email, password, name, username)}}
                 ></TextInput>
+              </View> 
+              <View style={{flexDirection: 'row'}}>
+                <Icon name='person-outline' size={20} color={'lightgrey'} style={styles.icon}/>
+                <TextInput
+                  placeholder="Username"
+                  style={styles.inputField}
+                  onChangeText={(username) => {setUsername(username)}}
+                  autoCorrect={false}
+                  onSubmitEditing={() => {registerUser(email, password, name, username)}}
+                ></TextInput>
+              </View>
+              <View style={{flexDirection: 'row'}}>
+                <Icon name='mail-outline' size={20} color={'lightgrey'} style={styles.icon}/>
+                <TextInput
+                  placeholder="Email Address"
+                  style={styles.inputField}
+                  keyboardType='email-address'
+                  onChangeText={(email) => {setEmail(email)}}
+                  autoCapitalize={false}
+                  autoCorrect={false}
+                  onSubmitEditing={() => {registerUser(email, password, name, username)}}
+                ></TextInput>                
+              </View>
+
+              <View style={{flexDirection: 'row'}}>
+                <Icon name='lock-closed-outline' size={20} color={'lightgrey'} style={styles.icon}/>
+                <TextInput
+                    placeholder="Password"
+                    style={styles.inputField}
+                    onChangeText={(password) => {setPassword(password)}}
+                    secureTextEntry={true}
+                    autoCapitalize={false}
+                    autoCorrect={false}
+                    onSubmitEditing={() => {registerUser(email, password, name, username)}}
+                  ></TextInput>
+              </View>
+              <View style={{flexDirection: 'row'}}>
+                <Icon name='lock-closed' size={20} color={'lightgrey'} style={styles.icon}/>
                 <TextInput
                   placeholder="Confirm Password"
                   style={styles.inputField}
@@ -127,6 +143,7 @@ export default function Register({ navigation }) {
                   autoCorrect={false}
                   onSubmitEditing={() => {registerUser(email, password, name, username)}}
                 ></TextInput>
+              </View>
 
                 <TouchableOpacity style={styles.loginButton} onPress={() => registerUser(email, password, name, username)}>
                   <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>Sign up
@@ -176,7 +193,8 @@ const styles = StyleSheet.create({
     inputField: {
       width: 200,
       marginVertical: 5,
-      padding: 7,
+      paddingVertical: 7,
+      paddingHorizontal: 25,
       borderColor: '#518BFF',
       borderBottomWidth: 1,
       textAlign: 'center',
@@ -189,5 +207,10 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: 20,
-    }
+    },
+    icon: {
+      position: 'absolute',
+      left: 0,
+      top: 10
+    },
   });

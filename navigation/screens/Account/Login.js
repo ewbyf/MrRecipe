@@ -1,8 +1,7 @@
-import { StyleSheet, View, Text, TextInput, Button, Alert, Image } from "react-native";
+import { StyleSheet, View, Text, TextInput, Button, Alert, Image, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useState, useEffect } from "react";
 import { firebase } from '../../../config';
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default function Login({ navigation }){
   const [email, setEmail] = useState('');
@@ -22,13 +21,13 @@ export default function Login({ navigation }){
           break;
         case 'auth/invalid-email':
           Alert.alert(
-            "Invalid Email Address",
+            "Invalid Email",
             "Please enter a valid email address into the input field.",
           );
           break;
         case 'auth/missing-email':
           Alert.alert(
-            "Email Address Not Entered",
+            "Missing Email",
             "Please enter your email address into the input field.",
           );
           break;
@@ -39,55 +38,57 @@ export default function Login({ navigation }){
   }
 
   return (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.appcontainer}> 
-          <View style={styles.topbar}>
-              <Text style={styles.topbarTitle}>Login</Text>
-          </View>
-          <View style={styles.logo}>
-            <Image 
-              style={styles.walter}
-              source={require('../../../assets/walter.jpg')} 
-            /> 
-          </View>
-          <View style={styles.login}>
-              <Text style={styles.title}>Mr. Recipe</Text>
-              <View style={{flexDirection: 'row'}}>
-                <Icon name='mail-outline' size={20} color={'lightgrey'} style={styles.icon}/>
-                <TextInput 
-                  placeholder="Email address" 
-                  style={styles.inputField} 
-                  onChangeText={(email) => {setEmail(email)}}
-                  autoCapitalize={false}
-                  onSubmitEditing={() => {loginUser(email, password)}}
-                ></TextInput>
-              </View>
-              <View style={{flexDirection: 'row'}}>
-                <Icon name='lock-closed-outline' size={20} color={'lightgrey'} style={styles.icon}/>
-                <TextInput
-                  placeholder="Password"
-                  style={styles.inputField}
-                  onChangeText={(password) => {setPassword(password)}}
-                  secureTextEntry={true}
-                  autoCapitalize={false}
-                  autoCorrect={false}
-                  onSubmitEditing={() => {loginUser(email, password)}}
-                ></TextInput>
-              </View>
-          
-              <TouchableOpacity onPress={() => loginUser(email, password)} style={styles.loginButton}>
-                <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>Login</Text>
-              </TouchableOpacity>
-      
+        <View style={styles.topbar}>
+          <Text style={styles.topbarTitle}>Login</Text>
+        </View>
+        <View style={styles.logo}>
+          <Image 
+            style={styles.walter}
+            source={require('../../../assets/walter.jpg')} 
+          /> 
+        </View>
+        <View style={styles.login}>
+            <Text style={styles.title}>Mr. Recipe</Text>
+            <View style={{flexDirection: 'row'}}>
+              <Icon name='mail-outline' size={20} color={'lightgrey'} style={styles.icon}/>
+              <TextInput 
+                placeholder="Email Address" 
+                style={styles.inputField} 
+                keyboardType='email-address'
+                onChangeText={(email) => {setEmail(email)}}
+                autoCapitalize={false}
+                autoCorrect={false}
+                onSubmitEditing={() => {loginUser(email, password)}}
+              ></TextInput>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <Icon name='lock-closed-outline' size={20} color={'lightgrey'} style={styles.icon}/>
+              <TextInput
+                placeholder="Password"
+                style={styles.inputField}
+                onChangeText={(password) => {setPassword(password)}}
+                secureTextEntry={true}
+                autoCapitalize={false}
+                autoCorrect={false}
+                onSubmitEditing={() => {loginUser(email, password)}}
+              ></TextInput>
+            </View>
+        
+            <TouchableOpacity onPress={() => loginUser(email, password)} style={styles.loginButton}>
+              <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>Login</Text>
+            </TouchableOpacity>
 
+            <View style={{flexDirection: 'row', marginTop: 20}}>
+              <Text>Don't have an account? </Text>
+              <Text onPress={() => navigation.navigate('RegisterScreen')} style={{color: '#518BFF'}}>Sign up</Text>
+            </View>
 
-              <View style={{flexDirection: 'row', marginTop: 20}}>
-                <Text>Don't have an account? </Text>
-                <Text onPress={() => navigation.navigate('RegisterScreen')} style={{color: '#518BFF'}}>Sign up</Text>
-              </View>
-
-              <Text onPress={() => navigation.navigate('ForgotPasswordScreen')} style={{color: '#518BFF', marginTop: 20}}>Forgot Password?</Text>
-          </View>
+            <Text onPress={() => navigation.navigate('ForgotPasswordScreen')} style={{color: '#518BFF', marginTop: 20}}>Forgot Password?</Text>
+        </View>
       </View>
+    </TouchableWithoutFeedback>
   );
 }
 

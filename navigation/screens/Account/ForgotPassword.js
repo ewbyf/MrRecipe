@@ -1,8 +1,7 @@
-import { StyleSheet, View, Text, TextInput, Alert } from "react-native";
+import { StyleSheet, View, Text, TextInput, Alert, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useState, useEffect } from "react";
 import { firebase } from '../../../config';
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default function ForgotPassword({ navigation }){
   const [email, setEmail] = useState('');
@@ -17,18 +16,18 @@ export default function ForgotPassword({ navigation }){
             case 'auth/user-not-found':
                 Alert.alert(
                     "Account Not Found",
-                    "No account found for the email you entered.",
+                    "No account found for the email address you entered.",
                   );
                 break;
             case 'auth/invalid-email':
                 Alert.alert(
-                    "Invalid Email Address",
+                    "Invalid Email",
                     "Please enter a valid email address into the input field.",
                   );
                 break;
             case 'auth/missing-email':
                 Alert.alert(
-                    "Email Address Not Entered",
+                    "Missing Email",
                     "Please enter your email address into the input field.",
                   );
                 break;
@@ -39,6 +38,7 @@ export default function ForgotPassword({ navigation }){
   };
 
   return (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.appcontainer}> 
           <View style={styles.topbar}>
                 <Icon name='arrow-back-outline' size={24} color='white' style={styles.backArrow} onPress={() => {navigation.goBack(null)}}/>
@@ -49,8 +49,9 @@ export default function ForgotPassword({ navigation }){
               <View style={{flexDirection: 'row'}}>
                 <Icon name='mail-outline' size={20} color={'lightgrey'} style={styles.icon}/>
                 <TextInput 
-                  placeholder="Email address" 
+                  placeholder="Email Address" 
                   style={styles.inputField} 
+                  keyboardType='email-address'
                   onChangeText={(email) => {setEmail(email)}}
                   autoCapitalize={false}
                   onSubmitEditing={() => forgotPassword(email)}
@@ -62,6 +63,7 @@ export default function ForgotPassword({ navigation }){
               </TouchableOpacity>
           </View>
       </View>
+    </TouchableWithoutFeedback>
   );
 }
 

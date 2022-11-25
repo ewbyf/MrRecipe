@@ -1,15 +1,84 @@
-import { StyleSheet, View, Text, TextInput, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert } from "react-native";
 import { useState } from "react";
-import Icon from 'react-native-vector-icons/Ionicons'
+import { firebase } from '../../../config';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 export default function Register({ navigation }) {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const usersDB = firebase.firestore().collection('users');
 
-  // const registerUser = async
+  const registerUser = async(email, password, name, username) => {
+    const snapshot = await usersDB.where('username_lowercase', '==', username.toLowerCase()).get();
+    if (!snapshot.empty)
+      Alert.alert(
+        "User Already Exists",
+        "An account with that username has already been created. Please login or retry using a different username."
+      );
+    else if (!password || !confirmPassword)
+      Alert.alert(
+        "Missing Password",
+        "Please enter and confirm your password in the input fields."
+      );
+    else if (confirmPassword != password)
+      Alert.alert(
+        "Passwords Don't Match",
+        "Passwords do not match. Please retry entering your password."
+      );
+    else if (!name)
+      Alert.alert(
+        "Missing Name",
+        "Please enter your name into the input field."
+      );
+    else if (!username)
+      Alert.alert(
+        "Missing Username",
+        "Please enter your username into the input field."
+      );
+    else {
+      await firebase.auth().createUserWithEmailAndPassword(email, password)
+      .then(() => {
+        let username_lowercase = username.toLowerCase();
+        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).set({name, username, username_lowercase, email})
+      })
+      .catch((error) => {
+        switch(error.code) {
+          case 'auth/weak-password':
+            Alert.alert(
+              "Weak Password",
+              "Password should be at least 6 characters long."
+            );
+            break;
+          case 'auth/invalid-email':
+            Alert.alert(
+              "Invalid Email",
+              "Please enter a valid email address into the input field.",
+            );
+            break;
+          case 'auth/missing-email':
+            Alert.alert(
+              "Missing Email",
+              "Please enter your email address into the input field.",
+            );
+            break;
+          case 'auth/email-already-in-use':
+            Alert.alert(
+              "Email Already Exists",
+              "The email address you entered is already in use by another account. Please login or retry with a different email address.",
+            );
+            break;
+          default:
+            alert(error.message);
+        }
+      })
+    }
+  }
 
   return (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.appcontainer}>
           <View style={styles.topbar}>
               <Icon name='arrow-back-outline' size={24} color='white' style={styles.backArrow} onPress={() => {navigation.goBack(null)}}/>
@@ -17,9 +86,29 @@ export default function Register({ navigation }) {
           </View>
           <View style={styles.register}>
               <Text style={styles.title}>Create an Account</Text>
-              <TextInput placeholder="Name" style={styles.inputField}></TextInput>
-              <TextInput placeholder="Username" style={styles.inputField}></TextInput>
-              <TextInput placeholder="Email Address" style={styles.inputField}></TextInput>
+              <TextInput 
+                placeholder="Name"
+                style={styles.inputField}
+                onChangeText={(name) => {setName(name)}}
+                autoCorrect={false}
+                onSubmitEditing={() => {registerUser(email, password, name, username)}}
+              ></TextInput>
+              <TextInput
+                placeholder="Username"
+                style={styles.inputField}
+                onChangeText={(username) => {setUsername(username)}}
+                autoCorrect={false}
+                onSubmitEditing={() => {registerUser(email, password, name, username)}}
+              ></TextInput>
+              <TextInput
+                placeholder="Email Address"
+                style={styles.inputField}
+                keyboardType='email-address'
+                onChangeText={(email) => {setEmail(email)}}
+                autoCapitalize={false}
+                autoCorrect={false}
+                onSubmitEditing={() => {registerUser(email, password, name, username)}}
+              ></TextInput>
               <TextInput
                   placeholder="Password"
                   style={styles.inputField}
@@ -27,22 +116,25 @@ export default function Register({ navigation }) {
                   secureTextEntry={true}
                   autoCapitalize={false}
                   autoCorrect={false}
+                  onSubmitEditing={() => {registerUser(email, password, name, username)}}
                 ></TextInput>
                 <TextInput
                   placeholder="Confirm Password"
                   style={styles.inputField}
-                  onChangeText={(password) => {setPassword(password)}}
+                  onChangeText={(confirmPassword) => {setConfirmPassword(confirmPassword)}}
                   secureTextEntry={true}
                   autoCapitalize={false}
                   autoCorrect={false}
+                  onSubmitEditing={() => {registerUser(email, password, name, username)}}
                 ></TextInput>
 
-                <TouchableOpacity style={styles.loginButton}>
+                <TouchableOpacity style={styles.loginButton} onPress={() => registerUser(email, password, name, username)}>
                   <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>Sign up
                   </Text>
                 </TouchableOpacity>
           </View>
       </View>
+    </TouchableWithoutFeedback>
   );
 }
 

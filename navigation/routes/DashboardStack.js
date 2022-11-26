@@ -1,9 +1,12 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import Dashboard from "../screens/LoginStack/Dashboard";
-import Settings from "../screens/LoginStack/Settings";
+
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import React from "react";
 import { StyleSheet } from "react-native";
+
+import Dashboard from "../screens/DashboardStack/Dashboard";
+import Settings from "../screens/DashboardStack/Settings";
+import ChangePassword from "../screens/DashboardStack/ChangePassword";
 
 const Stack = createStackNavigator();
 
@@ -22,6 +25,7 @@ export default function DashboardStack({ navigation, route}) {
         })}>
             <Stack.Screen name="DashboardScreen" component={Dashboard} />
             <Stack.Screen name="SettingsScreen" component={Settings}/>
+            <Stack.Screen name="ChangePasswordScreen" component={ChangePassword}/>
         </Stack.Navigator>
       );
 }

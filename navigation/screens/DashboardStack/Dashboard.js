@@ -45,10 +45,9 @@ export default function Dashboard({ navigation }) {
                 POSTS
               </Text>
               <Text style={{color: 'lightgrey', fontSize: 16}}>
-                User has not posted any recipes
+                You have not posted any recipes
               </Text>
             </View>
-            <Button title='Sign out' onPress={() => firebase.auth().signOut()}/>
           </View>
       </View>
   );
@@ -87,7 +86,8 @@ const styles = StyleSheet.create({
       borderRadius: 50,
       height: 100,
       width: 100,
-      margin: 10
+      marginTop: 20,
+      marginBottom: 10,
     },
     name: {
       fontSize: 26,
@@ -104,17 +104,22 @@ const styles = StyleSheet.create({
     bioContainer: {
       flexDirection: 'row',
       justifyContent: 'center',
-      width: '80%',
-      marginHorizontal: '10%',
-      paddingHorizontal: 10,
+      // width: '80%',
+      // marginHorizontal: '10%',
+      width: '100%',
+      paddingHorizontal: '10%',
+      // paddingHorizontal: 10,
       paddingVertical: 12,
       paddingBottom: 20,
-      borderBottomWidth: 3,
-      borderColor: 'white',
+      // borderBottomWidth: 3,
+      // borderColor: 'white',
+      borderBottomWidth: 1,
+      borderBottomColor: '#363636',
     },
     bio: {
         fontSize: 16,
         color: 'white',
+        textAlign: 'center',
     },
     postsContainer: {
       width: '100%',

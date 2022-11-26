@@ -14,10 +14,7 @@ import DashboardStack from './routes/DashboardStack';
 import PeopleStack from './routes/PeopleStack';
 import PostStack from './routes/PostStack';
 
-
-
 import { useEffect, useState } from 'react';
-
 
 const Tab = createBottomTabNavigator();
 
@@ -33,12 +30,9 @@ export default function NavigationBar() {
       alignItems: 'center',
       ...styles.shadow
     }} onPress={onPress}>
-      <View style={{
-        width: 70,
-        height: 70,
-        borderRadius: 35,
-        backgroundColor: '#FFDDA1',
-      }}>
+      <View style={
+        styles.postButton
+      }>
         {children}
       </View>
     </TouchableOpacity>
@@ -71,14 +65,7 @@ export default function NavigationBar() {
                 headerShown: false,
                 tabBarShowLabel: false, 
                 tabBarStyle: {
-                  position: 'absolute',
-                  bottom: 25,
-                  left: 20,
-                  right: 20,
-                  elevation: 0, 
-                  backgroundColor: '#518BFF',
-                  height: 90,
-                  borderRadius: 15,
+                  ...styles.tabBar,
                   ...styles.shadow
                 }
             })}>
@@ -146,6 +133,16 @@ const styles = StyleSheet.create({
   appcontainer: {
     height: '100%',
   },
+  tabBar: {
+    position: 'absolute',
+    bottom: 25,
+    left: 20,
+    right: 20,
+    elevation: 0, 
+    backgroundColor: '#518BFF',
+    height: 90,
+    borderRadius: 15,
+  },
   shadow: {
     shadowColor: 'black',
     shadowOffset: {
@@ -155,5 +152,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.5,
     elevation: 5
+  },
+  postButton: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: '#FFDDA1',
   }
 });

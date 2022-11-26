@@ -60,6 +60,7 @@ export default function Login({ navigation }){
                 onChangeText={(email) => {setEmail(email)}}
                 autoCapitalize={false}
                 autoCorrect={false}
+                maxLength={320}
                 onSubmitEditing={() => {loginUser(email, password)}}
               ></TextInput>
             </View>
@@ -76,8 +77,8 @@ export default function Login({ navigation }){
               ></TextInput>
             </View>
         
-            <TouchableOpacity onPress={() => loginUser(email, password)} style={styles.loginButton}>
-              <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>Login</Text>
+            <TouchableOpacity onPress={() => loginUser(email, password)} style={styles.button}>
+              <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
 
             <View style={{flexDirection: 'row', marginTop: 20}}>
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
       borderBottomWidth: 1,
       textAlign: 'center',
     },
-    loginButton: {
+    button: {
       backgroundColor: '#518BFF',
       width: 200,
       height: 40,
@@ -142,6 +143,11 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: 20,
+    },
+    buttonText: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: 'white'
     },
     logo: {
       position: 'absolute',

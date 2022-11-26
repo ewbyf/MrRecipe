@@ -3,7 +3,7 @@
 import { StyleSheet, View, Text, TextInput, Button } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons'
 
-export default function Password({ navigation }) {
+export default function ChangePassword({ navigation }) {
     return (
         <View style={styles.appcontainer}>
             <View style={styles.topbar}>

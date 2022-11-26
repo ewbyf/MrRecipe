@@ -94,6 +94,7 @@ export default function Register({ navigation }) {
                   style={styles.inputField}
                   onChangeText={(name) => {setName(name)}}
                   autoCorrect={false}
+                  maxLength={18}
                   onSubmitEditing={() => {registerUser(email, password, name, username)}}
                 ></TextInput>
               </View> 
@@ -104,6 +105,7 @@ export default function Register({ navigation }) {
                   style={styles.inputField}
                   onChangeText={(username) => {setUsername(username)}}
                   autoCorrect={false}
+                  maxLength={12}
                   onSubmitEditing={() => {registerUser(email, password, name, username)}}
                 ></TextInput>
               </View>
@@ -116,6 +118,7 @@ export default function Register({ navigation }) {
                   onChangeText={(email) => {setEmail(email)}}
                   autoCapitalize={false}
                   autoCorrect={false}
+                  maxLength={320}
                   onSubmitEditing={() => {registerUser(email, password, name, username)}}
                 ></TextInput>                
               </View>
@@ -145,8 +148,8 @@ export default function Register({ navigation }) {
                 ></TextInput>
               </View>
 
-                <TouchableOpacity style={styles.loginButton} onPress={() => registerUser(email, password, name, username)}>
-                  <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>Sign up
+                <TouchableOpacity style={styles.button} onPress={() => registerUser(email, password, name, username)}>
+                  <Text style={styles.buttonText}>Sign up
                   </Text>
                 </TouchableOpacity>
           </View>
@@ -199,7 +202,7 @@ const styles = StyleSheet.create({
       borderBottomWidth: 1,
       textAlign: 'center',
     },
-    loginButton: {
+    button: {
       backgroundColor: '#518BFF',
       width: 200,
       height: 40,
@@ -207,6 +210,11 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: 20,
+    },
+    buttonText: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: 'white'
     },
     icon: {
       position: 'absolute',

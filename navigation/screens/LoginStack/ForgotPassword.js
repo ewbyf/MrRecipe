@@ -58,8 +58,8 @@ export default function ForgotPassword({ navigation }){
                 ></TextInput>
               </View>
           
-              <TouchableOpacity onPress={() => forgotPassword(email)} style={styles.resetButton}>
-                <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>Reset Password</Text>
+              <TouchableOpacity onPress={() => forgotPassword(email)} style={styles.button}>
+                <Text style={styles.buttonText}>Reset Password</Text>
               </TouchableOpacity>
           </View>
       </View>
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
       borderBottomWidth: 1,
       textAlign: 'center',
     },
-    resetButton: {
+    button: {
       backgroundColor: '#518BFF',
       width: 200,
       height: 40,
@@ -117,6 +117,11 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: 20,
+    },
+    buttonText: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: 'white'
     },
     backArrow: {
         position: 'absolute',

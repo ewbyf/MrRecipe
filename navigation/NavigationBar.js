@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, Image, TouchableHighlight } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Image, TouchableHighlight, TouchableOpacity } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -11,17 +11,45 @@ import Recipes from './screens/Recipes';
 import FavoritesStack from './routes/FavoritesStack';
 import LoginStack from './routes/LoginStack';
 import DashboardStack from './routes/DashboardStack';
+import PeopleStack from './routes/PeopleStack';
+import PostStack from './routes/PostStack';
+
+
 
 import { useEffect, useState } from 'react';
+
 
 const Tab = createBottomTabNavigator();
 
 export default function NavigationBar() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
+  const [buttonName, setButtonName] = useState('');
+
+  const CustomTabBarButton = ({children, onPress}) => (
+    <TouchableOpacity style={{
+      top: -30,
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...styles.shadow
+    }} onPress={onPress}>
+      <View style={{
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        backgroundColor: '#FFDDA1',
+      }}>
+        {children}
+      </View>
+    </TouchableOpacity>
+  )
 
   function onAuthStateChanged(user) {
     setUser(user);
+    if (!user)
+    setButtonName('Login');
+    else
+      setButtonName('Profile');
     if (initializing)
       setInitializing(false);
   }
@@ -33,113 +61,78 @@ export default function NavigationBar() {
 
   if (initializing)
     return null;
-  
-  if (!user) {
-    return (
-      <View style={styles.appcontainer}>
-        <NavigationContainer>
-          <Tab.Navigator 
-            initialRouteName='Recipes' screenOptions={({route}) => ({
-                  tabBarIcon: ({focused, color, size}) => {
-                      let iconName;
-                      let routeName = route.name;
-  
-                      if (routeName == 'Recipes') {
-                          iconName = focused ? 'book' : 'book-outline';
-                      }
-                      else if (routeName == 'Favorites') {
-                          iconName = focused ? 'heart' : 'heart-outline';
-                      }
-                      else if (routeName == 'Login') {
-                          iconName = focused ? 'person-circle' : 'person-circle-outline';
-                      }
-                      else if (routeName == 'Search') {
-                        iconName = focused ? 'search' : 'search-outline';
-                      }
-                      else if (routeName == 'Post') {
-                        iconName = focused ? 'add' : 'add-outline';
-                      }
-                      return (
-                          focused? (
-                          <View style={{ borderTopWidth: 3, width: '100%', height: '100%', padding: 1, borderColor: '#FFDDA1' }}>
-                              <Icon style={{ alignSelf: "center", justifyContent: "center", alignItems: "center" }} name={iconName} size={size} color={color} />
-                          </View>) :
-                          (
-                              <Icon name={iconName} size={size} color={color}/>
-                          )
-                      )
-                  },
-                  tabBarActiveBackgroundColor: '#518BFF',
-                  tabBarInactiveBackgroundColor: '#518BFF',
-                  tabBarActiveTintColor: '#FFDDA1',
-                  tabBarInactiveTintColor: 'white',
-                  tabBarStyle: {backgroundColor: '#518BFF'},
-                  headerStyle: {backgroundColor: '#518BFF'},
-                  headerShown: false,
-              })}>
-  
-              <Tab.Screen name={'Recipes'} component={Recipes}/>
-              <Tab.Screen name={'Search'} component={FavoritesStack}/>
-              <Tab.Screen name={'Post'} component={FavoritesStack}/>
-              <Tab.Screen name={'Favorites'} component={FavoritesStack}/>
-              <Tab.Screen name={'Login'} component={LoginStack}/>
-              
-          </Tab.Navigator>
-        </NavigationContainer>
-        <View>
-        </View>
-      </View>
-    );
-  }
+
 
 
   return (
     <View style={styles.appcontainer}>
       <NavigationContainer>
         <Tab.Navigator initialRouteName='Recipes' screenOptions={({route}) => ({
-                tabBarIcon: ({focused, color, size}) => {
-                    let iconName;
-                    let routeName = route.name;
-
-                    if (routeName == 'Recipes') {
-                        iconName = focused ? 'book' : 'book-outline';
-                    }
-                    else if (routeName == 'Favorites') {
-                        iconName = focused ? 'heart' : 'heart-outline';
-                    }
-                    else if (routeName == 'Profile') {
-                        iconName = focused ? 'person-circle' : 'person-circle-outline';
-                    }
-                    else if (routeName == 'Search') {
-                      iconName = focused ? 'search' : 'search-outline';
-                    }
-                    else if (routeName == 'Post') {
-                      iconName = focused ? 'add' : 'add-outline';
-                    }
-                    return (
-                        focused? (
-                        <View style={{ borderTopWidth: 3, width: '100%', height: '100%', padding: 1, borderColor: '#FFDDA1' }}>
-                            <Icon style={{ alignSelf: "center", justifyContent: "center", alignItems: "center" }} name={iconName} size={size} color={color} />
-                        </View>) :
-                        (
-                            <Icon name={iconName} size={size} color={color}/>
-                        )
-                    )
-                },
-                tabBarActiveBackgroundColor: '#518BFF',
-                tabBarInactiveBackgroundColor: '#518BFF',
-                tabBarActiveTintColor: '#FFDDA1',
-                tabBarInactiveTintColor: 'white',
-                tabBarStyle: {backgroundColor: '#518BFF'},
-                headerStyle: {backgroundColor: '#518BFF'},
                 headerShown: false,
+                tabBarShowLabel: false, 
+                tabBarStyle: {
+                  position: 'absolute',
+                  bottom: 25,
+                  left: 20,
+                  right: 20,
+                  elevation: 0, 
+                  backgroundColor: '#518BFF',
+                  height: 90,
+                  borderRadius: 15,
+                  ...styles.shadow
+                }
             })}>
 
-            <Tab.Screen name={'Recipes'} component={Recipes}/>
-            <Tab.Screen name={'Search'} component={FavoritesStack}/>
-            <Tab.Screen name={'Post'} component={FavoritesStack}/>
-            <Tab.Screen name={'Favorites'} component={FavoritesStack}/>
-            <Tab.Screen name={'Profile'} component={DashboardStack}/>
+            <Tab.Screen name={'Recipes'} component={Recipes} options={{
+              tabBarIcon: ({focused}) => (
+                <View style={{alignItems: 'center', justifyContent: 'center', top: 10}}>
+                  <Icon name={focused ? 'book' : 'book-outline'} color={focused ? '#FFDDA1' : 'white'} size={25}/>
+                  <Text style={{fontSize: 13, color: focused ? '#FFDDA1' : 'white'}}>
+                    Recipes
+                  </Text>
+                </View> 
+              )
+            }}/>
+            <Tab.Screen name={'People'} component={PeopleStack} options={{
+              tabBarIcon: ({focused}) => (
+                <View style={{alignItems: 'center', justifyContent: 'center', top: 10}}>
+                  <Icon name={focused ? 'people' : 'people-outline'} color={focused ? '#FFDDA1' : 'white'} size={25}/>
+                  <Text style={{fontSize: 13, color: focused ? '#FFDDA1' : 'white'}}>
+                    People
+                  </Text>
+                </View>
+              )
+            }}/>
+            <Tab.Screen name={'Post'} component={PostStack} options={{
+              tabBarIcon: ({focused}) => (
+                <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                  <Icon name={focused ? 'add' : 'add-outline'} color='white' size={30}/>
+                </View>
+              ),
+              tabBarButton: (props) => (
+                <CustomTabBarButton {...props}/>
+              )
+            }}/>
+            <Tab.Screen name={'Favorites'} component={FavoritesStack} options={{
+              tabBarIcon: ({focused}) => (
+                <View style={{alignItems: 'center', justifyContent: 'center', top: 10}}>
+                  <Icon name={focused ? 'heart' : 'heart-outline'} color={focused ? '#FFDDA1' : 'white'} size={25}/>
+                  <Text style={{fontSize: 13, color: focused ? '#FFDDA1' : 'white'}}>
+                    Favorites
+                  </Text>
+                </View>
+              )
+            }}/>
+            <Tab.Screen name={buttonName} component={user ? DashboardStack : LoginStack} options={{
+              tabBarIcon: ({focused}) => (
+                <View style={{alignItems: 'center', justifyContent: 'center', top: 10}}>
+                  <Icon name={focused ? 'person-circle' : 'person-circle-outline'} color={focused ? '#FFDDA1' : 'white'} size={25}/>
+                  <Text style={{fontSize: 13, color: focused ? '#FFDDA1' : 'white'}}>
+                    {buttonName}
+                  </Text>
+                </View>
+              )
+            }}/>
 
         </Tab.Navigator>
       </NavigationContainer>
@@ -153,4 +146,14 @@ const styles = StyleSheet.create({
   appcontainer: {
     height: '100%',
   },
+  shadow: {
+    shadowColor: 'black',
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.5,
+    elevation: 5
+  }
 });

@@ -2,6 +2,7 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFe
 import { useState } from "react";
 import { firebase } from '../../../config';
 import Icon from 'react-native-vector-icons/Ionicons';
+import BackArrow from '../../../components/BackArrow';
 
 export default function Register({ navigation }) {
   const [name, setName] = useState('');
@@ -81,7 +82,7 @@ export default function Register({ navigation }) {
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.appcontainer}>
           <View style={styles.topbar}>
-              <Icon name='arrow-back-outline' size={24} color='white' style={styles.backArrow} onPress={() => {navigation.goBack(null)}}/>
+              <BackArrow navigation={navigation}/>
               <Text style={styles.topbarTitle}>Register</Text>
           </View>
           
@@ -170,12 +171,6 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: '#518BFF',
-    },
-    backArrow: {
-        position: 'absolute',
-        left: 20,
-        bottom: '50%',
-        marginBottom: -12,
     },
     topbarTitle: {
       fontSize: 24,

@@ -1,7 +1,7 @@
-import { StyleSheet, View, Text, TextInput, Button, Alert, Image, TouchableOpacity } from "react-native";
-import Icon from 'react-native-vector-icons/Ionicons';
+import { StyleSheet, View, Text, TextInput, Alert, Image, TouchableOpacity } from "react-native";
 import { firebase } from '../../../config';
 import { useState, useEffect } from "react";
+import BackArrow from '../../../components/BackArrow';
 
 export default function Settings({ navigation }) {
   const [name, setName] = useState('');
@@ -61,7 +61,7 @@ export default function Settings({ navigation }) {
   return (
       <View style={styles.appcontainer}>
           <View style={styles.topbar}>
-            <Icon name='arrow-back-outline' size={24} color='white' style={styles.backArrow} onPress={() => {navigation.goBack(null)}}/>
+            <BackArrow navigation={navigation}/>
             <Text style={styles.topbarTitle}>Settings</Text>
             <SaveButton/>
           </View>
@@ -164,12 +164,6 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: '#518BFF',
-    },
-    backArrow: {
-        position: 'absolute',
-        left: 20,
-        bottom: '50%',
-        marginBottom: -12,
     },
     topbarTitle: {
       fontSize: 24,

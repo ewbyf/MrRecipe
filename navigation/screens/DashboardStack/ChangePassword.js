@@ -2,6 +2,7 @@ import { StyleSheet, View, Text, TextInput, Button, TouchableOpacity, Alert } fr
 import Icon from 'react-native-vector-icons/Ionicons';
 import { firebase } from '../../../config';
 import { useState, useEffect } from "react";
+import BackArrow from '../../../components/BackArrow'
 
 export default function ChangePassword({ navigation }) {
     const [email, setEmail] = useState('');
@@ -52,11 +53,11 @@ export default function ChangePassword({ navigation }) {
     return (
         <View style={styles.appcontainer}>
             <View style={styles.topbar}>
-                <Icon name='arrow-back-outline' size={24} color='white' style={styles.backArrow} onPress={() => {navigation.goBack(null)}}/>
-                <Text style={styles.topbarTitle}>Create a Password</Text>
+                <BackArrow navigation={navigation}/>
+                <Text style={styles.topbarTitle}>Change Password</Text>
             </View>
             <View style={styles.formContainer}>
-                <Text style={styles.title}>Change Password</Text>
+                <Text style={styles.title}>Mr. Recipe</Text>
                 <TextInput
                     placeholder="Current Password"
                     placeholderTextColor='#818181'
@@ -107,12 +108,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#518BFF',
     },
-    backArrow: {
-        position: 'absolute',
-        left: 20,
-        bottom: '50%',
-        marginBottom: -12,
-    },
     topbarTitle: {
         fontSize: 24,
         fontWeight: 'bold',
@@ -121,7 +116,7 @@ const styles = StyleSheet.create({
     formContainer: {
         justifyContent: 'center',
         alignItems: 'center',
-        height: '87%',
+        height: '74%',
     },
     title: {
         marginBottom: 20,

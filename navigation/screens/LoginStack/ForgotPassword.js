@@ -2,6 +2,7 @@ import { StyleSheet, View, Text, TextInput, Alert, TouchableOpacity, TouchableWi
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useState, useEffect } from "react";
 import { firebase } from '../../../config';
+import BackArrow from '../../../components/BackArrow';
 
 export default function ForgotPassword({ navigation }){
   const [email, setEmail] = useState('');
@@ -41,26 +42,26 @@ export default function ForgotPassword({ navigation }){
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.appcontainer}> 
           <View style={styles.topbar}>
-                <Icon name='arrow-back-outline' size={24} color='white' style={styles.backArrow} onPress={() => {navigation.goBack(null)}}/>
-                <Text style={styles.topbarTitle}>Reset Password</Text>
+            <BackArrow navigation={navigation}/>
+            <Text style={styles.topbarTitle}>Reset Password</Text>
           </View>
           <View style={styles.login}>
-              <Text style={styles.title}>Mr. Recipe</Text>
-              <View style={{flexDirection: 'row'}}>
-                <Icon name='mail-outline' size={20} color={'lightgrey'} style={styles.icon}/>
-                <TextInput 
-                  placeholder="Email Address" 
-                  style={styles.inputField} 
-                  keyboardType='email-address'
-                  onChangeText={(email) => {setEmail(email)}}
-                  autoCapitalize={false}
-                  onSubmitEditing={() => forgotPassword(email)}
-                ></TextInput>
-              </View>
-          
-              <TouchableOpacity onPress={() => forgotPassword(email)} style={styles.button}>
-                <Text style={styles.buttonText}>Reset Password</Text>
-              </TouchableOpacity>
+            <Text style={styles.title}>Mr. Recipe</Text>
+            <View style={{flexDirection: 'row'}}>
+              <Icon name='mail-outline' size={20} color={'lightgrey'} style={styles.icon}/>
+              <TextInput 
+                placeholder="Email Address" 
+                style={styles.inputField} 
+                keyboardType='email-address'
+                onChangeText={(email) => {setEmail(email)}}
+                autoCapitalize={false}
+                onSubmitEditing={() => forgotPassword(email)}
+              ></TextInput>
+            </View>
+        
+            <TouchableOpacity onPress={() => forgotPassword(email)} style={styles.button}>
+              <Text style={styles.buttonText}>Reset Password</Text>
+            </TouchableOpacity>
           </View>
       </View>
     </TouchableWithoutFeedback>
@@ -122,11 +123,5 @@ const styles = StyleSheet.create({
       fontSize: 20,
       fontWeight: 'bold',
       color: 'white'
-    },
-    backArrow: {
-        position: 'absolute',
-        left: 20,
-        bottom: '50%',
-        marginBottom: -12,
-    },
+    }
   });

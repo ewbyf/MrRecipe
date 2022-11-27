@@ -13,7 +13,7 @@ const Stack = createStackNavigator();
 export default function DashboardStack({ navigation, route}) {
     React.useLayoutEffect(() => {
         const routeName = getFocusedRouteNameFromRoute(route);
-        if (routeName === "SettingsScreen"){
+        if (routeName === "SettingsScreen" || routeName == "ChangePasswordScreen"){
             navigation.setOptions({tabBarStyle: {display: 'none'}});
         }else {
             navigation.setOptions({tabBarStyle: styles.navbar});

@@ -8,7 +8,7 @@ export default function Settings({ navigation }) {
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
   const [email, setEmail] = useState('');
-  
+
   const [changedSettings, setChangedSettings] = useState(false);
 
   useEffect(() => {
@@ -70,8 +70,9 @@ export default function Settings({ navigation }) {
               <Image source={require('../../../assets/walter.jpg')} style={styles.profilePicture}
               />
             </View>
+            <Text style={styles.section}>Profile</Text>
             <View>
-              <View style={styles.field}>
+              <View style={{...styles.field, borderTopWidth: 1, borderTopColor: '#363636'}}>
                 <Text style={styles.fieldTitle}>Name</Text>
                 <TextInput
                   placeholder="Enter a name"
@@ -107,7 +108,11 @@ export default function Settings({ navigation }) {
               </View>
             </View>
 
-            <View style={{marginTop: 50}}>
+            <View style={{height: 50}}>
+              <Text style={{...styles.section, paddingTop: 20, height: 50}}>Account</Text>
+            </View>
+            
+            <View>
               <View style={{...styles.field, borderTopWidth: 1, borderTopColor: '#363636'}}>
                 <Text style={styles.fieldTitle}>Email</Text>
                 <TextInput
@@ -129,7 +134,7 @@ export default function Settings({ navigation }) {
                   onChangeText={(newUsername) => updateSettings('username', newUsername)}
                   style={styles.input}
                 ></TextInput>
-                <Text>Change</Text>
+                <Text onPress={() => navigation.navigate('ChangePasswordScreen')} style={{color: '#518BFF'}}>Change</Text>
               </View>
             </View>
           </View>
@@ -187,15 +192,20 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       alignItems: 'center',
       width: '100%',
-      paddingVertical: 20,
-      borderBottomWidth: 1,
-      borderBottomColor: '#363636',
+      paddingTop: 20,
     },
     profilePicture: {
       borderRadius: 50,
       height: 100,
       width: 100,
-      margin: 10,
+      marginTop: 10,
+    },
+    section: {
+      color: 'grey',
+      fontSize: 16,
+      fontWeight: 'bold',
+      marginVertical: 6,
+      paddingLeft: 30,
     },
     field: {
       flexDirection: 'row',

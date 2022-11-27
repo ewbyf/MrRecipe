@@ -8,31 +8,39 @@ export default function Login({ navigation }){
   const [password, setPassword] = useState('');
   
   const loginUser = async(email, password) => {
-    try {
-      await firebase.auth().signInWithEmailAndPassword(email, password);
+    if (!password) {
+      Alert.alert(
+        "Missing Password",
+        "Please enter your password in the input field."
+      );
     }
-    catch (error) {
-      switch(error.code) {
-        case 'auth/user-not-found':
-          Alert.alert(
-              "Account Not Found",
-              "No account found for the email you entered.",
+    else if (!email) {
+      Alert.alert(
+        "Missing Email",
+        "Please enter your email address into the input field.",
+      );
+    }
+    else {
+      try {
+        await firebase.auth().signInWithEmailAndPassword(email, password);
+      }
+      catch (error) {
+        switch(error.code) {
+          case 'auth/user-not-found':
+            Alert.alert(
+                "Account Not Found",
+                "No account found for the email you entered.",
+              );
+            break;
+          case 'auth/invalid-email':
+            Alert.alert(
+              "Invalid Email",
+              "Please enter a valid email address into the input field.",
             );
-          break;
-        case 'auth/invalid-email':
-          Alert.alert(
-            "Invalid Email",
-            "Please enter a valid email address into the input field.",
-          );
-          break;
-        case 'auth/missing-email':
-          Alert.alert(
-            "Missing Email",
-            "Please enter your email address into the input field.",
-          );
-          break;
-        default:
-          alert(error.message);
+            break;
+          default:
+            alert(error.message);
+        }
       }
     }
   }

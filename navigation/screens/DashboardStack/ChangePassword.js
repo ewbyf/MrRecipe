@@ -9,6 +9,7 @@ export default function ChangePassword({ navigation }) {
     const [password, setPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [fieldsFilled, setFieldsFilled] = useState(false);
 
     useEffect(() => {
         try {
@@ -16,7 +17,40 @@ export default function ChangePassword({ navigation }) {
         } catch (error) {
             alert(error.code);
         }
-    },[]) 
+    },[])
+
+    const SaveButton = ({onPress}) => (
+        <Text onPress={() => savePassword()}style={{...styles.save, color: fieldsFilled ? 'white' : 'grey'}}>Save</Text>
+    )
+    
+    const savePassword = () => {
+        if (fieldsFilled) {
+            Alert.alert(
+                "Password Saved",
+                "Password has been successfully saved."
+            );
+            navigation.navigate('DashboardScreen');
+        }
+    }
+
+    const updateFields = (type, value) => {
+        if (type == 'currentPassword') {
+            setPassword(value);
+        }
+        else if (type == 'newPassword') {
+            setNewPassword(value);
+        }
+        else if (type == 'confirmPassword') {
+            setConfirmPassword(value);
+        }
+        
+        if (password && newPassword && confirmPassword) {
+            setFieldsFilled(true);
+        }
+        
+        if (value == '')
+            setFieldsFilled(false);
+    }
 
     const changePassword = async() => {
         if (!password || !confirmPassword || !newPassword)
@@ -55,40 +89,49 @@ export default function ChangePassword({ navigation }) {
             <View style={styles.topbar}>
                 <BackArrow navigation={navigation}/>
                 <Text style={styles.topbarTitle}>Change Password</Text>
+                <SaveButton/>
             </View>
-            <View style={styles.formContainer}>
-                <Text style={styles.title}>Mr. Recipe</Text>
-                <TextInput
-                    placeholder="Current Password"
-                    placeholderTextColor='#818181'
-                    autoCapitalize={false}
-                    autoCorrect={false}
-                    secureTextEntry={true}
-                    style={styles.inputField}
-                    onChangeText={(password) => setPassword(password)}
-                ></TextInput>
-                <TextInput
-                    placeholder="New Password"
-                    placeholderTextColor='#818181'
-                    autoCapitalize={false}
-                    autoCorrect={false}
-                    secureTextEntry={true}
-                    style={styles.inputField}
-                    onChangeText={(newPassword) => setNewPassword(newPassword)}
-                ></TextInput>
-                <TextInput
-                    placeholder="Confirm Password"
-                    placeholderTextColor='#818181'
-                    autoCapitalize={false}
-                    autoCorrect={false}
-                    secureTextEntry={true}
-                    style={styles.inputField}
-                    onChangeText={(confirmPassword) => setConfirmPassword(confirmPassword)}
-                ></TextInput>
 
-                <TouchableOpacity onPress={() => changePassword()} style={styles.button}>
-                    <Text style={styles.buttonText}>Change Password</Text>
-                </TouchableOpacity>
+            <View>
+              <View style={{...styles.field, borderTopWidth: 1, borderTopColor: '#363636'}}>
+                <Text style={styles.fieldTitle}>Current Password</Text>
+                <TextInput
+                    placeholder="Enter your current password"
+                    placeholderTextColor='#818181'
+                    autoCapitalize={false}
+                    autoCorrect={false}
+                    secureTextEntry={true}
+                    maxLength={18}
+                    style={styles.input}
+                    onChangeText={(password) => updateFields("currentPassword", password)}
+                ></TextInput>
+              </View>
+              <View style={styles.field}>
+                <Text style={styles.fieldTitle}>New Password</Text>
+                <TextInput
+                    placeholder="Enter a new password"
+                    placeholderTextColor='#818181'
+                    autoCapitalize={false}
+                    autoCorrect={false}
+                    secureTextEntry={true}
+                    maxLength={18}
+                    style={styles.input}
+                    onChangeText={(password) => updateFields("newPassword", password)}
+                ></TextInput>
+              </View>
+              <View style={styles.field}>
+                <Text style={styles.fieldTitle}>Confirm Password</Text>
+                <TextInput 
+                    placeholder='Confirm your new password'
+                    placeholderTextColor='#818181'
+                    autoCapitalize={false}
+                    autoCorrect={false}
+                    secureTextEntry={true}
+                    maxLength={18}
+                    style={styles.input}
+                    onChangeText={(password) => updateFields("confirmPassword", password)}
+                ></TextInput>
+              </View>
             </View>
         </View>
     );
@@ -113,10 +156,13 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'white',
     },
-    formContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '74%',
+    save: {
+        position: 'absolute',
+        right: 20,
+        bottom: '50%',
+        marginBottom: -11,
+        fontSize: 18,
+        fontWeight: 'bold',
     },
     title: {
         marginBottom: 20,
@@ -124,27 +170,30 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#518BFF',
     },
-    inputField: {
-        width: 200,
-        marginVertical: 5,
-        padding: 7,
-        borderColor: '#518BFF',
-        borderBottomWidth: 1,
-        textAlign: 'center',
-        color: 'white',
-    },
-    button: {
-        backgroundColor: '#518BFF',
-        width: 200,
-        height: 40,
-        borderRadius: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 20,
-      },
-      buttonText: {
-        fontSize: 20,
+    section: {
+        color: 'grey',
+        fontSize: 16,
         fontWeight: 'bold',
-        color: 'white'
-      },
-    });
+        marginVertical: 6,
+        paddingLeft: 30,
+    },
+    field: {
+        flexDirection: 'row',
+        paddingVertical: 15,
+        paddingHorizontal: 30,
+        borderBottomWidth: 1,
+        borderBottomColor: '#363636',
+    },
+    fieldTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#518BFF',
+        marginRight: 20,
+        width: 90,
+    },
+    input: {
+        fontSize: 16,
+        color: 'white',
+        width: 225,
+    },
+});

@@ -102,6 +102,7 @@ export default function Settings({ navigation }) {
                   multiline={true}
                   maxLength={100}
                   value={bio}
+                  textAlignVertical='top'
                   onChangeText={(newBio) => updateSettings('bio', newBio)}
                   style={{...styles.input, paddingTop: 0}}
                 ></TextInput>
@@ -134,7 +135,7 @@ export default function Settings({ navigation }) {
                   onChangeText={(newUsername) => updateSettings('username', newUsername)}
                   style={styles.input}
                 ></TextInput>
-                <Text onPress={() => navigation.navigate('ChangePasswordScreen')} style={{color: '#518BFF'}}>Change</Text>
+                <Text onPress={() => navigation.navigate('ChangePasswordScreen')} style={styles.changeText}>Change</Text>
               </View>
             </View>
           </View>
@@ -219,6 +220,13 @@ const styles = StyleSheet.create({
       fontSize: 16,
       color: 'white',
       width: 225,
+    },
+    changeText: {
+      color: '#518BFF',
+      position: 'absolute',
+      right: 20,
+      top: '50%',
+      marginTop: 4,
     },
     footer: {
       marginTop: 'auto',

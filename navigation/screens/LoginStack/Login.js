@@ -38,6 +38,12 @@ export default function Login({ navigation }){
               "Please enter a valid email address into the input field.",
             );
             break;
+          case 'auth/wrong-password':
+            Alert.alert(
+                "Password Too Short",
+                "The password you have entered is incorrect. Please try again."
+            );
+            break;
           default:
             alert(error.message);
         }

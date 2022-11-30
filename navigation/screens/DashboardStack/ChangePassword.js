@@ -20,18 +20,8 @@ export default function ChangePassword({ navigation }) {
     },[])
 
     const SaveButton = ({onPress}) => (
-        <Text onPress={() => savePassword()}style={{...styles.save, color: fieldsFilled ? 'white' : 'grey'}}>Save</Text>
+        <Text onPress={() => changePassword()}style={{...styles.save, color: fieldsFilled ? 'white' : 'grey'}}>Save</Text>
     )
-    
-    const savePassword = () => {
-        if (fieldsFilled) {
-            Alert.alert(
-                "Password Saved",
-                "Password has been successfully saved."
-            );
-            navigation.navigate('DashboardScreen');
-        }
-    }
 
     const updateFields = (type, value) => {
         if (type == 'currentPassword') {
@@ -53,33 +43,55 @@ export default function ChangePassword({ navigation }) {
     }
 
     const changePassword = async() => {
-        if (!password || !confirmPassword || !newPassword)
+        if (fieldsFilled) {
+            if (!password || !confirmPassword || !newPassword)
             Alert.alert(
                 "Missing Password",
                 "One or more of the input fields is blank. Please enter your password in the input fields."
             );
-        else if (confirmPassword != newPassword)
-            Alert.alert(
-                "Passwords Don't Match",
-                "Passwords do not match. Please retry entering your password."
-            );
-        else if (newPassword == confirmPassword) {
-            try {
-                await firebase.auth().signInWithEmailAndPassword(email, password);
-                firebase.auth().currentUser.updatePassword(newPassword)
-                .then(() => {
-                    Alert.alert(
-                        "Password Changed",
-                        "Your password has been successfully changed."
-                    );
-                    navigation.navigate('DashboardScreen');
-                })
-                .catch((error) => {
-                    alert(error.code);
-                });
-            }
-            catch(error) {
-                alert(error.code);
+            else if (confirmPassword != newPassword)
+                Alert.alert(
+                    "Passwords Don't Match",
+                    "Passwords do not match. Please retry entering your password."
+                );
+            else if (newPassword.length < 6)
+                Alert.alert(
+                    "Password Too Short",
+                    "The new password you have entered is too short. Please enter a password with at least 6 characters."
+                );
+            else if (newPassword == confirmPassword) {
+                try {
+                    await firebase.auth().signInWithEmailAndPassword(email, password);
+                    firebase.auth().currentUser.updatePassword(newPassword)
+                    .then(() => {
+                        Alert.alert(
+                            "Password Changed",
+                            "Your password has been successfully changed."
+                        );
+                        navigation.navigate('DashboardScreen');
+                    })
+                    .catch((error) => {
+                        alert(error.code);
+                    });
+                }
+                catch(error) {
+                    switch(error.code) {
+                        case 'auth/wrong-password':
+                            Alert.alert(
+                                "Password Too Short",
+                                "The current password you have entered is incorrect. Please try again."
+                            );
+                            break;
+                        case 'auth/too-many-requests':
+                            Alert.alert(
+                                "Too Many Requests",
+                                "You are creating too many requests. Please try again later."
+                            );
+                            break;
+                        default:
+                            alert(error.code);
+                    }
+                }
             }
         }
     }

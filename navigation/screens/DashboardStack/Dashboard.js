@@ -4,21 +4,20 @@ import { firebase } from '../../../config';
 import { useState, useEffect } from "react";
 
 export default function Dashboard({ navigation }) {
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
+  const[userData, setUserData] = useState('');
+  const[loading, setLoading] = useState(false);
 
   useEffect(() => {
     firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
     .then((snapshot) => {
       if (snapshot.exists) {
-        setName(snapshot.data().name);
-        setUsername(snapshot.data().username);
+        setUserData(snapshot.data());
       }
       else
         Alert.alert("Unknown Error Occured", "Contact support with error.")
     })
-  },[]) 
-
+    navigation.addListener("focus", () => setLoading(!loading));
+  }, [navigation, loading]);
 
   return (
       <View style={styles.appcontainer}>
@@ -31,14 +30,12 @@ export default function Dashboard({ navigation }) {
               <View>
                 <Image source={require('../../../assets/walter.jpg')} style={styles.profilePicture}
                 />  
-                <Text style={styles.name}>{name}</Text>
-                <Text style={styles.username}>@{username}</Text>
+                <Text style={styles.name}>{userData.name}</Text>
+                <Text style={styles.username}>@{userData.username}</Text>
               </View>
             </View>
             <View style={styles.bioContainer}>
-              <Text style={styles.bio}>
-                Austin Karimi... Love tennis... Computer Science is life.🤓 India #1💯🇮🇳 Osu is Life my osu: ClownGaming.🤡 He / Indian
-              </Text>
+              <Text style={styles.bio}>{userData.bio}</Text>
             </View>
             <View style={styles.postsContainer}>
               <Text style={styles.postsTitle}>

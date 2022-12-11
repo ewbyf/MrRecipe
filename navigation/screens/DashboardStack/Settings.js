@@ -50,19 +50,28 @@ export default function Settings({ navigation }) {
 
   const saveSettings = async() => {
     if (changedSettings) {
-      await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({
-        bio: {bio}
-      })
-      .then(() => {
+      const doc = await firebase.firestore().collection('users').where("username_lowercase", "==", username.toLowerCase()).get();
+      if (!doc.empty) {
         Alert.alert(
-          "Settings Saved",
-          "Settings have been successfully saved."
+          "Username Taken",
+          "Sorry! Someone already has that username."
         );
-        navigation.navigate('DashboardScreen');
-      })
-      .catch((error) => {
-        alert(error.code);
-      })
+      }
+      else {
+        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update(
+          {name, username, bio, username_lowercase: username.toLowerCase()}
+        )
+        .then(() => {
+          Alert.alert(
+            "Settings Saved",
+            "Settings have been successfully saved."
+          );
+          navigation.navigate('DashboardScreen');
+        })
+        .catch((error) => {
+          alert(error.code);
+        })
+      }
     }
   }
 

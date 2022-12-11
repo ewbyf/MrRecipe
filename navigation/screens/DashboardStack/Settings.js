@@ -48,13 +48,21 @@ export default function Settings({ navigation }) {
     <Text onPress={() => saveSettings()}style={{...styles.save, color: changedSettings ? 'white' : 'grey'}}>Save</Text>
   )
 
-  const saveSettings = () => {
+  const saveSettings = async() => {
     if (changedSettings) {
-      Alert.alert(
-        "Settings Saved",
-        "Settings have been successfully saved."
-      );
-      navigation.navigate('DashboardScreen');
+      await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({
+        bio: {bio}
+      })
+      .then(() => {
+        Alert.alert(
+          "Settings Saved",
+          "Settings have been successfully saved."
+        );
+        navigation.navigate('DashboardScreen');
+      })
+      .catch((error) => {
+        alert(error.code);
+      })
     }
   }
 

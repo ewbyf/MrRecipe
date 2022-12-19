@@ -40,7 +40,7 @@ export default function Login({ navigation }){
             break;
           case 'auth/wrong-password':
             Alert.alert(
-                "Password Too Short",
+                "Invalid Password",
                 "The password you have entered is incorrect. Please try again."
             );
             break;

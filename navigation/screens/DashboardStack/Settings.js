@@ -11,7 +11,8 @@ export default function Settings({ navigation }) {
   const [username, setUsername] = useState('');
   const [originalUsername, setOriginalUsername] = useState('');
   const [bio, setBio] = useState('');
-  const [email, setEmail] = useState('');
+
+  const [loading, setLoading] = useState(true);
 
   const [changedSettings, setChangedSettings] = useState(false);
   const [image, setImage] = useState(null);
@@ -22,16 +23,20 @@ export default function Settings({ navigation }) {
     .then((snapshot) => {
       if (snapshot.exists) {
         setUserData(snapshot.data());
-        setName(snapshot.data().name);
-        setUsername(snapshot.data().username);
-        setOriginalUsername(snapshot.data().username);
-        setBio(snapshot.data().bio);
-        setEmail(snapshot.data().email);
+        initialize(snapshot.data());
+        setLoading(false);
       }
       else
         Alert.alert("Unknown Error Occured", "Contact support with error.")
     })
-  },[])
+  }, [])
+
+  const initialize = (snapshot) => {
+    setName(snapshot.name);
+    setUsername(snapshot.username);
+    setOriginalUsername(snapshot.username);
+    setBio(snapshot.bio);
+  }
 
   const updateSettings = (type, value) => {
     if (type == 'name') {
@@ -52,7 +57,7 @@ export default function Settings({ navigation }) {
       setChangedSettings(false);
   }
 
-  const SaveButton = ({onPress}) => (
+  const SaveButton = () => (
     <Text onPress={() => saveSettings()}style={{...styles.save, color: changedSettings ? 'white' : 'grey'}}>Save</Text>
   )
 
@@ -91,14 +96,15 @@ export default function Settings({ navigation }) {
 
   const choosePhoto = async() => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [3, 3],
       quality: 1,
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      const source = {uri : result.assets[0].uri};
+      setImage(source);
       setChangedSettings(true);
     }
   }
@@ -106,11 +112,14 @@ export default function Settings({ navigation }) {
   const uploadPhoto = async() => {
     if (image == null)
       return null;
-    let fileName = image.substring(image.lastIndexOf('/') + 1);
+
+    const response = await fetch(image.uri);
+    const blob = await response.blob();
+    const filename = image.uri.substring(image.uri.lastIndexOf('/') + 1);
+    var ref = firebase.storage().ref().child(filename).put(blob);
     try { 
-      await firebase.storage().ref().child(fileName).put(image);
-      setImage(null);
-      const url = await firebase.storage().ref().child(fileName).getDownloadURL();
+      await ref;
+      const url = await firebase.storage().ref().child(filename).getDownloadURL();
       return url;
     }
     catch(error) {
@@ -130,7 +139,9 @@ export default function Settings({ navigation }) {
             <View style={styles.profile}>
               <TouchableOpacity onPress={() => choosePhoto()}>
                 <View>                
-                  <Image source={{uri : image}} style={styles.profilePicture}/>
+                  {image && <Image source={{uri: image.uri}} style={styles.profilePicture}/>}
+                  {loading && <Image style={styles.profilePicture}/>}
+                  {userData.pfp && !loading && !image && <Image source={{uri: userData.pfp ? userData.pfp : 'https://imgur.com/hNwMcZQ.png'}} style={styles.profilePicture}/>}
                   <Icon name="camera-outline" size={40} color='white' style={styles.camera}/>
                 </View>
               </TouchableOpacity>
@@ -186,7 +197,7 @@ export default function Settings({ navigation }) {
                   placeholder="Enter an email"
                   placeholderTextColor='#818181'
                   maxLength={320}
-                  value={email}
+                  value={userData.email}
                   editable={false}
                   onChangeText={(newEmail) => updateSettings('name', newEmail)}
                   style={styles.input}
@@ -198,7 +209,7 @@ export default function Settings({ navigation }) {
                   placeholder="Enter a username"
                   placeholderTextColor='#818181'
                   secureTextEntry
-                  value={username}
+                  value='......'
                   editable={false}
                   onChangeText={(newUsername) => updateSettings('username', newUsername)}
                   style={styles.input}

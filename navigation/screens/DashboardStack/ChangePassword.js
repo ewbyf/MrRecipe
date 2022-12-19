@@ -78,7 +78,7 @@ export default function ChangePassword({ navigation }) {
                     switch(error.code) {
                         case 'auth/wrong-password':
                             Alert.alert(
-                                "Password Too Short",
+                                "Invalid Password",
                                 "The current password you have entered is incorrect. Please try again."
                             );
                             break;

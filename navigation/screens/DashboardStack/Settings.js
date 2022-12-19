@@ -141,7 +141,7 @@ export default function Settings({ navigation }) {
                 <View>                
                   {image && <Image source={{uri: image.uri}} style={styles.profilePicture}/>}
                   {loading && <Image style={styles.profilePicture}/>}
-                  {userData.pfp && !loading && !image && <Image source={{uri: userData.pfp ? userData.pfp : 'https://imgur.com/hNwMcZQ.png'}} style={styles.profilePicture}/>}
+                  {!loading && !image && <Image source={{uri: userData.pfp ? userData.pfp : 'https://imgur.com/hNwMcZQ.png'}} style={styles.profilePicture}/>}
                   <Icon name="camera-outline" size={40} color='white' style={styles.camera}/>
                 </View>
               </TouchableOpacity>

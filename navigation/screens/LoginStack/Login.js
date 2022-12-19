@@ -57,50 +57,54 @@ export default function Login({ navigation }){
         <View style={styles.topbar}>
           <Text style={styles.topbarTitle}>Login</Text>
         </View>
-        <View style={styles.logo}>
-          <Image 
-            style={styles.walter}
-            source={require('../../../assets/walter.jpg')} 
-          /> 
-        </View>
         <View style={styles.login}>
-            <Text style={styles.title}>Mr. Recipe</Text>
-            <View style={{flexDirection: 'row'}}>
-              <Icon name='mail-outline' size={20} color={'lightgrey'} style={styles.icon}/>
-              <TextInput 
-                placeholder="Email Address" 
-                style={styles.inputField} 
-                keyboardType='email-address'
-                onChangeText={(email) => {setEmail(email)}}
-                autoCapitalize={false}
-                autoCorrect={false}
-                maxLength={320}
-                onSubmitEditing={() => {loginUser(email, password)}}
-              ></TextInput>
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <Icon name='lock-closed-outline' size={20} color={'lightgrey'} style={styles.icon}/>
-              <TextInput
-                placeholder="Password"
-                style={styles.inputField}
-                onChangeText={(password) => {setPassword(password)}}
-                secureTextEntry={true}
-                autoCapitalize={false}
-                autoCorrect={false}
-                onSubmitEditing={() => {loginUser(email, password)}}
-              ></TextInput>
-            </View>
-        
-            <TouchableOpacity onPress={() => loginUser(email, password)} style={styles.button}>
-              <Text style={styles.buttonText}>Login</Text>
-            </TouchableOpacity>
+          <View style={styles.logoContainer}>
+            <Image 
+              style={styles.logo}
+              source={{uri: 'https://imgur.com/Fg7Vv0f.png'}} 
+            /> 
+          </View>
+          <View style={styles.loginContainer}>
+              <Text style={styles.title}>Mr. Recipe</Text>
+              <View style={{flexDirection: 'row'}}>
+                <Icon name='mail-outline' size={20} color={'white'} style={styles.icon}/>
+                <TextInput 
+                  placeholder="Email Address" 
+                  placeholderTextColor={'lightgrey'}
+                  style={styles.inputField} 
+                  keyboardType='email-address'
+                  onChangeText={(email) => {setEmail(email)}}
+                  autoCapitalize={false}
+                  autoCorrect={false}
+                  maxLength={320}
+                  onSubmitEditing={() => {loginUser(email, password)}}
+                ></TextInput>
+              </View>
+              <View style={{flexDirection: 'row'}}>
+                <Icon name='lock-closed-outline' size={20} color={'white'} style={styles.icon}/>
+                <TextInput
+                  placeholder="Password"
+                  placeholderTextColor={'lightgrey'}
+                  style={styles.inputField}
+                  onChangeText={(password) => {setPassword(password)}}
+                  secureTextEntry={true}
+                  autoCapitalize={false}
+                  autoCorrect={false}
+                  onSubmitEditing={() => {loginUser(email, password)}}
+                ></TextInput>
+              </View>
+          
+              <TouchableOpacity onPress={() => loginUser(email, password)} style={styles.button}>
+                <Text style={styles.buttonText}>Login</Text>
+              </TouchableOpacity>
 
-            <View style={{flexDirection: 'row', marginTop: 20}}>
-              <Text>Don't have an account? </Text>
-              <Text onPress={() => navigation.navigate('RegisterScreen')} style={{color: '#518BFF'}}>Sign up</Text>
-            </View>
+              <View style={{flexDirection: 'row', marginTop: 20}}>
+                <Text style={{color: 'white'}}>Don't have an account? </Text>
+                <Text onPress={() => navigation.navigate('RegisterScreen')} style={{color: '#518BFF'}}>Sign up</Text>
+              </View>
 
-            <Text onPress={() => navigation.navigate('ForgotPasswordScreen')} style={{color: '#518BFF', marginTop: 20}}>Forgot Password?</Text>
+              <Text onPress={() => navigation.navigate('ForgotPasswordScreen')} style={{color: '#518BFF', marginTop: 20}}>Forgot Password?</Text>
+          </View>
         </View>
       </View>
     </TouchableWithoutFeedback>
@@ -126,9 +130,22 @@ const styles = StyleSheet.create({
       color: 'white',
     },
     login: {
+      height: '87%',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    logoContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    logo: {
+      height: 100,
+      width: 100,
+    },
+    loginContainer: {
         justifyContent: 'center',
         alignItems: 'center',
-        height: '87%',
+        marginBottom: 115,
     },
     title: {
       marginBottom: 20,
@@ -163,14 +180,5 @@ const styles = StyleSheet.create({
       fontSize: 20,
       fontWeight: 'bold',
       color: 'white'
-    },
-    logo: {
-      position: 'absolute',
-      top: '13%',
-    },
-    walter: {
-      resizeMode: 'stretch',
-      height: 50,
-      width: 500,
     }
   });

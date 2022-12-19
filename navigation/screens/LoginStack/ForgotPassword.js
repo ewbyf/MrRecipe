@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TextInput, Alert, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
+import { StyleSheet, View, Text, TextInput, Alert, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Image } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useState, useEffect } from "react";
 import { firebase } from '../../../config';
@@ -45,12 +45,19 @@ export default function ForgotPassword({ navigation }){
             <BackArrow navigation={navigation}/>
             <Text style={styles.topbarTitle}>Reset Password</Text>
           </View>
-          <View style={styles.login}>
+          <View style={styles.forgotContainer}>
+              <View style={styles.logoContainer}>
+                <Image 
+                    style={styles.logo}
+                    source={{uri: 'https://imgur.com/Fg7Vv0f.png'}} 
+                  /> 
+              </View>
             <Text style={styles.title}>Mr. Recipe</Text>
             <View style={{flexDirection: 'row'}}>
-              <Icon name='mail-outline' size={20} color={'lightgrey'} style={styles.icon}/>
+              <Icon name='mail-outline' size={20} color={'white'} style={styles.icon}/>
               <TextInput 
                 placeholder="Email Address" 
+                placeholderTextColor={'lightgrey'}
                 style={styles.inputField} 
                 keyboardType='email-address'
                 onChangeText={(email) => {setEmail(email)}}
@@ -86,10 +93,18 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       color: 'white',
     },
-    login: {
+    forgotContainer: {
         justifyContent: 'center',
         alignItems: 'center',
         height: '87%',
+    },
+    logoContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    logo: {
+      height: 100,
+      width: 100,
     },
     title: {
       marginBottom: 20,
@@ -119,6 +134,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: 20,
+      marginBottom: 115,
     },
     buttonText: {
       fontSize: 20,

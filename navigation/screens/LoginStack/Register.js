@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert } from "react-native";
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert, Image } from "react-native";
 import { useState } from "react";
 import { firebase } from '../../../config';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -87,11 +87,18 @@ export default function Register({ navigation }) {
           </View>
           
           <View style={styles.register}>
+              <View style={styles.logoContainer}>
+                <Image 
+                    style={styles.logo}
+                    source={{uri: 'https://imgur.com/Fg7Vv0f.png'}} 
+                  /> 
+              </View>
               <Text style={styles.title}>Mr. Recipe</Text>
               <View style={{flexDirection: 'row'}}>
-                <Icon name='person-circle-outline' size={20} color={'lightgrey'} style={styles.icon}/>
+                <Icon name='person-circle-outline' size={20} color={'white'} style={styles.icon}/>
                 <TextInput 
                   placeholder="Name"
+                  placeholderTextColor={'lightgrey'}
                   style={styles.inputField}
                   onChangeText={(name) => {setName(name)}}
                   autoCorrect={false}
@@ -100,9 +107,10 @@ export default function Register({ navigation }) {
                 ></TextInput>
               </View> 
               <View style={{flexDirection: 'row'}}>
-                <Icon name='person-outline' size={20} color={'lightgrey'} style={styles.icon}/>
+                <Icon name='person-outline' size={20} color={'white'} style={styles.icon}/>
                 <TextInput
                   placeholder="Username"
+                  placeholderTextColor={'lightgrey'}
                   style={styles.inputField}
                   onChangeText={(username) => {setUsername(username)}}
                   autoCorrect={false}
@@ -111,9 +119,10 @@ export default function Register({ navigation }) {
                 ></TextInput>
               </View>
               <View style={{flexDirection: 'row'}}>
-                <Icon name='mail-outline' size={20} color={'lightgrey'} style={styles.icon}/>
+                <Icon name='mail-outline' size={20} color={'white'} style={styles.icon}/>
                 <TextInput
                   placeholder="Email Address"
+                  placeholderTextColor={'lightgrey'}
                   style={styles.inputField}
                   keyboardType='email-address'
                   onChangeText={(email) => {setEmail(email)}}
@@ -125,9 +134,10 @@ export default function Register({ navigation }) {
               </View>
 
               <View style={{flexDirection: 'row'}}>
-                <Icon name='lock-closed-outline' size={20} color={'lightgrey'} style={styles.icon}/>
+                <Icon name='lock-closed-outline' size={20} color={'white'} style={styles.icon}/>
                 <TextInput
                     placeholder="Password"
+                    placeholderTextColor={'lightgrey'}
                     style={styles.inputField}
                     onChangeText={(password) => {setPassword(password)}}
                     secureTextEntry={true}
@@ -137,9 +147,10 @@ export default function Register({ navigation }) {
                   ></TextInput>
               </View>
               <View style={{flexDirection: 'row'}}>
-                <Icon name='lock-closed' size={20} color={'lightgrey'} style={styles.icon}/>
+                <Icon name='lock-closed' size={20} color={'white'} style={styles.icon}/>
                 <TextInput
                   placeholder="Confirm Password"
+                  placeholderTextColor={'lightgrey'}
                   style={styles.inputField}
                   onChangeText={(confirmPassword) => {setConfirmPassword(confirmPassword)}}
                   secureTextEntry={true}
@@ -149,10 +160,10 @@ export default function Register({ navigation }) {
                 ></TextInput>
               </View>
 
-                <TouchableOpacity style={styles.button} onPress={() => registerUser(email, password, name, username)}>
-                  <Text style={styles.buttonText}>Sign up
-                  </Text>
-                </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={() => registerUser(email, password, name, username)}>
+                <Text style={styles.buttonText}>Sign up
+                </Text>
+              </TouchableOpacity>
           </View>
       </View>
     </TouchableWithoutFeedback>
@@ -183,6 +194,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: '87%',
     },
+    logoContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    logo: {
+      height: 100,
+      width: 100,
+    },
     title: {
       marginBottom: 20,
       fontSize: 24,
@@ -206,6 +225,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: 20,
+      marginBottom: 115,
     },
     buttonText: {
       fontSize: 20,

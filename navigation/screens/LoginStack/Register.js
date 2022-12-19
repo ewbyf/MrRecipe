@@ -10,7 +10,6 @@ export default function Register({ navigation }) {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [bio, setBio] = useState('');
   const usersDB = firebase.firestore().collection('users');
 
   const registerUser = async(email, password, name, username) => {
@@ -44,7 +43,7 @@ export default function Register({ navigation }) {
       await firebase.auth().createUserWithEmailAndPassword(email, password)
       .then(() => {
         let username_lowercase = username.toLowerCase();
-        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).set({name, username, username_lowercase, email, bio})
+        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).set({name, username, username_lowercase, email, bio: '', pfp: '', recipes: [], favorites: []})
       })
       .catch((error) => {
         switch(error.code) {

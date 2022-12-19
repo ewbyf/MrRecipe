@@ -10,7 +10,7 @@ import ChangePassword from "../screens/DashboardStack/ChangePassword";
 
 const Stack = createStackNavigator();
 
-export default function DashboardStack({ navigation, route}) {
+export default function DashboardStack({ navigation, route }) {
     React.useLayoutEffect(() => {
         const routeName = getFocusedRouteNameFromRoute(route);
         if (routeName === "SettingsScreen" || routeName == "ChangePasswordScreen"){
@@ -49,5 +49,5 @@ const styles = StyleSheet.create({
         shadowRadius: 3.5,
         elevation: 5
     }
-  });
+});
   

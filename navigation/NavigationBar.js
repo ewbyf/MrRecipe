@@ -55,9 +55,7 @@ export default function NavigationBar() {
 
   if (initializing)
     return null;
-
-
-
+    
   return (
     <View style={styles.appcontainer}>
       <NavigationContainer>
@@ -132,6 +130,7 @@ export default function NavigationBar() {
 const styles = StyleSheet.create({
   appcontainer: {
     height: '100%',
+    backgroundColor: '#222222',
   },
   tabBar: {
     position: 'absolute',

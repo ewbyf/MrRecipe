@@ -28,7 +28,7 @@ export default function Dashboard({ navigation }) {
           <View style={styles.dashboard}>
             <View style={{flexDirection: 'row', justifyContent: 'center', width: '100%'}}>
               <View style={{alignItems: 'center'}}>
-                <Image source={require('../../../assets/walter.jpg')} style={styles.profilePicture}
+                <Image source={{uri: userData.pfp}} style={styles.profilePicture}
                 />  
                 <Text style={styles.name}>{userData.name}</Text>
                 <Text style={styles.username}>@{userData.username}</Text>

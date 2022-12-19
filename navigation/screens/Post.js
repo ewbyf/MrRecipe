@@ -1,15 +1,16 @@
 import { StyleSheet, View, Text, TextInput } from "react-native";
 import { useState, useEffect } from "react";
 import { firebase } from '../../config';
+import BackArrow from '../../components/BackArrow';
 
 export default function Post({ navigation }) {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
 
   function onAuthStateChanged(user) {
-  setUser(user);
-  if (initializing)
-    setInitializing(false);
+    setUser(user);
+    if (initializing)
+      setInitializing(false);
   }
 
   useEffect(() => {
@@ -24,11 +25,11 @@ export default function Post({ navigation }) {
     return (
       <View style={styles.appcontainer}>
           <View style={styles.topbar}>
-              <Text style={styles.topbarTitle}>Favorites</Text>
-              <TextInput placeholder='Search for Favorites' style={styles.searchbar}></TextInput>
+            <BackArrow navigation={navigation}/>
+              <Text style={styles.topbarTitle}>Recipes</Text>
           </View>
           <View>
-              <Text>No way</Text>
+              <Text>No Posts</Text>
           </View>
       </View>
     );
@@ -37,8 +38,8 @@ export default function Post({ navigation }) {
   return (
       <View style={styles.appcontainer}>
           <View style={styles.topbar}>
-              <Text style={styles.topbarTitle}>Favorites</Text>
-              <TextInput placeholder='Search for Favorites' style={styles.searchbar}></TextInput>
+              <Text style={styles.topbarTitle}>Walter</Text>
+              <TextInput placeholder='Go ahead, log in' style={styles.searchbar}></TextInput>
           </View>
           <View style={{height: '74%', alignItems: 'center', justifyContent: 'center'}}>
             <Text style={{fontSize: 18, fontWeight: 'bold'}}>You are currently logged out.</Text>
@@ -49,12 +50,13 @@ export default function Post({ navigation }) {
 }
   
 const styles = StyleSheet.create({
-    appcontainer: {
-      height: '100%',
-    },
+  appcontainer: {
+    height: '100%',
+    backgroundColor: '#222222',
+  },
     topbar: {
       paddingTop: 30,
-      height: '20%',
+      height: '13%',
       width: '100%',
       alignItems: 'center',
       justifyContent: 'center',

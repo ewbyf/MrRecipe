@@ -51,6 +51,7 @@ export default function People({ navigation }) {
 const styles = StyleSheet.create({
     appcontainer: {
       height: '100%',
+      backgroundColor: '#222222',
     },
     topbar: {
       paddingTop: 30,

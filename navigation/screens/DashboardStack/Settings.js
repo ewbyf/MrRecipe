@@ -4,29 +4,27 @@ import { useState, useEffect } from "react";
 import BackArrow from '../../../components/BackArrow';
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
-import BottomSheet from 'reanimated-bottom-sheet'
-import Animated from 'react-native-reanimated';
-import React from "react";
 
 export default function Settings({ navigation }) {
+  const [userData, setUserData] = useState('');
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
+  const [originalUsername, setOriginalUsername] = useState('');
   const [bio, setBio] = useState('');
   const [email, setEmail] = useState('');
 
   const [changedSettings, setChangedSettings] = useState(false);
   const [image, setImage] = useState(null);
-  const [open, setOpen] = useState(false);
 
-  const bs = React.createRef();
-  const fall = new Animated.Value(1);
 
   useEffect(() => {
     firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
     .then((snapshot) => {
       if (snapshot.exists) {
+        setUserData(snapshot.data());
         setName(snapshot.data().name);
         setUsername(snapshot.data().username);
+        setOriginalUsername(snapshot.data().username);
         setBio(snapshot.data().bio);
         setEmail(snapshot.data().email);
       }
@@ -61,15 +59,21 @@ export default function Settings({ navigation }) {
   const saveSettings = async() => {
     if (changedSettings) {
       const doc = await firebase.firestore().collection('users').where("username_lowercase", "==", username.toLowerCase()).get();
-      if (!doc.empty) {
+      if (!doc.empty && originalUsername.toLowerCase() != username.toLowerCase()) {
         Alert.alert(
           "Username Taken",
           "Sorry! Someone already has that username."
         );
       }
       else {
+        let imgUrl = await uploadPhoto();
+
+        if (imgUrl == null && userData.pfp) {
+          imgUrl = userData.pfp;
+        }
+
         firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update(
-          {name, username, bio, username_lowercase: username.toLowerCase()}
+          {name, username, bio, username_lowercase: username.toLowerCase(), pfp: imgUrl}
         )
         .then(() => {
           Alert.alert(
@@ -85,7 +89,7 @@ export default function Settings({ navigation }) {
     }
   }
 
-  const changePfp = async() => {
+  const choosePhoto = async() => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
@@ -93,56 +97,30 @@ export default function Settings({ navigation }) {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setImage(result.assets[0].uri);
+      setChangedSettings(true);
     }
   }
 
-  const renderHeader = () => (
-    <View style={styles.header}>
-      <View style={styles.panelHeader}>
-        <View style={styles.panelHandle} />
-      </View>
-    </View>
-  )
-
-  const renderInner = () => (
-    <View style={styles.panel}>
-      <View style={{alignItems: 'center'}}>
-        <Text style={styles.panelTitle}>Upload Photo</Text>
-        <Text style={styles.panelSubtitle}>Choose Your Profile Picture</Text>
-      </View>
-      <TouchableOpacity style={styles.panelButton}>
-        <Text style={styles.panelButtonTitle}>Take Photo</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.panelButton}>
-        <Text style={styles.panelButtonTitle}>Choose From Library</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.panelButton}
-        onPress={() => bs.current.snapTo(1)}>
-        <Text style={styles.panelButtonTitle}>Cancel</Text>
-      </TouchableOpacity>
-    </View>
-  )
+  const uploadPhoto = async() => {
+    if (image == null)
+      return null;
+    let fileName = image.substring(image.lastIndexOf('/') + 1);
+    try { 
+      await firebase.storage().ref().child(fileName).put(image);
+      setImage(null);
+      const url = await firebase.storage().ref().child(fileName).getDownloadURL();
+      return url;
+    }
+    catch(error) {
+      alert(error.code);
+    }
+  }
 
   return (
-    <TouchableWithoutFeedback onPress={() => {bs.current.snapTo(1); Keyboard.dismiss()}}>
+    <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
       <View style={styles.appcontainer}>
-        <BottomSheet
-              ref={bs}
-              snapPoints={[330, 0]}
-              initialSnap={1}
-              renderContent={renderInner}
-              renderHeader={renderHeader}
-              onOpenStart={() => setOpen(true)}
-              onCloseStart={() => setOpen(false)}
-              callbackNode={fall}
-              enabledGestureInteraction={true}
-          />
-        <Animated.View style={{height: '100%', opacity: Animated.add(0.1, Animated.multiply(fall, 1.0))}}>
           <View style={styles.topbar}>
             <BackArrow navigation={navigation}/>
             <Text style={styles.topbarTitle}>Settings</Text>
@@ -150,9 +128,9 @@ export default function Settings({ navigation }) {
           </View>
           <View style={styles.settingsContainer}>
             <View style={styles.profile}>
-              <TouchableOpacity onPress={() => bs.current.snapTo(0)}>
+              <TouchableOpacity onPress={() => choosePhoto()}>
                 <View>                
-                  <Image source={require('../../../assets/walter.jpg')} style={styles.profilePicture}/>
+                  <Image source={{uri : image}} style={styles.profilePicture}/>
                   <Icon name="camera-outline" size={40} color='white' style={styles.camera}/>
                 </View>
               </TouchableOpacity>
@@ -166,7 +144,6 @@ export default function Settings({ navigation }) {
                   placeholder="Enter a name"
                   placeholderTextColor='#818181'
                   maxLength={18}
-                  editable={!open}
                   value={name}
                   onChangeText={(newName) => updateSettings('name', newName)}
                   style={styles.input}
@@ -210,6 +187,7 @@ export default function Settings({ navigation }) {
                   placeholderTextColor='#818181'
                   maxLength={320}
                   value={email}
+                  editable={false}
                   onChangeText={(newEmail) => updateSettings('name', newEmail)}
                   style={styles.input}
                 ></TextInput>
@@ -221,6 +199,7 @@ export default function Settings({ navigation }) {
                   placeholderTextColor='#818181'
                   secureTextEntry
                   value={username}
+                  editable={false}
                   onChangeText={(newUsername) => updateSettings('username', newUsername)}
                   style={styles.input}
                 ></TextInput>
@@ -237,7 +216,6 @@ export default function Settings({ navigation }) {
               <Text style={styles.buttonText}>Delete Account</Text>
             </TouchableOpacity>
           </View>
-        </Animated.View>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -290,6 +268,9 @@ const styles = StyleSheet.create({
     camera: {
       position: 'absolute',
       top: '50%',
+      left: '50%',
+      marginTop: -20,
+      marginLeft: -20,
     },
     section: {
       color: 'grey',
@@ -343,52 +324,4 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       color: 'white'
     },
-    panel: {
-      padding: 20,
-      backgroundColor: 'white',
-      paddingTop: 20,
-    },
-    header: {
-      backgroundColor: 'white',
-      shadowColor: '#333333',
-      shadowOffset: {width: -1, height: -3},
-      shadowRadius: 2,
-      shadowOpacity: 0.4,
-      paddingTop: 20,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-    },
-    panelHeader: {
-      alignItems: 'center',
-    },
-    panelHandle: {
-      width: 40,
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: '#00000040',
-      marginBottom: 10,
-    },
-    panelTitle: {
-      fontSize: 27,
-      height: 35,
-    },
-    panelSubtitle: {
-      fontSize: 14,
-      color: 'gray',
-      height: 30,
-      marginBottom: 10,
-    },
-    panelButton: {
-      padding: 13,
-      borderRadius: 10,
-      backgroundColor: '#FF6347',
-      alignItems: 'center',
-      marginVertical: 7,
-    },
-    panelButtonTitle: {
-      fontSize: 17,
-      fontWeight: 'bold',
-      color: 'white',
-    },
-    
   });

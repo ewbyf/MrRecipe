@@ -41,8 +41,8 @@ export default function Favorites({ navigation }) {
               <TextInput placeholder='Search for Favorites' style={styles.searchbar}></TextInput>
           </View>
           <View style={{height: '74%', alignItems: 'center', justifyContent: 'center'}}>
-            <Text style={{fontSize: 18, fontWeight: 'bold'}}>You are currently logged out.</Text>
-            <Text style={{fontSize: 18, marginTop: 15}}><Text onPress={() => navigation.navigate('Login')} style={{fontSize: 18, color: '#518BFF'}}>Sign in</Text> to view favorites</Text>
+            <Text style={{fontSize: 18, fontWeight: 'bold', color: 'white'}}>You are currently logged out.</Text>
+            <Text style={{fontSize: 18, marginTop: 15, color: 'white'}}><Text onPress={() => navigation.navigate('Login')} style={{fontSize: 18, color: '#518BFF'}}>Sign in</Text> to view favorites</Text>
           </View>
       </View>
   );

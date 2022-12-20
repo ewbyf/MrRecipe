@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TextInput } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Text, TextInput } from "react-native";
 import { useState, useEffect } from "react";
 import { firebase } from '../../config';
 import BackArrow from '../../components/BackArrow';
@@ -26,10 +26,28 @@ export default function Post({ navigation }) {
       <View style={styles.appcontainer}>
           <View style={styles.topbar}>
             <BackArrow navigation={navigation}/>
-              <Text style={styles.topbarTitle}>Recipes</Text>
+            <Text style={styles.topbarTitle}>Recipes</Text>
           </View>
-          <View>
-              <Text>No Posts</Text>
+          <View styles={styles.items}>
+              <TextInput
+                placeholder="Recipe Name"
+                style={styles.input_container}
+              ></TextInput>
+              <TextInput
+                placeholder="Preparation Time"
+                style={styles.input_container}
+              ></TextInput>
+              <TextInput
+                placeholder="Cooking Time"
+                style={styles.input_container}
+              ></TextInput>
+              <TextInput
+                placeholder="Total Time"
+                style={styles.input_container}
+              ></TextInput>
+              <TouchableOpacity style={styles.button}>
+                <Text style={styles.buttonText}>Publish</Text>
+              </TouchableOpacity>
           </View>
       </View>
     );
@@ -38,12 +56,12 @@ export default function Post({ navigation }) {
   return (
       <View style={styles.appcontainer}>
           <View style={styles.topbar}>
-              <Text style={styles.topbarTitle}>Walter</Text>
-              <TextInput placeholder='Go ahead, log in' style={styles.searchbar}></TextInput>
+            <BackArrow navigation={navigation}/>
+            <Text style={styles.topbarTitle}>Recipes</Text>
           </View>
           <View style={{height: '74%', alignItems: 'center', justifyContent: 'center'}}>
-            <Text style={{fontSize: 18, fontWeight: 'bold'}}>You are currently logged out.</Text>
-            <Text style={{fontSize: 18, marginTop: 15}}><Text onPress={() => navigation.navigate('Login')} style={{fontSize: 18, color: '#518BFF'}}>Sign in</Text> to view favorites</Text>
+            <Text style={{fontSize: 18, fontWeight: 'bold', color: 'white'}}>You are currently logged out.</Text>
+            <Text style={{fontSize: 18, marginTop: 15, color: 'white'}}><Text onPress={() => navigation.navigate('Login')} style={{fontSize: 18, color: '#518BFF'}}>Sign in</Text> to view favorites</Text>
           </View>
       </View>
   );
@@ -89,5 +107,32 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       marginTop: 20
     },
+    button: {
+      backgroundColor: '#518BFF',
+      width: 200,
+      height: 40,
+      borderRadius: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 20,
+    },
+    buttonText: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: 'white'
+    },
+    items: {
+      height: '87%',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },  
+    input_container: {
+      borderWidth: 0.5,
+      padding: 15,
+      fontSize: 16,
+      marginTop: 20,
+      borderRadius: 50,
+      backgroundColor: 'white'
+    }
   });
   

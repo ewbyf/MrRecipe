@@ -96,7 +96,7 @@ export default function Login({ navigation }){
             </TouchableOpacity>
 
             <View style={{flexDirection: 'row', marginTop: 20}}>
-              <Text>Don't have an account? </Text>
+              <Text style={{color: 'white'}}>Don't have an account? </Text>
               <Text onPress={() => navigation.navigate('RegisterScreen')} style={{color: '#518BFF'}}>Sign up</Text>
             </View>
 
@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
       borderColor: '#518BFF',
       borderBottomWidth: 1,
       textAlign: 'center',
+      color: 'white',
     },
     button: {
       backgroundColor: '#518BFF',

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { firebase } from '../../../config';
 import BackArrow from '../../../components/BackArrow';
 
+
 export default function ForgotPassword({ navigation }){
   const [email, setEmail] = useState('');
 

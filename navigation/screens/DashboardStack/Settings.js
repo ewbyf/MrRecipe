@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import BackArrow from '../../../components/BackArrow';
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
+import Dialog from 'react-native-dialog';
 
 export default function Settings({ navigation }) {
   const [userData, setUserData] = useState('');
@@ -16,6 +17,8 @@ export default function Settings({ navigation }) {
 
   const [changedSettings, setChangedSettings] = useState(false);
   const [image, setImage] = useState(null);
+  const [visible, setVisible] = useState(false);
+  const [password, setPassword] = useState('');
 
 
   useEffect(() => {
@@ -127,9 +130,65 @@ export default function Settings({ navigation }) {
     }
   }
 
+  const deleteAccount = async() => {
+    if (password) {
+      try {
+        await firebase.auth().signInWithEmailAndPassword(userData.email, password);
+        if (userData.pfp) {
+          let imageRef = firebase.storage().refFromURL(userData.pfp);
+          imageRef.delete();
+        }
+        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).delete();
+        firebase.auth().currentUser.delete()
+        .then(() => {
+          firebase.auth().signOut();
+        })
+        .catch((error) => {
+          alert(error.code);
+        });
+      }
+      catch(error) {
+          switch(error.code) {
+              case 'auth/wrong-password':
+                  Alert.alert(
+                      "Invalid Password",
+                      "The current password you have entered is incorrect. Please try again."
+                  );
+                  break;
+              case 'auth/too-many-requests':
+                  Alert.alert(
+                      "Too Many Requests",
+                      "You are creating too many requests. Please try again later."
+                  );
+                  break;
+              default:
+                  alert(error.code);
+          }
+      }
+    }
+  }
+
   return (
     <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
       <View style={styles.appcontainer}>
+
+          {/* Delete account pop up */} 
+          <Dialog.Container visible={visible}>
+            <Dialog.Title>Account delete</Dialog.Title>
+            <Dialog.Description>
+              Do you want to delete this account? You cannot undo this action.
+            </Dialog.Description>
+            <Dialog.Input
+              placeholder="Enter password"
+              secureTextEntry={true}
+              onChangeText={(pass) => setPassword(pass)}
+            />
+            <Dialog.Button label="Cancel" onPress={() => setVisible(false)}/>
+            <Dialog.Button label="Delete" style={{color: password ? 'red' : 'lightgrey'}} onPress={() => deleteAccount()}/>
+          </Dialog.Container>
+
+
+          {/* Main Content */}
           <View style={styles.topbar}>
             <BackArrow navigation={navigation}/>
             <Text style={styles.topbarTitle}>Settings</Text>
@@ -202,6 +261,7 @@ export default function Settings({ navigation }) {
                   onChangeText={(newEmail) => updateSettings('name', newEmail)}
                   style={styles.input}
                 ></TextInput>
+                <Text onPress={() => navigation.navigate('ChangePasswordScreen')} style={styles.changeText}>Change</Text>
               </View>
               <View style={styles.field}>
                 <Text style={styles.fieldTitle}>Password</Text>
@@ -223,7 +283,7 @@ export default function Settings({ navigation }) {
             <TouchableOpacity onPress={() => firebase.auth().signOut()} style={{...styles.button, backgroundColor: '#518BFF'}}>
               <Text style={styles.buttonText}>Sign Out</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => firebase.auth().signOut()} style={{...styles.button, backgroundColor: 'red'}}>
+            <TouchableOpacity onPress={() => setVisible(true)} style={{...styles.button, backgroundColor: 'red'}}>
               <Text style={styles.buttonText}>Delete Account</Text>
             </TouchableOpacity>
           </View>

@@ -44,6 +44,12 @@ export default function Login({ navigation }){
                 "The password you have entered is incorrect. Please try again."
             );
             break;
+          case 'auth/too-many-requests':
+            Alert.alert(
+                "Too Many Attempts",
+                "Access to this account has been temporarily disabled due to too many failed attempts."
+            );
+            break;
           default:
             alert(error.message);
         }
@@ -52,7 +58,7 @@ export default function Login({ navigation }){
   }
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}> 
       <View style={styles.appcontainer}> 
         <View style={styles.topbar}>
           <Text style={styles.topbarTitle}>Login</Text>

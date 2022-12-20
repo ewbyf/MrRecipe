@@ -7,18 +7,25 @@ import * as ImagePicker from 'expo-image-picker';
 import Dialog from 'react-native-dialog';
 
 export default function Settings({ navigation }) {
+  const [loading, setLoading] = useState(true);
+
   const [userData, setUserData] = useState('');
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [originalUsername, setOriginalUsername] = useState('');
   const [bio, setBio] = useState('');
 
-  const [loading, setLoading] = useState(true);
-
   const [changedSettings, setChangedSettings] = useState(false);
   const [image, setImage] = useState(null);
-  const [visible, setVisible] = useState(false);
+
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [deleteVisible, setDeleteVisible] = useState(false);
+  const [emailVisible, setEmailVisible] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
 
   useEffect(() => {
@@ -130,6 +137,103 @@ export default function Settings({ navigation }) {
     }
   }
 
+  const verify = async() => {
+    if (firebase.auth().currentUser.emailVerified) {
+      return true;
+    }
+    else {
+      Alert.alert(
+        "Verification Required",
+        "Do you need a verification email to be sent?",
+        [
+          {text: "Cancel"},
+          {text: "Send", onPress: () => {
+            firebase.auth().currentUser.sendEmailVerification({
+              handleCodeInApp: true,
+              url: 'https://mr-recipe-799e9.firebaseapp.com',
+            })
+            .then(() => {
+              Alert.alert(
+                "Verification Sent",
+                "A verification email has been sent to your email. Please check your junk mail."
+              );
+            })
+            .catch((error) => {
+              switch(error.code) {
+                case 'auth/too-many-requests':
+                  Alert.alert(
+                      "Too Many Requests",
+                      "Please check your junk mail for a verification email or wait to send a new one."
+                  );
+                  break;
+                default:
+                  alert(error.code);
+              }
+            })
+          }}
+        ]
+      );
+    }
+  }
+
+  const changeEmail = async() => {
+
+  }
+
+  const changePassword = async() => {
+    if (fieldsFilled) {
+        if (!password || !confirmPassword || !newPassword)
+        Alert.alert(
+            "Missing Password",
+            "One or more of the input fields is blank. Please enter your password in the input fields."
+        );
+        else if (confirmPassword != newPassword)
+            Alert.alert(
+                "Passwords Don't Match",
+                "Passwords do not match. Please retry entering your password."
+            );
+        else if (newPassword.length < 6)
+            Alert.alert(
+                "Password Too Short",
+                "The new password you have entered is too short. Please enter a password with at least 6 characters."
+            );
+        else if (newPassword == confirmPassword) {
+            try {
+                await firebase.auth().signInWithEmailAndPassword(email, password);
+                firebase.auth().currentUser.updatePassword(newPassword)
+                .then(() => {
+                    Alert.alert(
+                        "Password Changed",
+                        "Your password has been successfully changed."
+                    );
+                    navigation.navigate('DashboardScreen');
+                })
+                .catch((error) => {
+                    alert(error.code);
+                });
+            }
+            catch(error) {
+                switch(error.code) {
+                    case 'auth/wrong-password':
+                        Alert.alert(
+                            "Invalid Password",
+                            "The current password you have entered is incorrect. Please try again."
+                        );
+                        break;
+                    case 'auth/too-many-requests':
+                        Alert.alert(
+                            "Too Many Requests",
+                            "You are creating too many requests. Please try again later."
+                        );
+                        break;
+                    default:
+                        alert(error.code);
+                }
+            }
+        }
+    }
+  }
+
   const deleteAccount = async() => {
     if (password) {
       try {
@@ -173,8 +277,8 @@ export default function Settings({ navigation }) {
       <View style={styles.appcontainer}>
 
           {/* Delete account pop up */} 
-          <Dialog.Container visible={visible}>
-            <Dialog.Title>Account delete</Dialog.Title>
+          <Dialog.Container visible={deleteVisible}>
+            <Dialog.Title>Account Delete</Dialog.Title>
             <Dialog.Description>
               Do you want to delete this account? You cannot undo this action.
             </Dialog.Description>
@@ -183,8 +287,47 @@ export default function Settings({ navigation }) {
               secureTextEntry={true}
               onChangeText={(pass) => setPassword(pass)}
             />
-            <Dialog.Button label="Cancel" onPress={() => setVisible(false)}/>
+            <Dialog.Button label="Cancel" onPress={() => {setPassword(''); setDeleteVisible(false)}}/>
             <Dialog.Button label="Delete" style={{color: password ? 'red' : 'lightgrey'}} onPress={() => deleteAccount()}/>
+          </Dialog.Container>
+
+          {/* Change email pop up */} 
+          <Dialog.Container visible={emailVisible}>
+            <Dialog.Title>Change Email</Dialog.Title>
+            <Dialog.Description>
+              Please enter your new email.
+            </Dialog.Description>
+            <Dialog.Input
+              placeholder="Enter email"
+              onChangeText={(email) => setEmail(email)}
+            />
+            <Dialog.Button label="Cancel" onPress={() => {setEmail(''); setEmailVisible(false)}}/>
+            <Dialog.Button label="Change" style={{color: email ? 'red' : 'lightgrey'}} onPress={() => changeEmail()}/>
+          </Dialog.Container>
+
+          {/* Change email pop up */} 
+          <Dialog.Container visible={passwordVisible}>
+            <Dialog.Title>Change Password</Dialog.Title>
+            <Dialog.Description>
+              Please enter your current password and new password.
+            </Dialog.Description>
+            <Dialog.Input
+              placeholder="Enter current password"
+              secureTextEntry={true}
+              onChangeText={(pass) => setPassword(pass)}
+            />
+            <Dialog.Input
+              placeholder="Enter new password"
+              secureTextEntry={true}
+              onChangeText={(pass) => setNewPassword(pass)}
+            />
+            <Dialog.Input
+              placeholder="Confirm new password"
+              secureTextEntry={true}
+              onChangeText={(pass) => setConfirmPassword(pass)}
+            />
+            <Dialog.Button label="Cancel" onPress={() => {setPassword(''); setNewPassword(''); setConfirmPassword(''); setPasswordVisible(false)}}/>
+            <Dialog.Button label="Change" style={{color: email ? 'red' : 'lightgrey'}} onPress={() => changePassword()}/>
           </Dialog.Container>
 
 
@@ -230,7 +373,7 @@ export default function Settings({ navigation }) {
                   style={styles.input}
                 ></TextInput>
               </View>
-              <View style={{height: 100, ...styles.field}}>
+              <View style={{height: 100, ...styles.field, alignItems: 'flex-start'}}>
                 <Text style={styles.fieldTitle}>Bio</Text>
                 <TextInput 
                   placeholder='Add a bio to your profile'
@@ -261,7 +404,7 @@ export default function Settings({ navigation }) {
                   onChangeText={(newEmail) => updateSettings('name', newEmail)}
                   style={styles.input}
                 ></TextInput>
-                <Text onPress={() => navigation.navigate('ChangePasswordScreen')} style={styles.changeText}>Change</Text>
+                <Text onPress={async() => {if (await verify()) setEmailVisible(true)}} style={styles.changeText}>Change</Text>
               </View>
               <View style={styles.field}>
                 <Text style={styles.fieldTitle}>Password</Text>
@@ -274,7 +417,7 @@ export default function Settings({ navigation }) {
                   onChangeText={(newUsername) => updateSettings('username', newUsername)}
                   style={styles.input}
                 ></TextInput>
-                <Text onPress={() => navigation.navigate('ChangePasswordScreen')} style={styles.changeText}>Change</Text>
+                <Text onPress={async() => {if (await verify()) setPasswordVisible(true)}} style={styles.changeText}>Change</Text>
               </View>
             </View>
           </View>
@@ -283,7 +426,7 @@ export default function Settings({ navigation }) {
             <TouchableOpacity onPress={() => firebase.auth().signOut()} style={{...styles.button, backgroundColor: '#518BFF'}}>
               <Text style={styles.buttonText}>Sign Out</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setVisible(true)} style={{...styles.button, backgroundColor: 'red'}}>
+            <TouchableOpacity onPress={async() => {if (await verify()) setDeleteVisible(true)}} style={{...styles.button, backgroundColor: 'red'}}>
               <Text style={styles.buttonText}>Delete Account</Text>
             </TouchableOpacity>
           </View>
@@ -356,25 +499,23 @@ const styles = StyleSheet.create({
       paddingHorizontal: 30,
       borderBottomWidth: 1,
       borderBottomColor: '#363636',
+      alignItems: 'center',
     },
     fieldTitle: {
       fontSize: 16,
       fontWeight: 'bold',
       color: '#518BFF',
-      marginRight: 20,
+      marginRight: 15,
       width: 90,
     },
     input: {
-      fontSize: 16,
+      fontSize: 15,
       color: 'white',
-      width: 225,
+      width: 180,
+      marginRight: 10,
     },
     changeText: {
       color: '#518BFF',
-      position: 'absolute',
-      right: 20,
-      top: '50%',
-      marginTop: 4,
     },
     footer: {
       marginTop: 'auto',

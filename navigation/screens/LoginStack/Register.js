@@ -43,7 +43,20 @@ export default function Register({ navigation }) {
       await firebase.auth().createUserWithEmailAndPassword(email, password)
       .then(() => {
         let username_lowercase = username.toLowerCase();
-        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).set({name, username, username_lowercase, email, bio: '', pfp: '', recipes: [], favorites: []})
+        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).set({name, username, username_lowercase, email, bio: '', pfp: '', recipes: [], favorites: []});
+        firebase.auth().currentUser.sendEmailVerification({
+          handleCodeInApp: true,
+          url: 'https://mr-recipe-799e9.firebaseapp.com',
+        })
+        .then(() => {
+          Alert.alert(
+            "Verification Sent",
+            "A verification email has been sent to your email. Please check your junk mail."
+          );
+        })
+        .catch((error) => {
+          alert(error.code);
+        })
       })
       .catch((error) => {
         switch(error.code) {

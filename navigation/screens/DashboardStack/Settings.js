@@ -19,6 +19,7 @@ export default function Settings({ navigation }) {
   const [image, setImage] = useState(null);
 
   const [email, setEmail] = useState('');
+  const [confirmEmail, setConfirmEmail] = useState('');
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -26,6 +27,8 @@ export default function Settings({ navigation }) {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [emailVisible, setEmailVisible] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
+
+  const[inProgress, setInProgress] = useState(false);
 
 
   useEffect(() => {
@@ -67,10 +70,6 @@ export default function Settings({ navigation }) {
       setChangedSettings(false);
   }
 
-  const SaveButton = () => (
-    <Text onPress={() => saveSettings()}style={{...styles.save, color: changedSettings ? 'white' : 'grey'}}>Save</Text>
-  )
-
   const saveSettings = async() => {
     if (changedSettings) {
       const doc = await firebase.firestore().collection('users').where("username_lowercase", "==", username.toLowerCase()).get();
@@ -87,7 +86,7 @@ export default function Settings({ navigation }) {
           imgUrl = userData.pfp;
         }
 
-        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update(
+        await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update(
           {name, username, bio, username_lowercase: username.toLowerCase(), pfp: imgUrl}
         )
         .then(() => {
@@ -98,11 +97,16 @@ export default function Settings({ navigation }) {
           navigation.navigate('DashboardScreen');
         })
         .catch((error) => {
-          alert(error.code);
+          alert(error.message);
         })
       }
     }
+    setInProgress(false);
   }
+
+  const SaveButton = () => (
+    <Text disabled={inProgress} onPress={async() => {setInProgress(true); await saveSettings();}} style={{...styles.save, color: changedSettings ? 'white' : 'grey'}}>Save</Text>
+  )
 
   const choosePhoto = async() => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -133,11 +137,12 @@ export default function Settings({ navigation }) {
       return url;
     }
     catch(error) {
-      alert(error.code);
+      alert(error.message);
     }
   }
 
   const verify = async() => {
+    await firebase.auth().currentUser.reload();
     if (firebase.auth().currentUser.emailVerified) {
       return true;
     }
@@ -167,7 +172,7 @@ export default function Settings({ navigation }) {
                   );
                   break;
                 default:
-                  alert(error.code);
+                  alert(error.message);
               }
             })
           }}
@@ -177,60 +182,129 @@ export default function Settings({ navigation }) {
   }
 
   const changeEmail = async() => {
+    if (email != confirmEmail)
+        Alert.alert(
+            "Emails Don't Match",
+            "Emails do not match. Please retry entering your emails."
+        );
+    else {
+      try {
+        await firebase.auth().signInWithEmailAndPassword(userData.email, password);
+        firebase.auth().currentUser.updateEmail(email)
+        .then(() => {
+            firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update(
+              {email}
+            )
+            .then(() => {
+              setEmailVisible(false);
+              setEmail('');
+              setConfirmEmail('');
+              setPassword('');
 
+              firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
+              .then((snapshot) => {
+                if (snapshot.exists) {
+                  setUserData(snapshot.data());
+                }
+                else
+                  Alert.alert("Unknown Error Occured", "Contact support with error.")
+              })
+
+              Alert.alert(
+                  "Email Changed",
+                  "Your email has been successfully changed."
+              );
+            })
+            .catch((error) => {
+              alert(error.message);
+            })  
+        })
+        .catch((error) => {
+            switch(error.code) {
+              case 'auth/email-already-in-use':
+                Alert.alert(
+                  "Email Already Exists",
+                  "The email address you entered is already in use by another account. Please retry with a different email address.",
+                );
+                break;
+              default:
+                alert(error.message);
+            }
+        });
+      }
+      catch(error) {
+          switch(error.code) {
+              case 'auth/wrong-password':
+                  Alert.alert(
+                      "Invalid Password",
+                      "The current password you have entered is incorrect. Please try again."
+                  );
+                  break;
+              case 'auth/too-many-requests':
+                  Alert.alert(
+                      "Too Many Requests",
+                      "You are creating too many requests. Please try again later."
+                  );
+                  break;
+              default:
+                  alert(error.message);
+          }
+      }
+    }
   }
 
   const changePassword = async() => {
-    if (fieldsFilled) {
-        if (!password || !confirmPassword || !newPassword)
+    if (confirmPassword != newPassword)
         Alert.alert(
-            "Missing Password",
-            "One or more of the input fields is blank. Please enter your password in the input fields."
+            "Passwords Don't Match",
+            "Passwords do not match. Please retry entering your passwords."
         );
-        else if (confirmPassword != newPassword)
-            Alert.alert(
-                "Passwords Don't Match",
-                "Passwords do not match. Please retry entering your password."
-            );
-        else if (newPassword.length < 6)
-            Alert.alert(
-                "Password Too Short",
-                "The new password you have entered is too short. Please enter a password with at least 6 characters."
-            );
-        else if (newPassword == confirmPassword) {
-            try {
-                await firebase.auth().signInWithEmailAndPassword(email, password);
-                firebase.auth().currentUser.updatePassword(newPassword)
-                .then(() => {
-                    Alert.alert(
-                        "Password Changed",
-                        "Your password has been successfully changed."
-                    );
-                    navigation.navigate('DashboardScreen');
-                })
-                .catch((error) => {
-                    alert(error.code);
-                });
-            }
-            catch(error) {
-                switch(error.code) {
-                    case 'auth/wrong-password':
-                        Alert.alert(
-                            "Invalid Password",
-                            "The current password you have entered is incorrect. Please try again."
-                        );
-                        break;
-                    case 'auth/too-many-requests':
-                        Alert.alert(
-                            "Too Many Requests",
-                            "You are creating too many requests. Please try again later."
-                        );
-                        break;
-                    default:
-                        alert(error.code);
-                }
-            }
-        }
+    else if (newPassword.length < 6)
+        Alert.alert(
+            "Password Too Short",
+            "The new password you have entered is too short. Please enter a password with at least 6 characters."
+        );
+    else if (password == newPassword)
+        Alert.alert(
+          "Password Not Unique",
+          "Your new password should be different from your current password."
+        );
+    else if (newPassword == confirmPassword) {
+      try {
+          await firebase.auth().signInWithEmailAndPassword(userData.email, password);
+          firebase.auth().currentUser.updatePassword(newPassword)
+          .then(() => {
+              setPasswordVisible(false);
+              setPassword('');
+              setNewPassword('');
+              setConfirmPassword('');
+              Alert.alert(
+                  "Password Changed",
+                  "Your password has been successfully changed."
+              );
+          })
+          .catch((error) => {
+              alert(error.code);
+          });
+      }
+      catch(error) {
+          switch(error.code) {
+              case 'auth/wrong-password':
+                  Alert.alert(
+                      "Invalid Password",
+                      "The current password you have entered is incorrect. Please try again."
+                  );
+                  break;
+              case 'auth/too-many-requests':
+                  Alert.alert(
+                      "Too Many Requests",
+                      "You are creating too many requests. Please try again later."
+                  );
+                  break;
+              default:
+                  alert(error.message);
+          }
+      }
     }
   }
 
@@ -295,17 +369,33 @@ export default function Settings({ navigation }) {
           <Dialog.Container visible={emailVisible}>
             <Dialog.Title>Change Email</Dialog.Title>
             <Dialog.Description>
-              Please enter your new email.
+              Please enter your new email and current password.
             </Dialog.Description>
             <Dialog.Input
-              placeholder="Enter email"
+              placeholder="Enter new email"
+              keyboardType='email-address'
+              autoCapitalize={false}
+              maxLength={320}
               onChangeText={(email) => setEmail(email)}
             />
-            <Dialog.Button label="Cancel" onPress={() => {setEmail(''); setEmailVisible(false)}}/>
-            <Dialog.Button label="Change" style={{color: email ? 'red' : 'lightgrey'}} onPress={() => changeEmail()}/>
+            <Dialog.Input
+              placeholder="Confirm new email"
+              keyboardType='email-address'
+              autoCapitalize={false}
+              maxLength={320}
+              onChangeText={(email) => setConfirmEmail(email)}
+            />
+            <Dialog.Input
+              placeholder="Enter password"
+              secureTextEntry={true}
+              onChangeText={(pass) => setPassword(pass)}
+            />
+            <Dialog.Button label="Cancel" onPress={() => {setEmail(''); setConfirmEmail(''); setPassword(''); setEmailVisible(false)}}/>
+            {(!password || !email || !confirmEmail) && <Dialog.Button label="Change" style={{color: 'lightgrey'}}/>}
+            {password && email && confirmEmail && <Dialog.Button label="Change" style={{color: 'red'}} onPress={() => changeEmail()}/>}
           </Dialog.Container>
 
-          {/* Change email pop up */} 
+          {/* Change password pop up */} 
           <Dialog.Container visible={passwordVisible}>
             <Dialog.Title>Change Password</Dialog.Title>
             <Dialog.Description>
@@ -327,9 +417,9 @@ export default function Settings({ navigation }) {
               onChangeText={(pass) => setConfirmPassword(pass)}
             />
             <Dialog.Button label="Cancel" onPress={() => {setPassword(''); setNewPassword(''); setConfirmPassword(''); setPasswordVisible(false)}}/>
-            <Dialog.Button label="Change" style={{color: email ? 'red' : 'lightgrey'}} onPress={() => changePassword()}/>
+            {(!password || !newPassword || !confirmPassword) && <Dialog.Button label="Change" style={{color: 'lightgrey'}}/>}
+            {password && newPassword && confirmPassword && <Dialog.Button label="Change" style={{color: 'red'}} onPress={() => changePassword()}/>}
           </Dialog.Container>
-
 
           {/* Main Content */}
           <View style={styles.topbar}>
@@ -339,7 +429,7 @@ export default function Settings({ navigation }) {
           </View>
           <View style={styles.settingsContainer}>
             <View style={styles.profile}>
-              <TouchableOpacity onPress={() => choosePhoto()}>
+              <TouchableOpacity disabled={inProgress} onPress={() => choosePhoto()}>
                 <View>                
                   {image && <Image source={{uri: image.uri}} style={styles.profilePicture}/>}
                   {loading && <Image style={styles.profilePicture}/>}
@@ -357,6 +447,7 @@ export default function Settings({ navigation }) {
                   placeholder="Enter a name"
                   placeholderTextColor='#818181'
                   maxLength={18}
+                  editable={!inProgress}
                   value={name}
                   onChangeText={(newName) => updateSettings('name', newName)}
                   style={styles.input}
@@ -368,6 +459,7 @@ export default function Settings({ navigation }) {
                   placeholder="Enter a username"
                   placeholderTextColor='#818181'
                   maxLength={12}
+                  editable={!inProgress}
                   value={username}
                   onChangeText={(newUsername) => updateSettings('username', newUsername)}
                   style={styles.input}
@@ -379,11 +471,14 @@ export default function Settings({ navigation }) {
                   placeholder='Add a bio to your profile'
                   placeholderTextColor='#818181'
                   multiline={true}
-                  maxLength={100}
+                  maxLength={750}
+                  blurOnSubmit={true}
+                  editable={!inProgress}
                   value={bio}
+                  height={70}
                   textAlignVertical='top'
                   onChangeText={(newBio) => updateSettings('bio', newBio)}
-                  style={{...styles.input, paddingTop: 0}}
+                  style={{...styles.input, paddingTop: 0, width: 200}}
                 ></TextInput>
               </View>
             </View>
@@ -396,9 +491,6 @@ export default function Settings({ navigation }) {
               <View style={{...styles.field, borderTopWidth: 1, borderTopColor: '#363636'}}>
                 <Text style={styles.fieldTitle}>Email</Text>
                 <TextInput
-                  placeholder="Enter an email"
-                  placeholderTextColor='#818181'
-                  maxLength={320}
                   value={userData.email}
                   editable={false}
                   onChangeText={(newEmail) => updateSettings('name', newEmail)}
@@ -409,8 +501,6 @@ export default function Settings({ navigation }) {
               <View style={styles.field}>
                 <Text style={styles.fieldTitle}>Password</Text>
                 <TextInput
-                  placeholder="Enter a username"
-                  placeholderTextColor='#818181'
                   secureTextEntry
                   value='......'
                   editable={false}
@@ -423,10 +513,10 @@ export default function Settings({ navigation }) {
           </View>
 
           <View style={styles.footer}>
-            <TouchableOpacity onPress={() => firebase.auth().signOut()} style={{...styles.button, backgroundColor: '#518BFF'}}>
+            <TouchableOpacity disabled={inProgress} onPress={() => firebase.auth().signOut()} style={{...styles.button, backgroundColor: '#518BFF'}}>
               <Text style={styles.buttonText}>Sign Out</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={async() => {if (await verify()) setDeleteVisible(true)}} style={{...styles.button, backgroundColor: 'red'}}>
+            <TouchableOpacity disabled={inProgress} onPress={async() => {if (await verify()) setDeleteVisible(true)}} style={{...styles.button, backgroundColor: 'red'}}>
               <Text style={styles.buttonText}>Delete Account</Text>
             </TouchableOpacity>
           </View>

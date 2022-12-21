@@ -10,6 +10,7 @@ export default function Register({ navigation }) {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const usersDB = firebase.firestore().collection('users');
 
   const registerUser = async(email, password, name, username) => {
@@ -83,12 +84,14 @@ export default function Register({ navigation }) {
               "Email Already Exists",
               "The email address you entered is already in use by another account. Please login or retry with a different email address.",
             );
+            console.debug('a');
             break;
           default:
             alert(error.message);
         }
       })
     }
+    setLoading(false);
   }
 
   return (
@@ -98,7 +101,6 @@ export default function Register({ navigation }) {
               <BackArrow navigation={navigation}/>
               <Text style={styles.topbarTitle}>Register</Text>
           </View>
-          
           <View style={styles.register}>
               <View style={styles.logoContainer}>
                 <Image 
@@ -112,9 +114,9 @@ export default function Register({ navigation }) {
                 <TextInput 
                   placeholder="Name"
                   placeholderTextColor={'lightgrey'}
+                  editable={!loading}
                   style={styles.inputField}
                   onChangeText={(name) => {setName(name)}}
-                  autoCorrect={false}
                   maxLength={18}
                   onSubmitEditing={() => {registerUser(email, password, name, username)}}
                 ></TextInput>
@@ -124,9 +126,10 @@ export default function Register({ navigation }) {
                 <TextInput
                   placeholder="Username"
                   placeholderTextColor={'lightgrey'}
+                  editable={!loading}
+                  autoCorrect={false}
                   style={styles.inputField}
                   onChangeText={(username) => {setUsername(username)}}
-                  autoCorrect={false}
                   maxLength={12}
                   onSubmitEditing={() => {registerUser(email, password, name, username)}}
                 ></TextInput>
@@ -136,11 +139,11 @@ export default function Register({ navigation }) {
                 <TextInput
                   placeholder="Email Address"
                   placeholderTextColor={'lightgrey'}
+                  editable={!loading}
                   style={styles.inputField}
                   keyboardType='email-address'
                   onChangeText={(email) => {setEmail(email)}}
                   autoCapitalize={false}
-                  autoCorrect={false}
                   maxLength={320}
                   onSubmitEditing={() => {registerUser(email, password, name, username)}}
                 ></TextInput>                
@@ -151,11 +154,10 @@ export default function Register({ navigation }) {
                 <TextInput
                     placeholder="Password"
                     placeholderTextColor={'lightgrey'}
+                    editable={!loading}
                     style={styles.inputField}
                     onChangeText={(password) => {setPassword(password)}}
                     secureTextEntry={true}
-                    autoCapitalize={false}
-                    autoCorrect={false}
                     onSubmitEditing={() => {registerUser(email, password, name, username)}}
                   ></TextInput>
               </View>
@@ -164,18 +166,16 @@ export default function Register({ navigation }) {
                 <TextInput
                   placeholder="Confirm Password"
                   placeholderTextColor={'lightgrey'}
+                  editable={!loading}
                   style={styles.inputField}
                   onChangeText={(confirmPassword) => {setConfirmPassword(confirmPassword)}}
                   secureTextEntry={true}
-                  autoCapitalize={false}
-                  autoCorrect={false}
                   onSubmitEditing={() => {registerUser(email, password, name, username)}}
                 ></TextInput>
               </View>
 
-              <TouchableOpacity style={styles.button} onPress={() => registerUser(email, password, name, username)}>
-                <Text style={styles.buttonText}>Sign up
-                </Text>
+              <TouchableOpacity disabled={loading} style={styles.button} onPress={() => {setLoading(true); registerUser(email, password, name, username)}}>
+                <Text style={styles.buttonText}>Sign up</Text>
               </TouchableOpacity>
           </View>
       </View>

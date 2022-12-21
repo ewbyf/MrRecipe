@@ -41,10 +41,6 @@ export default function Post({ navigation }) {
                 placeholder="Cooking Time"
                 style={styles.input_container}
               ></TextInput>
-              <TextInput
-                placeholder="Total Time"
-                style={styles.input_container}
-              ></TextInput>
               <TouchableOpacity style={styles.button}>
                 <Text style={styles.buttonText}>Publish</Text>
               </TouchableOpacity>
@@ -61,7 +57,7 @@ export default function Post({ navigation }) {
           </View>
           <View style={{height: '74%', alignItems: 'center', justifyContent: 'center'}}>
             <Text style={{fontSize: 18, fontWeight: 'bold', color: 'white'}}>You are currently logged out.</Text>
-            <Text style={{fontSize: 18, marginTop: 15, color: 'white'}}><Text onPress={() => navigation.navigate('Login')} style={{fontSize: 18, color: '#518BFF'}}>Sign in</Text> to view favorites</Text>
+            <Text style={{fontSize: 18, marginTop: 15, color: 'white'}}><Text onPress={() => navigation.navigate('Login')} style={{fontSize: 18, color: '#518BFF'}}>Sign in</Text> to post recipes</Text>
           </View>
       </View>
   );

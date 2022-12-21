@@ -1,26 +1,29 @@
-import { StyleSheet, View, Text, TextInput, Button, Alert, Image, ScrollView, TouchableOpacity, Animated, RefreshControl } from "react-native";
+import { StyleSheet, View, Text, TextInput, Button, Alert, Image, ScrollView, TouchableOpacity, Animated, RefreshControl, ImageBackground, YellowBox } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { firebase } from '../../../config';
 import { useState, useEffect } from "react";
 import { FlashList } from "@shopify/flash-list";
 import React, { useRef } from 'react';
 import { useSafeAreaInsets} from 'react-native-safe-area-context';
+import { Rating } from "react-native-ratings";
 
-const wait = (timeout) => {
-  return new Promise(resolve => setTimeout(resolve, timeout));
-}
 
 export default function Dashboard({ navigation }) {
+  const [refreshing, setRefreshing] = useState(false);
+  const [userData, setUserData] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [dataList, setDataList] = useState([]);
+
   const insets = useSafeAreaInsets();
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  const [refreshing, setRefreshing] = useState(false);
-  const[userData, setUserData] = useState('');
-  const[loading, setLoading] = useState(false);
+  const wait = (timeout) => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+  }
 
   const DATA = [
     {
-      name: 'Pasta',
+      name: 'askdjaskjdasjkldakj Pasta',
       description: 'Delicious!'
     },
     {
@@ -54,6 +57,23 @@ export default function Dashboard({ navigation }) {
     .then((snapshot) => {
       if (snapshot.exists) {
         setUserData(snapshot.data());
+        const tempList = []
+        snapshot.data().recipes.forEach((doc) => {
+          firebase.firestore().collection("recipes").doc(doc).get()
+          .then ((snap) => {
+            if (snap.exists) {
+              tempList.push(snap.data());
+              setDataList(tempList);
+            }
+            else {
+              console.debug('error');
+            }
+          })
+          .catch((error) => {
+            alert(error.message);
+          })
+        })
+        
       }
       else
         Alert.alert("Unknown Error Occured", "Contact support with error.")
@@ -196,16 +216,36 @@ export default function Dashboard({ navigation }) {
             {(userData && userData.recipes.length == 0) && <Text style={{color: 'lightgrey', fontSize: 16, textAlign: 'center'}}>You have not posted any recipes</Text>}
             {(userData && userData.recipes.length > 0) && 
               <FlashList 
-                data={DATA}
+                data={dataList}
                 renderItem={({item}) => (
-                  <TouchableOpacity>
-                    <View style={styles.list}>
+                  <TouchableOpacity style={{width: '100%'}}>
+                    <ImageBackground source={{uri: item.image}} style={styles.list} imageStyle={{borderRadius: 15}}>
                       <Text style={styles.listTitle}>{item.name}</Text>
-                      <Text>Description of the dish: Lorem ipsum dolor sit amet consectetur, adipisicing elit. Id doloremque illum commodi ullam natus veniam assumenda quia sapiente nemo officia ipsum asperiores, consequuntur ipsa! Necessitatibus ullam recusandae quam distinctio deserunt?</Text>
-                    </View>
+                      <View style={{flexDirection: 'row', alignItems: 'center', width: '100%'}}>
+                        <View style={{flex: 1}}></View>
+                        <Rating
+                          style={styles.ratingBar}
+                          ratingCount={5}
+                          imageSize={16}
+                          readonly={true}
+                          type={'custom'}
+                          ratingBackgroundColor={'transparent'}
+                          tintColor={'#2E2E2E'}
+                          startingValue={item.rating}
+                        />
+                        <Text style={styles.rating}>{item.rating}</Text>
+                      </View>
+                      <Text style={styles.listText}>Difficulty: {item.difficulty}</Text>
+                      <Text style={styles.listText}>Total time: {(item.cooktime + item.preptime) / 60} hr</Text>
+                      
+                      {/* <View style={styles.author}>
+                        <Text style={styles.listText}>Posted By: {item.user}</Text>
+                      </View> */}
+                    </ImageBackground>
                   </TouchableOpacity>
                 )}
                 estimatedItemSize={1}
+                numColumns={2}
               />
             }
           </View>
@@ -318,16 +358,52 @@ const styles = StyleSheet.create({
   list: {
     height: 300,
     alignItems: 'center',
-    padding: 10,
-    margin: 10,
+    padding: 15,
+    margin: 3,
     backgroundColor: '#28466E',
-    borderRadius: 30,
+    borderRadius: 15,
   },
   listTitle: {
     color: '#FFD9AC',
-    fontSize: 26,
+    fontSize: 22,
+    paddingHorizontal: 5,
     fontWeight: 'bold',
-    marginBottom: 7,
+    marginBottom: 5,
+    textAlign: 'center',
+    backgroundColor: '#28466E',
+    shadowOffset: {width: 1, height: 1},
+    shadowOpacity: 1,
+    shadowRadius: 1,
+  },
+  listText: {
+    color: '#FFD9AC',
+    fontSize: 13,
+    paddingHorizontal: 5,
+    marginTop: 5,
+    textAlign: 'center',
+    backgroundColor: '#28466E',
+    shadowOffset: {width: 1, height: 1},
+    shadowOpacity: 1,
+    shadowRadius: 1,
+  },
+  ratingBar: {
+    flex: 1, 
+    marginHorizontal: 30,
+    shadowOffset: {width: 1, height: 1},
+    shadowOpacity: 1,
+    shadowRadius: 1,
+  },
+  rating: {
+    color: '#f1c40f',
+    fontSize: 15,
+    fontWeight: 'bold',
+    flex: 1,
+    shadowOffset: {width: 1, height: 1},
+    shadowOpacity: 1,
+    shadowRadius: 1,
+  },
+  author: {
+    marginTop: 'auto',
   }
 });
 

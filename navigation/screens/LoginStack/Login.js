@@ -2,10 +2,14 @@ import { StyleSheet, View, Text, TextInput, Button, Alert, Image, TouchableOpaci
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useState, useEffect } from "react";
 import { firebase } from '../../../config';
+import Dialog from 'react-native-dialog';
 
 export default function Login({ navigation }){
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const [forgotVisible, setForgotVisible] = useState(false);
+  const[resetEmail, setResetEmail] = useState('');
   
   const loginUser = async(email, password) => {
     if (!password) {
@@ -44,6 +48,12 @@ export default function Login({ navigation }){
                 "The password you have entered is incorrect. Please try again."
             );
             break;
+          case 'auth/too-many-requests':
+            Alert.alert(
+                "Too Many Attempts",
+                "Access to this account has been temporarily disabled due to too many failed attempts."
+            );
+            break;
           default:
             alert(error.message);
         }
@@ -51,9 +61,57 @@ export default function Login({ navigation }){
     }
   }
 
+  const resetPassword = async() => {
+    try {
+        await firebase.auth().sendPasswordResetEmail(resetEmail);
+        alert("Your password reset email has been sent!");
+        setResetEmail('');
+        setForgotVisible(false);
+    }
+    catch (error) {
+        switch(error.code) {
+            case 'auth/user-not-found':
+                Alert.alert(
+                    "Account Not Found",
+                    "No account found for the email address you entered.",
+                  );
+                break;
+            case 'auth/invalid-email':
+                Alert.alert(
+                    "Invalid Email",
+                    "Please enter a valid email address into the input field.",
+                  );
+                break;
+            case 'auth/missing-email':
+                Alert.alert(
+                    "Missing Email",
+                    "Please enter your email address into the input field.",
+                  );
+                break;
+            default:
+                alert(error.message);
+        }
+    }
+  };
+
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}> 
       <View style={styles.appcontainer}> 
+
+        {/* Forgot password pop up */} 
+        <Dialog.Container visible={forgotVisible}>
+          <Dialog.Title>Forgot Password</Dialog.Title>
+          <Dialog.Description>
+            Please enter the email for your account.
+          </Dialog.Description>
+          <Dialog.Input
+            placeholder="Enter email"
+            onChangeText={(email) => setResetEmail(email)}
+          />
+          <Dialog.Button label="Cancel" onPress={() => {setResetEmail(''); setForgotVisible(false)}}/>
+          <Dialog.Button label="Reset" style={{color: resetEmail ? 'red' : 'lightgrey'}} onPress={() => resetPassword()}/>
+        </Dialog.Container>
+
         <View style={styles.topbar}>
           <Text style={styles.topbarTitle}>Login</Text>
         </View>
@@ -73,10 +131,9 @@ export default function Login({ navigation }){
                   placeholderTextColor={'lightgrey'}
                   style={styles.inputField} 
                   keyboardType='email-address'
-                  onChangeText={(email) => {setEmail(email)}}
                   autoCapitalize={false}
-                  autoCorrect={false}
                   maxLength={320}
+                  onChangeText={(email) => {setEmail(email)}}
                   onSubmitEditing={() => {loginUser(email, password)}}
                 ></TextInput>
               </View>
@@ -88,8 +145,6 @@ export default function Login({ navigation }){
                   style={styles.inputField}
                   onChangeText={(password) => {setPassword(password)}}
                   secureTextEntry={true}
-                  autoCapitalize={false}
-                  autoCorrect={false}
                   onSubmitEditing={() => {loginUser(email, password)}}
                 ></TextInput>
               </View>
@@ -103,7 +158,7 @@ export default function Login({ navigation }){
                 <Text onPress={() => navigation.navigate('RegisterScreen')} style={{color: '#518BFF'}}>Sign up</Text>
               </View>
 
-              <Text onPress={() => navigation.navigate('ForgotPasswordScreen')} style={{color: '#518BFF', marginTop: 20}}>Forgot Password?</Text>
+              <Text onPress={() => setForgotVisible(true)} style={{color: '#518BFF', marginTop: 20}}>Forgot Password?</Text>
           </View>
         </View>
       </View>

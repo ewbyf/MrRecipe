@@ -68,58 +68,6 @@ export default function Dashboard({ navigation }) {
   return (
     <View style={styles.appcontainer}>
 
-      {/* Profile picture pop up */}
-      {/* <Animated.View
-        style={{
-          zIndex: 2,
-          position: 'absolute',
-          top: insets.top + 8,
-          left: 0,
-          right: 0,
-          flexDirection: 'row',
-          justifyContent: 'center',          
-          opacity: scrollY.interpolate({
-            inputRange: [145, 165],
-            outputRange: [0, 1],
-          }),
-          transform: [{
-              translateY: scrollY.interpolate({
-                inputRange: [145, 175],
-                outputRange: [40, 0],
-                extrapolate: 'clamp'
-            })
-          }]
-        }}
-      >
-        <Image style={{height: 40, width: 40}} source={{uri: userData.pfp ? userData.pfp : 'https://imgur.com/hNwMcZQ.png'}}/>
-        <Text style={[styles.text, styles.topbarTitle]}>{userData.name}</Text>
-      </Animated.View> */}
-      
-      {/* <Animated.Image 
-        source={{uri: userData.pfp ? userData.pfp : 'https://imgur.com/hNwMcZQ.png'}}
-        style={{
-          borderRadius: 50,
-          height: 35,
-          width: 35,
-          zIndex: 2,
-          position: 'absolute',
-          top: insets.top + 8,
-          left: 0,
-          right: 0,
-          alignItems: 'center',
-          opacity: scrollY.interpolate({
-            inputRange: [145, 165],
-            outputRange: [0, 1],
-          }),
-          transform: [{
-              translateY: scrollY.interpolate({
-                inputRange: [145, 175],
-                outputRange: [40, 0],
-                extrapolate: 'clamp'
-            })
-          }]
-        }}/> */}
-
       {/* Header pop up */}
       <View style={{position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', zIndex: 2, paddingTop: 30, height: 110}}>
         <View style={{flex: 1, height: '100%', justifyContent: 'center'}}>
@@ -128,16 +76,16 @@ export default function Dashboard({ navigation }) {
             style={{
               marginLeft: 'auto',
               borderRadius: 50,
-              height: 35,
-              width: 35,
+              height: 40,
+              width: 40,
               opacity: scrollY.interpolate({
-                inputRange: [30, 100],
+                inputRange: [100, 140],
                 outputRange: [0, 1],
               }),
               transform: [{
                   translateY: scrollY.interpolate({
-                    inputRange: [30, 140],
-                    outputRange: [60, 0],
+                    inputRange: [100, 140],
+                    outputRange: [22, 0],
                     extrapolate: 'clamp'
                 })
               }]
@@ -147,67 +95,42 @@ export default function Dashboard({ navigation }) {
           <Animated.View
             style={{
               textAlign: 'center',
-              marginBottom: 0,
               opacity: scrollY.interpolate({
                 inputRange: [135, 165],
                 outputRange: [0, 1],
               }),
               transform: [{
                   translateY: scrollY.interpolate({
-                    inputRange: [135, 175],
-                    outputRange: [50, 0],
+                    inputRange: [135, 195],
+                    outputRange: [62, 0],
                     extrapolate: 'clamp'
                 })
               }]
             }}
           >
-            <Text style={styles.name}>{userData.name}</Text>
+            <Text style={[styles.name, {fontSize: 23.5}]}>{userData.name}</Text>
           </Animated.View>
           <Animated.View
             style={{
-              textAlign: 'center',
               opacity: scrollY.interpolate({
-                inputRange: [135, 165],
+                inputRange: [165, 185],
                 outputRange: [0, 1],
               }),
               transform: [{
                   translateY: scrollY.interpolate({
-                    inputRange: [135, 175],
-                    outputRange: [50, 0],
+                    inputRange: [165, 195],
+                    outputRange: [32, 0],
                     extrapolate: 'clamp'
                 })
               }]
             }}
           >
-            <Text style={styles.username}>@{userData.username}</Text>
+            <Text style={[styles.username, {fontSize: 13.5}]}>@{userData.username}</Text>
           </Animated.View>
         </View>
-        <View style={{flex: 1}}><Text></Text></View>
+        <View style={{flex: 1}}></View>
       </View>
 
-      {/* <Animated.View
-        style={{
-          zIndex: 2,
-          position: 'absolute',
-          top: insets.top + 8,
-          left: 0,
-          right: 0,
-          alignItems: 'center',          
-          opacity: scrollY.interpolate({
-            inputRange: [145, 165],
-            outputRange: [0, 1],
-          }),
-          transform: [{
-              translateY: scrollY.interpolate({
-                inputRange: [145, 175],
-                outputRange: [40, 0],
-                extrapolate: 'clamp'
-            })
-          }]
-        }}
-      >
-        <Text style={[styles.text, styles.topbarTitle]}>{userData.name}</Text>
-      </Animated.View> */}
         
       <View style={styles.topbar}>
         <Animated.View style={{
@@ -230,6 +153,7 @@ export default function Dashboard({ navigation }) {
       <View style={styles.dashboard}>
         <Animated.ScrollView
           showsVerticalScrollIndicator={false}
+          stickyHeaderIndices={[2]}
           onScroll={Animated.event([{nativeEvent: {contentOffset: { y: scrollY }}}],{ useNativeDriver: true })}
           style={{zIndex: 3}}
           contentContainerStyle={styles.scrollView}
@@ -262,8 +186,11 @@ export default function Dashboard({ navigation }) {
             {userData.bio && <Text style={styles.bio}>{userData.bio}</Text>}
           </View>
 
-          <View style={styles.postsContainer}>
+          <View style={styles.postTitleContainer}>
             <Text style={styles.postsTitle}>POSTS</Text>
+          </View>
+
+          <View style={styles.postsContainer}>
             {(userData && userData.recipes.length == 0) && <Text style={{color: 'lightgrey', fontSize: 16, textAlign: 'center'}}>You have not posted any recipes</Text>}
             {(userData && userData.recipes.length > 0) && 
               <FlashList 
@@ -340,7 +267,7 @@ const styles = StyleSheet.create({
     color: '#C9C9C9',
     fontSize: 16,
     textAlign: 'center',
-    marginVertical: 3,
+    marginBottom: 3,
   },
   bioContainer: {
     flexDirection: 'row',
@@ -354,16 +281,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 12,
   },
+  postTitleContainer: {
+    width: '100%',
+    marginTop: 20,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#363636',
+    backgroundColor: '#222222',
+  },
   postsContainer: {
     width: '100%',
     height: '100%',
     maxHeight: '57%',
-    marginVertical: 20,
-    paddingTop: 10,
     paddingHorizontal: 10,
     marginBottom: 125,
-    borderTopWidth: 1,
-    borderTopColor: '#363636',
   },
   postsTitle: {
     color: 'white',

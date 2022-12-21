@@ -33,7 +33,7 @@ export default function DashboardStack({ navigation, route }) {
 const styles = StyleSheet.create({
     navbar: {
         position: 'absolute',
-        bottom: 25,
+        bottom: 25, 
         left: 20,
         right: 20,
         elevation: 0, 

@@ -1,11 +1,19 @@
-import { StyleSheet, View, TouchableOpacity, Text, TextInput } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Text, TextInput, SelectList, Image } from "react-native";
 import { useState, useEffect } from "react";
 import { firebase } from '../../config';
 import BackArrow from '../../components/BackArrow';
 
+
 export default function Post({ navigation }) {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
+  const [selected, setSelected] = useState("");
+
+  const data = [
+    {key:'1', value:'Easy'},
+    {key:'2', value:'Medium'},
+    {key:'3', value:'Hard'},  
+  ];
 
   function onAuthStateChanged(user) {
     setUser(user);
@@ -26,7 +34,7 @@ export default function Post({ navigation }) {
       <View style={styles.appcontainer}>
           <View style={styles.topbar}>
             <BackArrow navigation={navigation}/>
-            <Text style={styles.topbarTitle}>Recipes</Text>
+            <Text style={styles.topbarTitle}>Add a Recipe</Text>
           </View>
           <View styles={styles.items}>
               <TextInput
@@ -41,6 +49,15 @@ export default function Post({ navigation }) {
                 placeholder="Cooking Time"
                 style={styles.input_container}
               ></TextInput>
+              <TextInput
+                placeholder="Ingredients"
+                style={styles.input_container}
+              ></TextInput>
+              <TextInput
+                placeholder="Procedure"
+                style={styles.input_container}
+              ></TextInput>
+
               <TouchableOpacity style={styles.button}>
                 <Text style={styles.buttonText}>Publish</Text>
               </TouchableOpacity>
@@ -105,17 +122,18 @@ const styles = StyleSheet.create({
     },
     button: {
       backgroundColor: '#518BFF',
-      width: 200,
+      width: 175,
       height: 40,
       borderRadius: 20,
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: 20,
+      marginHorizontal: 102.5,
     },
     buttonText: {
       fontSize: 20,
       fontWeight: 'bold',
-      color: 'white'
+      color: 'white',
     },
     items: {
       height: '87%',
@@ -124,11 +142,12 @@ const styles = StyleSheet.create({
     },  
     input_container: {
       borderWidth: 0.5,
-      padding: 15,
+      padding: 12.5,
+      marginHorizontal: 15,
       fontSize: 16,
       marginTop: 20,
       borderRadius: 50,
       backgroundColor: 'white'
-    }
+    },
   });
   

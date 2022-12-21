@@ -20,7 +20,8 @@ export default function Dashboard({ navigation }) {
 
   const DATA = [
     {
-      name: 'pasta'
+      name: 'Pasta',
+      description: 'Delicious!'
     },
     {
       name: 'rice'
@@ -69,7 +70,7 @@ export default function Dashboard({ navigation }) {
     <View style={styles.appcontainer}>
 
       {/* Header pop up */}
-      <View style={{position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', zIndex: 2, paddingTop: 30, height: 110}}>
+      <View style={styles.animationContainer}>
         <View style={{flex: 1, height: '100%', justifyContent: 'center'}}>
           <Animated.Image 
             source={{uri: userData.pfp ? userData.pfp : 'https://imgur.com/hNwMcZQ.png'}}
@@ -91,7 +92,7 @@ export default function Dashboard({ navigation }) {
               }]
           }}/>
         </View>
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', height: '100%'}}>
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', height: '100%', marginHorizontal: 10}}>
           <Animated.View
             style={{
               textAlign: 'center',
@@ -128,7 +129,9 @@ export default function Dashboard({ navigation }) {
             <Text style={[styles.username, {fontSize: 13.5}]}>@{userData.username}</Text>
           </Animated.View>
         </View>
-        <View style={{flex: 1}}></View>
+        <View style={{flex: 1}}>
+          <Icon name='cog-outline' color='white' size={35} style={styles.gear} onPress={() => navigation.navigate('SettingsScreen')}/>
+        </View>
       </View>
 
         
@@ -147,7 +150,6 @@ export default function Dashboard({ navigation }) {
           }]}}>
           <Text style={styles.topbarTitle}>Profile</Text>
         </Animated.View>
-        <Icon name='cog-outline' color='white' size={35} style={styles.gear} onPress={() => navigation.navigate('SettingsScreen')}/>
       </View>
 
       <View style={styles.dashboard}>
@@ -199,7 +201,7 @@ export default function Dashboard({ navigation }) {
                   <TouchableOpacity>
                     <View style={styles.list}>
                       <Text style={styles.listTitle}>{item.name}</Text>
-                      <Text>Hidsadasdasas</Text>
+                      <Text>Description of the dish: Lorem ipsum dolor sit amet consectetur, adipisicing elit. Id doloremque illum commodi ullam natus veniam assumenda quia sapiente nemo officia ipsum asperiores, consequuntur ipsa! Necessitatibus ullam recusandae quam distinctio deserunt?</Text>
                     </View>
                   </TouchableOpacity>
                 )}
@@ -218,6 +220,19 @@ const styles = StyleSheet.create({
   appcontainer: {
     height: '100%',
     backgroundColor: '#222222',
+  },
+  animationContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center', 
+    justifyContent: 'center',
+    zIndex: 2,
+    elevation: 2,
+    paddingTop: 30,
+    height: 110,
   },
   backArrow: {
       position: 'absolute',
@@ -240,10 +255,8 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   gear: {
-    position: 'absolute',
-    right: '5%',
-    top: '50%',
-    marginTop: 12.5,
+    alignSelf: 'flex-end',
+    marginRight: 20,
   },
   dashboard: {
     flexDirection: 'column',
@@ -284,7 +297,7 @@ const styles = StyleSheet.create({
   postTitleContainer: {
     width: '100%',
     marginTop: 20,
-    paddingTop: 10,
+    paddingVertical: 5,
     borderTopWidth: 1,
     borderTopColor: '#363636',
     backgroundColor: '#222222',
@@ -292,7 +305,6 @@ const styles = StyleSheet.create({
   postsContainer: {
     width: '100%',
     height: '100%',
-    maxHeight: '57%',
     paddingHorizontal: 10,
     marginBottom: 125,
   },
@@ -305,18 +317,17 @@ const styles = StyleSheet.create({
   },
   list: {
     height: 300,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
     alignItems: 'center',
     padding: 10,
-    margin: 5,
-    backgroundColor: '#518BFF',
+    margin: 10,
+    backgroundColor: '#28466E',
     borderRadius: 30,
   },
   listTitle: {
-    color: 'white',
-    fontSize: 17,
+    color: '#FFD9AC',
+    fontSize: 26,
     fontWeight: 'bold',
+    marginBottom: 7,
   }
 });
 

@@ -19,11 +19,7 @@ export default function Post({ navigation }) {
     {key: '3', value: 'Hard'},
   ];
 
-  const [textInput, setTextInput] = useState('');
-  const[todos, setTodos] = useState([
-    {id: 1, task: 'First ingredient'},
-    {id: 2, task: 'Second ingredient'},
-  ]);
+  const [inputs, setInputs] = useState([{key: '', value: ''}]);
 
   // Check if users signed in
   function onAuthStateChanged(user) {
@@ -56,31 +52,26 @@ export default function Post({ navigation }) {
     </View>;
   };
 
-  const addTodo = ()=> {
-    if(textInput == ""){
-      Alert.alert('No way', 'You are a clown. twitter.com/Dreamybullxxx');
+  const takePhoto = async() => {
+    if ((await ImagePicker.getCameraPermissionsAsync()).granted == false) {
+      await ImagePicker.requestCameraPermissionsAsync();
     }
-    else{
-      const newTodo ={
-        id: Math.random(),
-        task: textInput,
-      };
-      setTodos([...todos,newTodo]);
-      setTextInput('');
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [3, 4],
+    });
+    if (!result.canceled) {
+      const source = {uri : result.assets[0].uri};
+      setImage(source);
     }
-  };
-
-  const deleteTodo = (todoId) => {
-    const newTodos = todos.filter(item => item.id != todoId);
-    setTodos(newTodos);
-  };
+  }
 
   const choosePhoto = async() => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [3, 3],
-      quality: 1,
+      aspect: [3, 4],
     });
 
     if (!result.canceled) {
@@ -107,6 +98,24 @@ export default function Post({ navigation }) {
     }
   }
 
+  const addHandler = () => {
+    const _inputs = [...inputs];
+    _inputs.push({key: '', value: ''});
+    setInputs(_inputs);
+  }
+  
+  const deleteHandler = (key) => {
+    const _inputs = inputs.filter((input, index) => index != key);
+    setInputs(_inputs);
+  }
+
+  const inputHandler = (text, key) => {
+    const _inputs = [...inputs];
+    _inputs[key].value = text;
+    _inputs[key].key = key;
+    setInputs(_inputs);
+  }
+
   if (user) {
     return (
       <View style={styles.appcontainer}>
@@ -121,7 +130,7 @@ export default function Post({ navigation }) {
                 <Icon name="image" size={75} color={'gray'}/>
                 <Button title="Choose Photo" onPress={choosePhoto}/>
                 <Text style={{color: 'gray', fontSize: 16}}>or</Text>
-                <Button title="Take Photo" onPress={choosePhoto}/>
+                <Button title="Take Photo" onPress={takePhoto}/>
               </View>
               }
               {image && 
@@ -153,20 +162,16 @@ export default function Post({ navigation }) {
                 style={styles.input_container}
               ></TextInput>
 
-              <View styles={styles.ingredients}>
-              <TextInput
-                    placeholder="Add Ingredient" 
-                    value={textInput}
-                    onChangeText={(text)=>setTextInput(text)}
-                    style={styles.input_container}
-                ></TextInput>
-              
-                <TouchableOpacity onPress={addTodo}>
-                    <View style={styles.iconContainer}>
-                      <Icon name="add" color='white' size={30} />
-                    </View>
-                </TouchableOpacity>
-              </View>
+
+              {inputs.map((input, key) => (
+                <View style={styles.ingredients}>
+                  <TextInput placeholder="Enter ingredient and amount" value={input.value} style={styles.ingredientField} onChangeText={(text)=>inputHandler(text, key)}/>
+                  <TouchableOpacity onPress = {()=> deleteHandler(key)}>
+                    <Icon name="remove-circle" color='red' size={20} />
+                  </TouchableOpacity> 
+                </View>
+              ))}
+              <Button title="Add Ingredient" onPress={addHandler} />
 
               {/* <FlatList 
                 showsVerticalScrollIndicator={false}
@@ -240,6 +245,17 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     borderColor: 'white',
   },
+  ingredients: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ingredientField: {
+    backgroundColor: 'white',
+    padding: 10,
+    margin: 10,
+    width: 300,
+  },
   input_container: {
     borderWidth: 0.5,
     padding: 12.5,
@@ -248,18 +264,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 50,
     backgroundColor: 'white'
-  },
-  ingredients: {
-    flexDirection: 'row',
-  },
-  iconContainer: {
-    height: 50,
-    width: 50,
-    backgroundColor: '#518BFF',
-    borderRadius: 25,
-    elevation: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   listItem: {
     padding: 20,
@@ -293,5 +297,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
-  });
+});
   

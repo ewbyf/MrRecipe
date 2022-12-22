@@ -68,7 +68,8 @@ export default function Login({ navigation }){
             <View style={{flexDirection: 'row'}}>
               <Icon name='mail-outline' size={20} color={'lightgrey'} style={styles.icon}/>
               <TextInput 
-                placeholder="Email Address" 
+                placeholder="Email Address"
+                placeholderTextColor = "#518BFF" 
                 style={styles.inputField} 
                 keyboardType='email-address'
                 onChangeText={(email) => {setEmail(email)}}
@@ -82,6 +83,7 @@ export default function Login({ navigation }){
               <Icon name='lock-closed-outline' size={20} color={'lightgrey'} style={styles.icon}/>
               <TextInput
                 placeholder="Password"
+                placeholderTextColor = "#518BFF"
                 style={styles.inputField}
                 onChangeText={(password) => {setPassword(password)}}
                 secureTextEntry={true}
@@ -172,6 +174,6 @@ const styles = StyleSheet.create({
     walter: {
       resizeMode: 'stretch',
       height: 50,
-      width: 500,
+      width: 420,
     }
   });

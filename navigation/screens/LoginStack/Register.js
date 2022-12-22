@@ -92,6 +92,7 @@ export default function Register({ navigation }) {
                 <Icon name='person-circle-outline' size={20} color={'lightgrey'} style={styles.icon}/>
                 <TextInput 
                   placeholder="Name"
+                  placeholderTextColor = "#518BFF"
                   style={styles.inputField}
                   onChangeText={(name) => {setName(name)}}
                   autoCorrect={false}
@@ -103,6 +104,7 @@ export default function Register({ navigation }) {
                 <Icon name='person-outline' size={20} color={'lightgrey'} style={styles.icon}/>
                 <TextInput
                   placeholder="Username"
+                  placeholderTextColor = "#518BFF"
                   style={styles.inputField}
                   onChangeText={(username) => {setUsername(username)}}
                   autoCorrect={false}
@@ -114,6 +116,7 @@ export default function Register({ navigation }) {
                 <Icon name='mail-outline' size={20} color={'lightgrey'} style={styles.icon}/>
                 <TextInput
                   placeholder="Email Address"
+                  placeholderTextColor = "#518BFF"
                   style={styles.inputField}
                   keyboardType='email-address'
                   onChangeText={(email) => {setEmail(email)}}
@@ -128,6 +131,7 @@ export default function Register({ navigation }) {
                 <Icon name='lock-closed-outline' size={20} color={'lightgrey'} style={styles.icon}/>
                 <TextInput
                     placeholder="Password"
+                    placeholderTextColor = "#518BFF"
                     style={styles.inputField}
                     onChangeText={(password) => {setPassword(password)}}
                     secureTextEntry={true}
@@ -140,6 +144,7 @@ export default function Register({ navigation }) {
                 <Icon name='lock-closed' size={20} color={'lightgrey'} style={styles.icon}/>
                 <TextInput
                   placeholder="Confirm Password"
+                  placeholderTextColor = "#518BFF"
                   style={styles.inputField}
                   onChangeText={(confirmPassword) => {setConfirmPassword(confirmPassword)}}
                   secureTextEntry={true}

@@ -147,7 +147,7 @@ export default function Settings({ navigation }) {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.section}>Profile</Text>
+            <Text style={{...styles.section, paddingTop : 12}}>Profile</Text>
             <View>
               <View style={{...styles.field, borderTopWidth: 1, borderTopColor: '#363636'}}>
                 <Text style={styles.fieldTitle}>Name</Text>
@@ -171,7 +171,7 @@ export default function Settings({ navigation }) {
                   style={styles.input}
                 ></TextInput>
               </View>
-              <View style={{height: 100, ...styles.field}}>
+              <View style={{height: 105, ...styles.field}}>
                 <Text style={styles.fieldTitle}>Bio</Text>
                 <TextInput 
                   placeholder='Add a bio to your profile'
@@ -185,9 +185,11 @@ export default function Settings({ navigation }) {
                 ></TextInput>
               </View>
             </View>
-
-            <View style={{height: 50}}>
-              <Text style={{...styles.section, paddingTop: 20, height: 50}}>Account</Text>
+            
+            <View style = {{...styles.field, height : 80, borderTopWidth: 5, borderTopColor: '#518BFF'}}></View>
+        
+            <View style={{height: 42}}>
+              <Text style={{...styles.section, paddingTop: 10}}>Account</Text>
             </View>
             
             <View>

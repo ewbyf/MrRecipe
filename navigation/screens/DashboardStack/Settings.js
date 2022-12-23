@@ -480,7 +480,7 @@ export default function Settings({ navigation }) {
                   onChangeText={(newBio) => updateSettings('bio', newBio)}
                   style={{...styles.input, paddingTop: 0, width: 200}}
                 ></TextInput>
-                <Text style={{color: '#494949', position: 'absolute', right: 5, bottom: 3}}>{bio.length}/150</Text>
+                <Text style={{color: '#494949', position: 'absolute', right: 10, bottom: 5}}>{bio.length}/150</Text>
               </View>
             </View>
 
@@ -587,7 +587,8 @@ const styles = StyleSheet.create({
     field: {
       flexDirection: 'row',
       paddingVertical: 15,
-      paddingHorizontal: 30,
+      paddingLeft: 30,
+      paddingRight: 20,
       borderBottomWidth: 1,
       borderBottomColor: '#363636',
       alignItems: 'center',
@@ -607,6 +608,7 @@ const styles = StyleSheet.create({
     },
     changeText: {
       color: '#518BFF',
+      marginLeft: 'auto',
     },
     footer: {
       marginTop: 'auto',

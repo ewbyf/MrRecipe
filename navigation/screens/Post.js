@@ -16,7 +16,7 @@ export default function Post({ navigation }) {
   const [description, setDescription] = useState("");
 
   const [ingredients, setIngredients] = useState([{key: 0, value: ''}]);
-  const [instructions, setInstructionsaaa] = useState([{key: 0, value: ''}]);
+  const [instructions, setInstructions] = useState([{key: 0, value: ''}]);
 
   const data = [
     {key: 'a', value: 'Easy'},
@@ -86,22 +86,43 @@ export default function Post({ navigation }) {
     }
   }
 
-  const addHandler = () => {
-    const _inputs = [...inputs];
-    _inputs.push({key: '', value: ''});
-    setInputs(_inputs);
+  const addHandler = (type) => {
+    if (type == "ingredients") {
+      const _inputs = [...ingredients];
+      _inputs.push({key: '', value: ''});
+      setIngredients(_inputs);
+    }
+    else {
+      const _inputs = [...instructions];
+      _inputs.push({key: '', value: ''});
+      setInstructions(_inputs);
+    }
   }
   
-  const deleteHandler = (key) => {
-    const _inputs = inputs.filter((input, index) => index != key);
-    setInputs(_inputs);
+  const deleteHandler = (key, type) => {
+    if (type == "ingredients") {
+      const _inputs = ingredients.filter((ingredients, index) => index != key);
+      setIngredients(_inputs);
+    }
+    else {
+      const _inputs = instructions.filter((instructions, index) => index != key);
+      setInstructions(_inputs);
+    }
   }
 
-  const inputHandler = (text, key) => {
-    const _inputs = [...inputs];
-    _inputs[key].value = text;
-    _inputs[key].key = key;
-    setInputs(_inputs);
+  const inputHandler = (text, key, type) => {
+    if (type == "ingredients") {
+      const _inputs = [...ingredients];
+      _inputs[key].value = text;
+      _inputs[key].key = key;
+      setIngredients(_inputs);
+    }
+    else {
+      const _inputs = [...instructions];
+      _inputs[key].value = text;
+      _inputs[key].key = key;
+      setInstructions(_inputs);
+    }
   }
 
   if (user) {
@@ -158,7 +179,7 @@ export default function Post({ navigation }) {
                   textAlignVertical='top'
                   onChangeText={(desc) => setDescription(desc)}
                 ></TextInput>
-                <Text style={{color: '#494949', position: 'absolute', right: 5, bottom: 3}}>{description.length}/200</Text>
+                <Text style={{color: '#494949', position: 'absolute', right: 10, bottom: 5}}>{description.length}/200</Text>
               </View>
               <View style={styles.section}>
                 <Text style={styles.title}>DIFFICULTY</Text>
@@ -173,7 +194,7 @@ export default function Post({ navigation }) {
                     paddingHorizontal: 10,
                     borderRadius: 8,
                   }}
-                  arrowicon={<View style={{justifyContent: 'center'}}><Icon name='chevron-down-outline' size={16} style={{color: '#494949'}}/></View>}
+                  arrowicon={<View style={{justifyContent: 'center', right: 6}}><Icon name='chevron-down-outline' size={16} style={{color: '#494949'}}/></View>}
                   dropdownStyles={{backgroundColor: '#151515', borderWidth: 0}}
                   dropdownTextStyles={{color: '#adadad'}}
                   dropdownItemStyles={{borderWidth: 0}}
@@ -181,45 +202,41 @@ export default function Post({ navigation }) {
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.title}>INGREDIENTS</Text>
-                <TextInput 
-                  style={styles.input}
-                  placeholder="Enter an ingredient and amount"
-                  placeholderTextColor='#494949'
-                ></TextInput>
-              </View>
-              {inputs.map((input, key) => (
-                <View style={styles.ingredients}>
-                  <TextInput placeholderTextColor={'#494949'} placeholder="Enter ingredient and amount" value={input.value} style={styles.ingredientField} onChangeText={(text)=>inputHandler(text, key)}/>
-                  <TouchableOpacity onPress = {()=> deleteHandler(key)}>
-                    <Icon name="remove-circle" color='red' size={20} />
-                  </TouchableOpacity> 
+                <View style={styles.addContainer}>
+                  <Text style={styles.title}>INGREDIENTS</Text>
+                  <TouchableOpacity onPress = {()=> addHandler("ingredients")} style={{position: 'absolute', right: 10, top: '50%', marginTop: -12.5}}>
+                  <Icon name='add-outline' color="#494949" size={25}/>
+                    </TouchableOpacity> 
                 </View>
-              ))}
-              <TouchableOpacity onPress={addHandler} style={{marginVertical: 10}}>
-                <Text style = {styles.addText}>Add Ingredient</Text>
-              </TouchableOpacity>
+                {ingredients.map((input, key) => (
+                  <View style={[styles.section, {marginTop: 0, marginBottom: 6}]}>
+                    <TextInput placeholderTextColor={'#494949'} placeholder="Enter ingredient and amount" value={input.value} style={styles.input} onChangeText={(text)=>inputHandler(text, key, "ingredients")}></TextInput>
+                    <TouchableOpacity onPress = {()=> deleteHandler(key, "ingredients")} style={{position: 'absolute', right: 10, bottom: 10}}>
+                      <Icon name="trash-outline" color='#FF4444' size={20} />
+                    </TouchableOpacity> 
+                  </View>
+                ))}
+                <TouchableOpacity onPress={() => addHandler("ingredients")} style={styles.addContainer}>
+                  <Icon name='add-outline' color="#518BFF" size={30}/>
 
+                </TouchableOpacity>
+              </View>
 
               <View style={styles.section}>
                 <Text style={styles.title}>INSTRUCTIONS</Text>
-                <TextInput 
-                  style={styles.input}
-                  placeholder="Enter a step"
-                  placeholderTextColor={'#494949'}
-                ></TextInput>
+                {instructions.map((input, key) => (
+                    <View style={[styles.section, {marginTop: 0, marginBottom: 6}]}>
+                    <TextInput placeholderTextColor={'#494949'} placeholder="Enter a step" value={input.value} style={styles.input} onChangeText={(text)=>inputHandler(text, key, "instructions")}/>
+                    <TouchableOpacity onPress = {()=> deleteHandler(key, "instructions")} style={{position: 'absolute', right: 10, bottom: 10}}>
+                      <Icon name="trash-outline" color='#FF4444' size={20} />
+                    </TouchableOpacity> 
+                  </View>
+                ))}
+                <TouchableOpacity onPress={() => addHandler("instructions")} style={styles.addContainer}>
+                  <Icon name='add-circle-outline' color="#518BFF" size={20}/>
+                  <Text style = {styles.addText}>Add Step</Text>
+                </TouchableOpacity>
               </View>
-              {inputs.map((input, key) => (
-                <View style={styles.ingredients}>
-                  <TextInput placeholderTextColor={'#494949'} placeholder="Enter ingredient and amount" value={input.value} style={styles.ingredientField} onChangeText={(text)=>inputHandler(text, key)}/>
-                  <TouchableOpacity onPress = {()=> deleteHandler(key)}>
-                    <Icon name="remove-circle" color='red' size={20} />
-                  </TouchableOpacity> 
-                </View>
-              ))}
-              <TouchableOpacity onPress={addHandler} style={{marginVertical: 10}}>
-                <Text style = {styles.addText}>Add Step</Text>
-              </TouchableOpacity>
   
             
               <TouchableOpacity style={styles.button}>
@@ -271,7 +288,7 @@ const styles = StyleSheet.create({
     width: 250,
     borderWidth: 1,
     borderStyle: 'dashed',
-    borderColor: 'white',
+    borderColor: '#518BFF',
   },
   items: {
     alignItems: 'center',
@@ -295,34 +312,14 @@ const styles = StyleSheet.create({
     width: '100%',
     marginVertical: 8,
   },
-  ingredients: {
+  addContainer: {
+    width: '100%',
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
   },
-  ingredientField: {
-    backgroundColor: '#151515',
-    padding: 7,
-    margin: 10,
-    width: 320,
-    borderRadius: 8,
-  },
-  listItem: {
-    padding: 20,
-    backgroundColor: '#fff',
-    flexDirection: 'row',
-    elevation: 12,
-    borderRadius: 7,
-    marginVertical: 10,
-  },
-  actionIcon: {
-    height: 25,
-    width: 25,
-    backgroundColor: 'red',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 5,
-    borderRadius: 3,
+  addText: {
+    fontSize: 16,
+    color: '#518BFF',
   },
   button: {
     backgroundColor: '#518BFF',
@@ -337,9 +334,5 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: 'white',
-  },
-  addText: {
-    fontSize: 16,
-    color: '#518BFF',
   },
 });

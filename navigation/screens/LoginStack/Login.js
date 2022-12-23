@@ -66,10 +66,10 @@ export default function Login({ navigation }){
         <View style={styles.login}>
             <Text style={styles.title}>Mr. Recipe</Text>
             <View style={{flexDirection: 'row'}}>
-              <Icon name='mail-outline' size={20} color={'lightgrey'} style={styles.icon}/>
+              <Icon name='mail-outline' size={20} color={'white'} style={styles.icon}/>
               <TextInput 
                 placeholder="Email Address"
-                placeholderTextColor = "#518BFF" 
+                placeholderTextColor = "lightgrey" 
                 style={styles.inputField} 
                 keyboardType='email-address'
                 onChangeText={(email) => {setEmail(email)}}
@@ -80,10 +80,10 @@ export default function Login({ navigation }){
               ></TextInput>
             </View>
             <View style={{flexDirection: 'row'}}>
-              <Icon name='lock-closed-outline' size={20} color={'lightgrey'} style={styles.icon}/>
+              <Icon name='lock-closed-outline' size={20} color={'white'} style={styles.icon}/>
               <TextInput
                 placeholder="Password"
-                placeholderTextColor = "#518BFF"
+                placeholderTextColor = "lightgrey"
                 style={styles.inputField}
                 onChangeText={(password) => {setPassword(password)}}
                 secureTextEntry={true}
@@ -141,7 +141,8 @@ const styles = StyleSheet.create({
     icon: {
       position: 'absolute',
       left: 0,
-      top: 10
+      top: '50%',
+      marginTop: -10,
     },
     inputField: {
       width: 200,

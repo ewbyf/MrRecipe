@@ -2,24 +2,28 @@ import { StyleSheet, View, TouchableOpacity, Text, TextInput, FlatList, Alert, I
 import { useState, useEffect } from "react";
 import { firebase } from '../../config';
 import BackArrow from '../../components/BackArrow';
-import { SelectList } from 'react-native-dropdown-select-list'
-import Icon from "react-native-vector-icons/MaterialIcons";
+import Icon from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import { ScrollView } from "react-native-gesture-handler";
+import { SelectList } from "react-native-dropdown-select-list";
 
 export default function Post({ navigation }) {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
   const [selected, setSelected] = useState("");
+
   const [image, setImage] = useState(null);
+  const [description, setDescription] = useState("");
+
+  const [ingredients, setIngredients] = useState([{key: 0, value: ''}]);
+  const [instructions, setInstructionsaaa] = useState([{key: 0, value: ''}]);
 
   const data = [
-    {key: '1', value: 'Easy'},
-    {key: '2', value: 'Medium'},
-    {key: '3', value: 'Hard'},
+    {key: 'a', value: 'Easy'},
+    {key: 'b', value: 'Medium'},
+    {key: 'c', value: 'Hard'},
+    {key: 'd', value: 'Mr Recipe'},
   ];
-
-  const [inputs, setInputs] = useState([{key: '', value: ''}]);
 
   // Check if users signed in
   function onAuthStateChanged(user) {
@@ -35,22 +39,6 @@ export default function Post({ navigation }) {
 
   if (initializing)
     return null;
-
-  const ListItem = ({todo})=> {
-    return <View style={styles.listItem}>
-      <View style={{flex: 1}}>
-        <Text 
-          style={{fontWeight: 'bold', fontSize: 15, color: 'black'}}>
-          {todo?.task}
-        </Text>
-      </View>
-      <TouchableOpacity 
-        style={[styles.actionIcon]} 
-        onPress={()=>deleteTodo(todo?.id)}>
-        <Icon name="delete" size={20} color='#fff' />
-      </TouchableOpacity>
-    </View>;
-  };
 
   const takePhoto = async() => {
     if ((await ImagePicker.getCameraPermissionsAsync()).granted == false) {
@@ -124,71 +112,116 @@ export default function Post({ navigation }) {
             <Text style={styles.topbarTitle}>Add a Recipe</Text>
           </View>
           <ScrollView>
-            <View style={{alignItems: 'center'}}>
+            <View style={styles.items}>
               {!image && 
               <View style={styles.photoSelect}>
                 <Icon name="image" size={75} color={'gray'}/>
-                <Button title="Choose Photo" onPress={choosePhoto}/>
-                <Text style={{color: 'gray', fontSize: 16}}>or</Text>
-                <Button title="Take Photo" onPress={takePhoto}/>
+                <View style={{alignItems: 'center', marginVertical: 5}}>
+                  <TouchableOpacity onPress={choosePhoto}>
+                    <Text style = {styles.addText}>Choose Photo</Text>
+                  </TouchableOpacity>
+                </View>
+                <Text style={{color: 'gray', fontSize: 15}}>or</Text>
+                <View style={{alignItems: 'center', marginTop: 5}}>
+                  <TouchableOpacity onPress={takePhoto}>
+                    <Text style = {styles.addText}>Take Photo</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
               }
               {image && 
                 <View style={{alignItems: 'center'}}>
-                  <Image source={{uri: image.uri}} style={{width: 300, height: 300, marginTop: 20}}/>
-                  <Button title="Remove Photo" onPress={() => setImage(null)}/>
+                  <Image source={{uri: image.uri}} style={{width: 250, height: 250, marginTop: 20}}/>
+                  <TouchableOpacity onPress={() => setImage(null)}>
+                    <Text style = {{...styles.addText, marginTop: 5}}>Remove Photo</Text>
+                  </TouchableOpacity>
                 </View>
               }
-            </View>
-            <View styles={styles.items}>
-              <TextInput
-                placeholder="Recipe Name"
-                style={styles.input_container}
-              ></TextInput>
-              <TextInput
-                placeholder="Description"
-                style={styles.input_container}
-              ></TextInput>
-              <TextInput
-                placeholder="Preparation Time (minutes)"
-                style={styles.input_container}
-              ></TextInput>
-              <TextInput
-                placeholder="Cooking Time (minutes)"
-                style={styles.input_container}
-              ></TextInput>
-              <TextInput
-                placeholder="Procedure"
-                style={styles.input_container}
-              ></TextInput>
 
+              <View style={styles.section}>
+                <Text style={styles.title}>TITLE</Text>
+                <TextInput 
+                  style={styles.input}
+                  placeholder="Enter a title"
+                  placeholderTextColor='#494949'
+                ></TextInput>
+              </View>
+              <View style={styles.section}>
+                <Text style={styles.title}>DESCRIPTION</Text>
+                <TextInput 
+                  style={{...styles.input, height: 100, paddingVertical: 8}}
+                  placeholder="Enter a description"
+                  placeholderTextColor='#494949'
+                  multiline={true}
+                  maxLength={200}
+                  blurOnSubmit={true}
+                  textAlignVertical='top'
+                  onChangeText={(desc) => setDescription(desc)}
+                ></TextInput>
+                <Text style={{color: '#494949', position: 'absolute', right: 5, bottom: 3}}>{description.length}/200</Text>
+              </View>
+              <View style={styles.section}>
+                <Text style={styles.title}>DIFFICULTY</Text>
+                <SelectList
+                  data={data}
+                  setSelected={setSelected}
+                  search={false}
+                  inputStyles={{color: 'white'}}
+                  boxStyles={{
+                    borderWidth: 0,
+                    backgroundColor: '#151515',
+                    paddingHorizontal: 10,
+                    borderRadius: 8,
+                  }}
+                  arrowicon={<View style={{justifyContent: 'center'}}><Icon name='chevron-down-outline' size={16} style={{color: '#494949'}}/></View>}
+                  dropdownStyles={{backgroundColor: '#151515', borderWidth: 0}}
+                  dropdownTextStyles={{color: '#adadad'}}
+                  dropdownItemStyles={{borderWidth: 0}}
+                />
+              </View>
 
+              <View style={styles.section}>
+                <Text style={styles.title}>INGREDIENTS</Text>
+                <TextInput 
+                  style={styles.input}
+                  placeholder="Enter an ingredient and amount"
+                  placeholderTextColor='#494949'
+                ></TextInput>
+              </View>
               {inputs.map((input, key) => (
                 <View style={styles.ingredients}>
-                  <TextInput placeholder="Enter ingredient and amount" value={input.value} style={styles.ingredientField} onChangeText={(text)=>inputHandler(text, key)}/>
+                  <TextInput placeholderTextColor={'#494949'} placeholder="Enter ingredient and amount" value={input.value} style={styles.ingredientField} onChangeText={(text)=>inputHandler(text, key)}/>
                   <TouchableOpacity onPress = {()=> deleteHandler(key)}>
                     <Icon name="remove-circle" color='red' size={20} />
                   </TouchableOpacity> 
                 </View>
               ))}
-              <Button title="Add Ingredient" onPress={addHandler} />
-
-              {/* <FlatList 
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{padding:20, paddingBottom: 100}}
-                data={todos} 
-                renderItem={({item}) => <ListItem todo={item}/>}
-              /> */}
-
-              <SelectList data={data} setSelected={setSelected} dropdownStyles={{backgroundColor: 'white'}}
-                  boxStyles={{
-                    backgroundColor: 'white',
-                    marginHorizontal: 12.5,
-                    borderRadius: 50,
-                  }}
-              />
+              <TouchableOpacity onPress={addHandler} style={{marginVertical: 10}}>
+                <Text style = {styles.addText}>Add Ingredient</Text>
+              </TouchableOpacity>
 
 
+              <View style={styles.section}>
+                <Text style={styles.title}>INSTRUCTIONS</Text>
+                <TextInput 
+                  style={styles.input}
+                  placeholder="Enter a step"
+                  placeholderTextColor={'#494949'}
+                ></TextInput>
+              </View>
+              {inputs.map((input, key) => (
+                <View style={styles.ingredients}>
+                  <TextInput placeholderTextColor={'#494949'} placeholder="Enter ingredient and amount" value={input.value} style={styles.ingredientField} onChangeText={(text)=>inputHandler(text, key)}/>
+                  <TouchableOpacity onPress = {()=> deleteHandler(key)}>
+                    <Icon name="remove-circle" color='red' size={20} />
+                  </TouchableOpacity> 
+                </View>
+              ))}
+              <TouchableOpacity onPress={addHandler} style={{marginVertical: 10}}>
+                <Text style = {styles.addText}>Add Step</Text>
+              </TouchableOpacity>
+  
+            
               <TouchableOpacity style={styles.button}>
                 <Text style={styles.buttonText}>Publish</Text>
               </TouchableOpacity>
@@ -230,20 +263,37 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
-  items: {
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   photoSelect: {
     marginVertical: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 300,
-    width: 300,
+    height: 250,
+    width: 250,
     borderWidth: 1,
     borderStyle: 'dashed',
     borderColor: 'white',
+  },
+  items: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 30,
+  },
+  title: {
+    color: '#518BFF',
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginBottom: 6,
+  },
+  input: {
+    backgroundColor: '#151515',
+    paddingHorizontal: 10,
+    height: 40,
+    borderRadius: 8,
+    color: 'white',
+  },
+  section: {
+    width: '100%',
+    marginVertical: 8,
   },
   ingredients: {
     flexDirection: 'row',
@@ -251,19 +301,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   ingredientField: {
-    backgroundColor: 'white',
-    padding: 10,
+    backgroundColor: '#151515',
+    padding: 7,
     margin: 10,
-    width: 300,
-  },
-  input_container: {
-    borderWidth: 0.5,
-    padding: 12.5,
-    marginHorizontal: 15, 
-    fontSize: 16,
-    marginTop: 20,
-    borderRadius: 50,
-    backgroundColor: 'white'
+    width: 320,
+    borderRadius: 8,
   },
   listItem: {
     padding: 20,
@@ -289,13 +331,15 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
-    marginHorizontal: 102.5,
+    marginVertical: 20,
   },
   buttonText: {
     fontSize: 20,
     fontWeight: 'bold',
     color: 'white',
   },
+  addText: {
+    fontSize: 16,
+    color: '#518BFF',
+  },
 });
-  

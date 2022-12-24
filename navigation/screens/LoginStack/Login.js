@@ -157,7 +157,6 @@ export default function Login({ navigation }){
                 <Text style={{color: 'white'}}>Don't have an account? </Text>
                 <Text onPress={() => navigation.navigate('RegisterScreen')} style={{color: '#518BFF'}}>Sign up</Text>
               </View>
-
               <Text onPress={() => setForgotVisible(true)} style={{color: '#518BFF', marginTop: 20}}>Forgot Password?</Text>
           </View>
         </View>
@@ -211,7 +210,8 @@ const styles = StyleSheet.create({
     icon: {
       position: 'absolute',
       left: 0,
-      top: 10
+      top: '50%',
+      marginTop: -10,
     },
     inputField: {
       width: 200,
@@ -221,6 +221,7 @@ const styles = StyleSheet.create({
       borderColor: '#518BFF',
       borderBottomWidth: 1,
       textAlign: 'center',
+      color: 'white',
     },
     button: {
       backgroundColor: '#518BFF',

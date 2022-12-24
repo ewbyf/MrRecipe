@@ -13,7 +13,7 @@ export default function Register({ navigation }) {
   const [loading, setLoading] = useState(false);
   const usersDB = firebase.firestore().collection('users');
 
-  const registerUser = async(email, password, name, username) => {
+  const registerUser = async() => {
     const snapshot = await usersDB.where('username_lowercase', '==', username.toLowerCase()).get();
     if (!snapshot.empty)
       Alert.alert(
@@ -113,39 +113,39 @@ export default function Register({ navigation }) {
                 <Icon name='person-circle-outline' size={20} color={'white'} style={styles.icon}/>
                 <TextInput 
                   placeholder="Name"
-                  placeholderTextColor={'lightgrey'}
+                  placeholderTextColor='lightgrey'
                   editable={!loading}
                   style={styles.inputField}
                   onChangeText={(name) => {setName(name)}}
                   maxLength={18}
-                  onSubmitEditing={() => {registerUser(email, password, name, username)}}
+                  onSubmitEditing={() => {registerUser()}}
                 ></TextInput>
               </View> 
               <View style={{flexDirection: 'row'}}>
                 <Icon name='person-outline' size={20} color={'white'} style={styles.icon}/>
                 <TextInput
                   placeholder="Username"
-                  placeholderTextColor={'lightgrey'}
+                  placeholderTextColor='lightgrey'
                   editable={!loading}
                   autoCorrect={false}
                   style={styles.inputField}
                   onChangeText={(username) => {setUsername(username)}}
                   maxLength={12}
-                  onSubmitEditing={() => {registerUser(email, password, name, username)}}
+                  onSubmitEditing={() => {registerUser()}}
                 ></TextInput>
               </View>
               <View style={{flexDirection: 'row'}}>
                 <Icon name='mail-outline' size={20} color={'white'} style={styles.icon}/>
                 <TextInput
                   placeholder="Email Address"
-                  placeholderTextColor={'lightgrey'}
+                  placeholderTextColor='lightgrey'
                   editable={!loading}
                   style={styles.inputField}
                   keyboardType='email-address'
                   onChangeText={(email) => {setEmail(email)}}
                   autoCapitalize={false}
                   maxLength={320}
-                  onSubmitEditing={() => {registerUser(email, password, name, username)}}
+                  onSubmitEditing={() => {registerUser()}}
                 ></TextInput>                
               </View>
 
@@ -158,14 +158,14 @@ export default function Register({ navigation }) {
                     style={styles.inputField}
                     onChangeText={(password) => {setPassword(password)}}
                     secureTextEntry={true}
-                    onSubmitEditing={() => {registerUser(email, password, name, username)}}
+                    onSubmitEditing={() => {registerUser()}}
                   ></TextInput>
               </View>
               <View style={{flexDirection: 'row'}}>
                 <Icon name='lock-closed' size={20} color={'white'} style={styles.icon}/>
                 <TextInput
                   placeholder="Confirm Password"
-                  placeholderTextColor={'lightgrey'}
+                  placeholderTextColor='lightgrey'
                   editable={!loading}
                   style={styles.inputField}
                   onChangeText={(confirmPassword) => {setConfirmPassword(confirmPassword)}}
@@ -174,7 +174,7 @@ export default function Register({ navigation }) {
                 ></TextInput>
               </View>
 
-              <TouchableOpacity disabled={loading} style={styles.button} onPress={() => {setLoading(true); registerUser(email, password, name, username)}}>
+              <TouchableOpacity disabled={loading} style={styles.button} onPress={() => {setLoading(true); registerUser()}}>
                 <Text style={styles.buttonText}>Sign up</Text>
               </TouchableOpacity>
           </View>
@@ -229,6 +229,7 @@ const styles = StyleSheet.create({
       borderColor: '#518BFF',
       borderBottomWidth: 1,
       textAlign: 'center',
+      color: 'white',
     },
     button: {
       backgroundColor: '#518BFF',
@@ -248,6 +249,7 @@ const styles = StyleSheet.create({
     icon: {
       position: 'absolute',
       left: 0,
-      top: 10
+      top: '50%',
+      marginTop: -10,
     },
   });

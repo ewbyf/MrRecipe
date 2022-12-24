@@ -439,7 +439,7 @@ export default function Settings({ navigation }) {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.section}>Profile</Text>
+            <Text style={styles.section}>PROFILE</Text>
             <View>
               <View style={{...styles.field, borderTopWidth: 1, borderTopColor: '#363636'}}>
                 <Text style={styles.fieldTitle}>Name</Text>
@@ -471,7 +471,7 @@ export default function Settings({ navigation }) {
                   placeholder='Add a bio to your profile'
                   placeholderTextColor='#818181'
                   multiline={true}
-                  maxLength={750}
+                  maxLength={150}
                   blurOnSubmit={true}
                   editable={!inProgress}
                   value={bio}
@@ -480,11 +480,12 @@ export default function Settings({ navigation }) {
                   onChangeText={(newBio) => updateSettings('bio', newBio)}
                   style={{...styles.input, paddingTop: 0, width: 200}}
                 ></TextInput>
+                <Text style={{color: '#494949', position: 'absolute', right: 10, bottom: 5}}>{bio.length}/150</Text>
               </View>
             </View>
 
             <View style={{height: 50}}>
-              <Text style={{...styles.section, paddingTop: 20, height: 50}}>Account</Text>
+              <Text style={{...styles.section, paddingTop: 20, height: 50}}>ACCOUNT</Text>
             </View>
             
             <View>
@@ -586,7 +587,8 @@ const styles = StyleSheet.create({
     field: {
       flexDirection: 'row',
       paddingVertical: 15,
-      paddingHorizontal: 30,
+      paddingLeft: 30,
+      paddingRight: 20,
       borderBottomWidth: 1,
       borderBottomColor: '#363636',
       alignItems: 'center',
@@ -606,6 +608,7 @@ const styles = StyleSheet.create({
     },
     changeText: {
       color: '#518BFF',
+      marginLeft: 'auto',
     },
     footer: {
       marginTop: 'auto',

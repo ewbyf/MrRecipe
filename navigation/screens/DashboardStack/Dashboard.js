@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TextInput, Button, Alert, Image, ScrollView, TouchableOpacity, Animated, RefreshControl, ImageBackground, YellowBox, FlatList } from "react-native";
+import { StyleSheet, View, Text, TextInput, Button, Alert, Image, ScrollView, TouchableOpacity, Animated, RefreshControl, ImageBackground, YellowBox, FlatList, Vibration } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { firebase } from '../../../config';
 import { useState, useEffect } from "react";
@@ -6,7 +6,6 @@ import { FlashList } from "@shopify/flash-list";
 import React, { useRef } from 'react';
 import { useSafeAreaInsets} from 'react-native-safe-area-context';
 import { Rating } from "react-native-ratings";
-
 
 export default function Dashboard({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
@@ -22,48 +21,46 @@ export default function Dashboard({ navigation }) {
     return new Promise(resolve => setTimeout(resolve, timeout));
   }
 
-  useEffect(() => {
-    const myfunc = async() => {
+  const fetchData = async() => {
+    var tempList = [];
+    let ref = '';
+    
     await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
     .then((snapshot) => {
       if (snapshot.exists) {
         setUserData(snapshot.data());
-        const tempList = []
-        snapshot.data().recipes.forEach((doc) => {
-          firebase.firestore().collection("recipes").doc(doc).get()
-          .then ((snap) => {
+        ref = snapshot.data();
+      }
+      else
+        Alert.alert("Unknown Error Occured", "Contact support with error.")
+    })
+    
+    await Promise.all(ref.recipes.reverse().map((doc) => {
+      return firebase.firestore().collection("recipes").doc(doc).get()
+          .then((snap) => {
             if (snap.exists) {
               tempList.push(snap.data());
-              setDataList(tempList);
-            }
-            else {
-              console.debug('error');
             }
           })
           .catch((error) => {
             alert(error.message);
           })
-        })
-        
-      }
-      else
-        Alert.alert("Unknown Error Occured", "Contact support with error.")
-    })
-    setReload(false);
+    }))
+    setDataList(tempList);
   }
-    myfunc();
-    navigation.addListener("focus", () => {setLoading(!loading); setReload(true)});
+
+  useEffect(() => {
+    fetchData();
+    navigation.addListener("focus", () => {setLoading(!loading)});
   }, [navigation, loading]);
 
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
+    fetchData();
     wait(800).then(() => setRefreshing(false));
   }, []);
 
-  if (reload) {
-    return null;
-  }
 
   return (
     <View style={styles.appcontainer}>
@@ -196,6 +193,7 @@ export default function Dashboard({ navigation }) {
             {(userData && userData.recipes.length > 0) && 
               <FlashList 
                 data={dataList}
+                extraData={dataList}
                 renderItem={({item}) => (
                   <TouchableOpacity style={{width: '100%'}}>
                     <ImageBackground source={{uri: item.image}} style={styles.list} imageStyle={{borderRadius: 15}}>
@@ -217,18 +215,17 @@ export default function Dashboard({ navigation }) {
                       <Text style={styles.listText}>Difficulty: {item.difficulty}</Text>
                       <Text style={styles.listText}>Total time: {(item.cooktime + item.preptime) / 60} hr</Text>
                       
-                      {/* <View style={styles.author}>
+                      <View style={styles.author}>
                         <Text style={styles.listText}>Posted By: {item.user}</Text>
-                      </View> */}
+                      </View>
                     </ImageBackground>
                   </TouchableOpacity>
                 )}
-                estimatedItemSize={1}
+                estimatedItemSize={10}
                 numColumns={2}
               />
             }
           </View>
-
         </Animated.ScrollView>
       </View>
     </View>

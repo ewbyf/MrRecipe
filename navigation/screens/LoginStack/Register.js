@@ -12,7 +12,7 @@ export default function Register({ navigation }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const usersDB = firebase.firestore().collection('users');
 
-  const registerUser = async(email, password, name, username) => {
+  const registerUser = async() => {
     const snapshot = await usersDB.where('username_lowercase', '==', username.toLowerCase()).get();
     if (!snapshot.empty)
       Alert.alert(
@@ -97,7 +97,7 @@ export default function Register({ navigation }) {
                   onChangeText={(name) => {setName(name)}}
                   autoCorrect={false}
                   maxLength={18}
-                  onSubmitEditing={() => {registerUser(email, password, name, username)}}
+                  onSubmitEditing={() => {registerUser()}}
                 ></TextInput>
               </View> 
               <View style={{flexDirection: 'row'}}>
@@ -109,7 +109,7 @@ export default function Register({ navigation }) {
                   onChangeText={(username) => {setUsername(username)}}
                   autoCorrect={false}
                   maxLength={12}
-                  onSubmitEditing={() => {registerUser(email, password, name, username)}}
+                  onSubmitEditing={() => {registerUser()}}
                 ></TextInput>
               </View>
               <View style={{flexDirection: 'row'}}>
@@ -123,7 +123,7 @@ export default function Register({ navigation }) {
                   autoCapitalize={false}
                   autoCorrect={false}
                   maxLength={320}
-                  onSubmitEditing={() => {registerUser(email, password, name, username)}}
+                  onSubmitEditing={() => {registerUser()}}
                 ></TextInput>                
               </View>
 
@@ -137,7 +137,7 @@ export default function Register({ navigation }) {
                     secureTextEntry={true}
                     autoCapitalize={false}
                     autoCorrect={false}
-                    onSubmitEditing={() => {registerUser(email, password, name, username)}}
+                    onSubmitEditing={() => {registerUser()}}
                   ></TextInput>
               </View>
               <View style={{flexDirection: 'row'}}>
@@ -154,7 +154,7 @@ export default function Register({ navigation }) {
                 ></TextInput>
               </View>
 
-                <TouchableOpacity style={styles.button} onPress={() => registerUser(email, password, name, username)}>
+                <TouchableOpacity style={styles.button} onPress={() => registerUser()}>
                   <Text style={styles.buttonText}>Sign up
                   </Text>
                 </TouchableOpacity>

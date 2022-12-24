@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TextInput, Button, Alert, Image, ScrollView, TouchableOpacity, Animated, RefreshControl, ImageBackground, YellowBox } from "react-native";
+import { StyleSheet, View, Text, TextInput, Button, Alert, Image, ScrollView, TouchableOpacity, Animated, RefreshControl, ImageBackground, YellowBox, FlatList } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { firebase } from '../../../config';
 import { useState, useEffect } from "react";
@@ -13,6 +13,7 @@ export default function Dashboard({ navigation }) {
   const [userData, setUserData] = useState('');
   const [loading, setLoading] = useState(false);
   const [dataList, setDataList] = useState([]);
+  const [reload, setReload] = useState(true);
 
   const insets = useSafeAreaInsets();
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -21,39 +22,9 @@ export default function Dashboard({ navigation }) {
     return new Promise(resolve => setTimeout(resolve, timeout));
   }
 
-  const DATA = [
-    {
-      name: 'askdjaskjdasjkldakj Pasta',
-      description: 'Delicious!'
-    },
-    {
-      name: 'rice'
-    },
-    {
-      name: 'noodles'
-    },
-    {
-      name: 'cake'
-    },
-    {
-      name: 'chicken'
-    },
-    {
-      name: 'steak'
-    },
-    {
-      name: 'steak'
-    },
-    {
-      name: 'steak'
-    },
-    {
-      name: 'steak'
-    }
-  ]
-
   useEffect(() => {
-    firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
+    const myfunc = async() => {
+    await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
     .then((snapshot) => {
       if (snapshot.exists) {
         setUserData(snapshot.data());
@@ -78,13 +49,21 @@ export default function Dashboard({ navigation }) {
       else
         Alert.alert("Unknown Error Occured", "Contact support with error.")
     })
-    navigation.addListener("focus", () => setLoading(!loading));
+    setReload(false);
+  }
+    myfunc();
+    navigation.addListener("focus", () => {setLoading(!loading); setReload(true)});
   }, [navigation, loading]);
+
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     wait(800).then(() => setRefreshing(false));
   }, []);
+
+  if (reload) {
+    return null;
+  }
 
   return (
     <View style={styles.appcontainer}>

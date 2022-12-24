@@ -6,7 +6,6 @@ import { StyleSheet } from "react-native";
 
 import Dashboard from "../screens/DashboardStack/Dashboard";
 import Settings from "../screens/DashboardStack/Settings";
-import ChangePassword from "../screens/DashboardStack/ChangePassword";
 
 const Stack = createStackNavigator();
 
@@ -27,7 +26,6 @@ export default function DashboardStack({ navigation, route }) {
         })}>
             <Stack.Screen name="DashboardScreen" component={Dashboard} />
             <Stack.Screen name="SettingsScreen" component={Settings}/>
-            <Stack.Screen name="ChangePasswordScreen" component={ChangePassword}/>
         </Stack.Navigator>
       );
 }
@@ -42,6 +40,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#518BFF',
         height: 90,
         borderRadius: 15,
+        borderTopWidth: 0,
         shadowColor: 'black',
         shadowOffset: {
         width: 0,

@@ -76,17 +76,5 @@ const styles = StyleSheet.create({
       backgroundColor: 'white',
       color: 'black',
     },
-    signinText: {
-      width: 300,
-      borderWidth: 5,
-      marginTop: 15,
-      borderColor: 'white',
-      borderRadius: 20,
-      padding: 7,
-      backgroundColor: '#518BFF',
-      color: 'black',
-      flexDirection: 'row',
-      marginTop: 20
-    },
   });
   

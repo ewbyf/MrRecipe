@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert } from "react-native";
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert, Image } from "react-native";
 import { useState } from "react";
 import { firebase } from '../../../config';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -10,6 +10,7 @@ export default function Register({ navigation }) {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const usersDB = firebase.firestore().collection('users');
 
   const registerUser = async() => {
@@ -43,7 +44,20 @@ export default function Register({ navigation }) {
       await firebase.auth().createUserWithEmailAndPassword(email, password)
       .then(() => {
         let username_lowercase = username.toLowerCase();
-        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).set({name, username, username_lowercase, email, bio: '', pfp: '', recipes: [], favorites: []})
+        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).set({name, username, username_lowercase, email, bio: '', pfp: '', recipes: [], favorites: []});
+        firebase.auth().currentUser.sendEmailVerification({
+          handleCodeInApp: true,
+          url: 'https://mr-recipe-799e9.firebaseapp.com',
+        })
+        .then(() => {
+          Alert.alert(
+            "Verification Sent",
+            "A verification email has been sent to your email. Please check your junk mail."
+          );
+        })
+        .catch((error) => {
+          alert(error.code);
+        })
       })
       .catch((error) => {
         switch(error.code) {
@@ -70,12 +84,14 @@ export default function Register({ navigation }) {
               "Email Already Exists",
               "The email address you entered is already in use by another account. Please login or retry with a different email address.",
             );
+            console.debug('a');
             break;
           default:
             alert(error.message);
         }
       })
     }
+    setLoading(false);
   }
 
   return (
@@ -85,17 +101,22 @@ export default function Register({ navigation }) {
               <BackArrow navigation={navigation}/>
               <Text style={styles.topbarTitle}>Register</Text>
           </View>
-          
           <View style={styles.register}>
+              <View style={styles.logoContainer}>
+                <Image 
+                    style={styles.logo}
+                    source={{uri: 'https://imgur.com/Fg7Vv0f.png'}} 
+                  /> 
+              </View>
               <Text style={styles.title}>Mr. Recipe</Text>
               <View style={{flexDirection: 'row'}}>
                 <Icon name='person-circle-outline' size={20} color={'white'} style={styles.icon}/>
                 <TextInput 
                   placeholder="Name"
-                  placeholderTextColor = "lightgrey"
+                  placeholderTextColor='lightgrey'
+                  editable={!loading}
                   style={styles.inputField}
                   onChangeText={(name) => {setName(name)}}
-                  autoCorrect={false}
                   maxLength={18}
                   onSubmitEditing={() => {registerUser()}}
                 ></TextInput>
@@ -104,10 +125,11 @@ export default function Register({ navigation }) {
                 <Icon name='person-outline' size={20} color={'white'} style={styles.icon}/>
                 <TextInput
                   placeholder="Username"
-                  placeholderTextColor = "lightgrey"
+                  placeholderTextColor='lightgrey'
+                  editable={!loading}
+                  autoCorrect={false}
                   style={styles.inputField}
                   onChangeText={(username) => {setUsername(username)}}
-                  autoCorrect={false}
                   maxLength={12}
                   onSubmitEditing={() => {registerUser()}}
                 ></TextInput>
@@ -116,12 +138,12 @@ export default function Register({ navigation }) {
                 <Icon name='mail-outline' size={20} color={'white'} style={styles.icon}/>
                 <TextInput
                   placeholder="Email Address"
-                  placeholderTextColor = "lightgrey"
+                  placeholderTextColor='lightgrey'
+                  editable={!loading}
                   style={styles.inputField}
                   keyboardType='email-address'
                   onChangeText={(email) => {setEmail(email)}}
                   autoCapitalize={false}
-                  autoCorrect={false}
                   maxLength={320}
                   onSubmitEditing={() => {registerUser()}}
                 ></TextInput>                
@@ -131,12 +153,11 @@ export default function Register({ navigation }) {
                 <Icon name='lock-closed-outline' size={20} color={'white'} style={styles.icon}/>
                 <TextInput
                     placeholder="Password"
-                    placeholderTextColor = "lightgrey"
+                    placeholderTextColor={'lightgrey'}
+                    editable={!loading}
                     style={styles.inputField}
                     onChangeText={(password) => {setPassword(password)}}
                     secureTextEntry={true}
-                    autoCapitalize={false}
-                    autoCorrect={false}
                     onSubmitEditing={() => {registerUser()}}
                   ></TextInput>
               </View>
@@ -144,20 +165,18 @@ export default function Register({ navigation }) {
                 <Icon name='lock-closed' size={20} color={'white'} style={styles.icon}/>
                 <TextInput
                   placeholder="Confirm Password"
-                  placeholderTextColor = "lightgrey"
+                  placeholderTextColor='lightgrey'
+                  editable={!loading}
                   style={styles.inputField}
                   onChangeText={(confirmPassword) => {setConfirmPassword(confirmPassword)}}
                   secureTextEntry={true}
-                  autoCapitalize={false}
-                  autoCorrect={false}
                   onSubmitEditing={() => {registerUser(email, password, name, username)}}
                 ></TextInput>
               </View>
 
-                <TouchableOpacity style={styles.button} onPress={() => registerUser()}>
-                  <Text style={styles.buttonText}>Sign up
-                  </Text>
-                </TouchableOpacity>
+              <TouchableOpacity disabled={loading} style={styles.button} onPress={() => {setLoading(true); registerUser()}}>
+                <Text style={styles.buttonText}>Sign up</Text>
+              </TouchableOpacity>
           </View>
       </View>
     </TouchableWithoutFeedback>
@@ -188,6 +207,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: '87%',
     },
+    logoContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    logo: {
+      height: 100,
+      width: 100,
+    },
     title: {
       marginBottom: 20,
       fontSize: 24,
@@ -212,6 +239,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: 20,
+      marginBottom: 115,
     },
     buttonText: {
       fontSize: 20,

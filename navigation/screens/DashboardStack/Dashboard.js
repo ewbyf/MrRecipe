@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TextInput, Button, Alert, Image, ScrollView, TouchableOpacity, Animated, RefreshControl, ImageBackground, YellowBox, FlatList, Vibration } from "react-native";
+import { StyleSheet, View, Text, TextInput, Button, Alert, Image, ScrollView, TouchableOpacity, Animated, RefreshControl, ImageBackground, FlatList, Vibration } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { firebase } from '../../../config';
 import { useState, useEffect } from "react";
@@ -12,7 +12,6 @@ export default function Dashboard({ navigation }) {
   const [userData, setUserData] = useState('');
   const [loading, setLoading] = useState(false);
   const [dataList, setDataList] = useState([]);
-  const [reload, setReload] = useState(true);
 
   const insets = useSafeAreaInsets();
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -213,11 +212,7 @@ export default function Dashboard({ navigation }) {
                         <Text style={styles.rating}>{item.rating}</Text>
                       </View>
                       <Text style={styles.listText}>Difficulty: {item.difficulty}</Text>
-                      <Text style={styles.listText}>Total time: {(item.cooktime + item.preptime) / 60} hr</Text>
-                      
-                      <View style={styles.author}>
-                        <Text style={styles.listText}>Posted By: {item.user}</Text>
-                      </View>
+                      <Text style={styles.listText}>Total time: {((item.cooktime + item.preptime) / 60).toFixed(2)} hr</Text>
                     </ImageBackground>
                   </TouchableOpacity>
                 )}
@@ -276,8 +271,6 @@ const styles = StyleSheet.create({
   },
   dashboard: {
     flexDirection: 'column',
-    height: '87%',
-    maxHeight: '87%',
   },
   profilePicture: {
     borderRadius: 50,
@@ -322,7 +315,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     paddingHorizontal: 10,
-    marginBottom: 125,
+    marginBottom: 250,
   },
   postsTitle: {
     color: 'white',
@@ -378,8 +371,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     shadowRadius: 1,
   },
-  author: {
-    marginTop: 'auto',
-  }
 });
 

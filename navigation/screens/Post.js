@@ -336,7 +336,9 @@ export default function Post({ navigation }) {
                       value={prepHrs}
                       onChangeText={(text) => setPrepHrs(convertNumber(text))}
                     />
-                    <Text style={styles.timeText}>hrs</Text>
+                    <View style={{justifyContent: 'center'}}>
+                      <Text style={styles.timeText}>hrs</Text>
+                    </View>           
                     <TextInput 
                       style={{...styles.inputTime, marginLeft: 10}}
                       placeholder="0"
@@ -348,7 +350,9 @@ export default function Post({ navigation }) {
                       value={prepMin}
                       onChangeText={(text) => setPrepMin(convertNumber(text))}
                     />
-                    <Text style={styles.timeText}>min</Text>
+                    <View style={{justifyContent: 'center'}}>
+                      <Text style={styles.timeText}>min</Text>
+                    </View>
                   </View>
                 </View>
                 <View style={[styles.section, {width: '50%'}]}>
@@ -366,7 +370,9 @@ export default function Post({ navigation }) {
                         value={cookHrs}
                         onChangeText={(text) => setCookHrs(convertNumber(text))}
                       />
-                      <Text style={styles.timeText}>hrs</Text>
+                      <View style={{justifyContent: 'center'}}>
+                        <Text style={styles.timeText}>hrs</Text>
+                        </View>
                       <TextInput 
                         style={{...styles.inputTime, marginLeft: 10}}
                         placeholder="0"
@@ -378,7 +384,9 @@ export default function Post({ navigation }) {
                         value={cookMin}
                         onChangeText={(text) => setCookMin(convertNumber(text))}
                       />
-                      <Text style={styles.timeText}>min</Text>
+                      <View style={{justifyContent: 'center'}}>
+                        <Text style={styles.timeText}>min</Text>
+                      </View>
                     </View>
                   </View>
                 </View>
@@ -463,7 +471,7 @@ const styles = StyleSheet.create({
     width: 250,
     borderWidth: 1,
     borderStyle: 'dashed',
-    borderColor: '#518BFF',
+    borderColor: 'white',
   },
   items: {
     alignItems: 'center',

@@ -5,15 +5,12 @@ import { useState, useEffect } from "react";
 import React from 'react';
 import { Rating } from "react-native-ratings";
 import { firebase } from '../../../config';
-import { debug } from "react-native-reanimated";
-
 
 export default function Recipes({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [userData, setUserData] = useState('');
   const [loading, setLoading] = useState(false);
   const [dataList, setDataList] = useState([]);
-
 
   const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
@@ -24,7 +21,7 @@ export default function Recipes({ navigation }) {
     const snapshot = await firebase.firestore().collection('recipes').orderBy('rating', 'desc').get()
 
     await Promise.all(snapshot.docs.map((doc) => {
-      tempList.push(doc.data());
+      tempList.push({key: doc.id, value: doc.data()});
     }))
 
     setDataList(tempList);
@@ -43,7 +40,7 @@ export default function Recipes({ navigation }) {
 
   return (
       <View style={global.appContainer}>
-          <View style={global.topbar}>
+          <View style={global.searchTopbar}>
               <Text style={global.topbarTitle}>Mr. Recipe</Text>
               <TextInput placeholder='Search for Recipe' style={global.searchbar}></TextInput>
           </View>
@@ -53,9 +50,9 @@ export default function Recipes({ navigation }) {
                 data={dataList}
                 extraData={dataList}
                 renderItem={({item}) => (
-                  <TouchableOpacity style={{width: '100%'}}>
-                    <ImageBackground source={{uri: (item.image)}} style={global.list} imageStyle={{borderRadius: 15}}>
-                      <Text style={global.listTitle}>{item.name}</Text>
+                  <TouchableOpacity style={{width: '100%'}} onPress={() => navigation.navigate("DishScreen", {doc: item.key})}>
+                    <ImageBackground source={{uri: (item.value.image)}} style={global.list} imageStyle={{borderRadius: 15}}>
+                      <Text style={global.listTitle}>{item.value.name}</Text>
                       <View style={{flexDirection: 'row', alignItems: 'center', width: '100%'}}>
                         <View style={{flex: 1}}></View>
                         <Rating
@@ -70,11 +67,11 @@ export default function Recipes({ navigation }) {
                         />
                         <Text style={global.rating}>{item.rating}</Text>
                       </View>
-                      <Text style={global.listText}>Difficulty: {item.difficulty}</Text>
-                      <Text style={global.listText}>Total time: {((item.cooktime + item.preptime) / 60).toFixed(2)} hr</Text>
+                      <Text style={global.listText}>Difficulty: {item.value.difficulty}</Text>
+                      <Text style={global.listText}>Total time: {((item.value.cooktime + item.value.preptime) / 60).toFixed(2)} hr</Text>
                       
                       <View style={global.author}>
-                        <Text style={global.listText}>Posted By: {item.user}</Text>
+                        <Text style={global.listText}>Posted By: {item.value.user}</Text>
                       </View>
                     </ImageBackground>
                   </TouchableOpacity>
@@ -103,8 +100,5 @@ const styles = StyleSheet.create({
       marginVertical: 10,
       textAlign: 'center',
     },
-    author: {
-      marginTop: 'auto',
-    }
   });
   

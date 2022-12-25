@@ -1,14 +1,25 @@
 import { StyleSheet, View, Text, TextInput } from "react-native";
 import global from "../../../Styles";
+import BackArrow from '../../../components/BackArrow';
 import { useState, useEffect } from "react";
 import { firebase } from '../../../config';
+import { useRoute } from "@react-navigation/native";
 
 
+export default function Dish({props, navigation}) {
+    const route = useRoute();
 
-export default function Dish({navigation}) {
+    useEffect(() => {
+        console.debug(route.params.doc)
+    }, [])
+
     return (
-        <View styles={global.appContainer}>
-            <Text>hi</Text>
+        <View style={global.appContainer}>
+            <View style={global.topbar}>
+                <BackArrow navigation={navigation}/>
+                <Text style={global.topbarTitle}>Recipe</Text>
+            </View>
+
         </View>
     );
 }

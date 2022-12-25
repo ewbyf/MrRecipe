@@ -55,6 +55,7 @@ export default StyleSheet.create({
         shadowOffset: {width: 1, height: 1},
         shadowOpacity: 1,
         shadowRadius: 1,
+        elevation: 10,
     },
     listText: {
         color: '#FFD9AC',
@@ -66,6 +67,7 @@ export default StyleSheet.create({
         shadowOffset: {width: 1, height: 1},
         shadowOpacity: 1,
         shadowRadius: 1,
+        elevation: 10,
     },
     ratingBar: {
         flex: 1, 
@@ -73,6 +75,7 @@ export default StyleSheet.create({
         shadowOffset: {width: 1, height: 1},
         shadowOpacity: 1,
         shadowRadius: 1,
+        elevation: 10,
     },
     rating: {
         color: '#f1c40f',
@@ -82,5 +85,9 @@ export default StyleSheet.create({
         shadowOffset: {width: 1, height: 1},
         shadowOpacity: 1,
         shadowRadius: 1,
+        elevation: 10,
     },
+    author: {
+        marginTop: 'auto',
+    }
 });

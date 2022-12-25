@@ -19,7 +19,7 @@ export default function RecipesStack({ navigation, route }) {
         }
     }, [navigation, route]);
     return (
-        <Stack.Navigator initialRouteName="DishScreen" screenOptions={({route}) => ({
+        <Stack.Navigator initialRouteName="RecipesScreen" screenOptions={({route}) => ({
             headerShown: false,
         })}>
             <Stack.Screen name="RecipesScreen" component={Recipes} />

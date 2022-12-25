@@ -1,4 +1,5 @@
 import { StyleSheet, View, Text, TextInput } from "react-native";
+import global from "../../Styles";
 import { useState, useEffect } from "react";
 import { firebase } from '../../config';
 
@@ -22,10 +23,10 @@ export default function People({ navigation }) {
 
   if (user) {
     return (
-      <View style={styles.appcontainer}>
-          <View style={styles.topbar}>
-              <Text style={styles.topbarTitle}>Favorites</Text>
-              <TextInput placeholder='Search for Favorites' style={styles.searchbar}></TextInput>
+      <View style={global.appContainer}>
+          <View style={global.searchTopbar}>
+              <Text style={global.topbarTitle}>Favorites</Text>
+              <TextInput placeholder='Search for Favorites' style={global.searchbar}></TextInput>
           </View>
           <View>
               <Text>No way</Text>
@@ -35,10 +36,10 @@ export default function People({ navigation }) {
   }
 
   return (
-      <View style={styles.appcontainer}>
-          <View style={styles.topbar}>
-              <Text style={styles.topbarTitle}>Favorites</Text>
-              <TextInput placeholder='Search for Favorites' style={styles.searchbar}></TextInput>
+      <View style={global.appContainer}>
+          <View style={global.searchTopbar}>
+              <Text style={global.topbarTitle}>Favorites</Text>
+              <TextInput placeholder='Search for Favorites' style={global.searchbar}></TextInput>
           </View>
           <View style={{height: '74%', alignItems: 'center', justifyContent: 'center'}}>
             <Text style={{fontSize: 18, fontWeight: 'bold', color: 'white'}}>You are currently logged out.</Text>
@@ -49,33 +50,6 @@ export default function People({ navigation }) {
 }
   
 const styles = StyleSheet.create({
-    appcontainer: {
-      height: '100%',
-      backgroundColor: '#222222',
-    },
-    topbar: {
-      paddingTop: 30,
-      height: '20%',
-      width: '100%',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: '#518BFF',
-    },
-    topbarTitle: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: 'white',
-    },
-    searchbar: {
-      width: 300,
-      borderWidth: 5,
-      marginTop: 15,
-      borderColor: 'white',
-      borderRadius: 20,
-      padding: 7,
-      backgroundColor: 'white',
-      color: 'black',
-    },
     signinText: {
       width: 300,
       borderWidth: 5,

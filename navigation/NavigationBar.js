@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { firebase } from '../config';
 
 // Screens
-import Recipes from './screens/Recipes';
+import RecipesStack from './routes/RecipesStack';
 import FavoritesStack from './routes/FavoritesStack';
 import LoginStack from './routes/LoginStack';
 import DashboardStack from './routes/DashboardStack';
@@ -28,7 +28,7 @@ export default function NavigationBar() {
       top: -30,
       justifyContent: 'center',
       alignItems: 'center',
-      ...styles.shadow
+      ...styles.shadow,
     }} onPress={onPress}>
       <View style={
         styles.postButton
@@ -59,7 +59,7 @@ export default function NavigationBar() {
   return (
     <View style={styles.appcontainer}>
       <NavigationContainer>
-        <Tab.Navigator initialRouteName='Recipes' screenOptions={({route}) => ({
+        <Tab.Navigator initialRouteName='RecipesStack' screenOptions={({route}) => ({
                 headerShown: false,
                 tabBarShowLabel: false, 
                 tabBarStyle: {
@@ -68,7 +68,7 @@ export default function NavigationBar() {
                 }
             })}>
 
-            <Tab.Screen name={'Recipes'} component={Recipes} options={{
+            <Tab.Screen name={'RecipesStack'} component={RecipesStack} options={{
               tabBarIcon: ({focused}) => (
                 <View style={{alignItems: 'center', justifyContent: 'center', top: 10}}>
                   <Icon name={focused ? 'book' : 'book-outline'} color={focused ? '#FFDDA1' : 'white'} size={25}/>
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.5,
-    elevation: 5
+    elevation: 5,
   },
   postButton: {
     width: 70,

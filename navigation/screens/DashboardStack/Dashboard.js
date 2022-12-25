@@ -1,4 +1,5 @@
 import { StyleSheet, View, Text, TextInput, Button, Alert, Image, ScrollView, TouchableOpacity, Animated, RefreshControl, ImageBackground, FlatList, Vibration } from "react-native";
+import global from "../../../Styles";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { firebase } from '../../../config';
 import { useState, useEffect } from "react";
@@ -62,7 +63,7 @@ export default function Dashboard({ navigation }) {
 
 
   return (
-    <View style={styles.appcontainer}>
+    <View style={global.appContainer}>
 
       {/* Header pop up */}
       <View style={styles.animationContainer}>
@@ -195,12 +196,12 @@ export default function Dashboard({ navigation }) {
                 extraData={dataList}
                 renderItem={({item}) => (
                   <TouchableOpacity style={{width: '100%'}}>
-                    <ImageBackground source={{uri: item.image}} style={styles.list} imageStyle={{borderRadius: 15}}>
-                      <Text style={styles.listTitle}>{item.name}</Text>
+                    <ImageBackground source={{uri: item.image}} style={global.list} imageStyle={{borderRadius: 15}}>
+                      <Text style={global.listTitle}>{item.name}</Text>
                       <View style={{flexDirection: 'row', alignItems: 'center', width: '100%'}}>
                         <View style={{flex: 1}}></View>
                         <Rating
-                          style={styles.ratingBar}
+                          style={global.ratingBar}
                           ratingCount={5}
                           imageSize={16}
                           readonly={true}
@@ -209,10 +210,10 @@ export default function Dashboard({ navigation }) {
                           tintColor={'#2E2E2E'}
                           startingValue={item.rating}
                         />
-                        <Text style={styles.rating}>{item.rating}</Text>
+                        <Text style={global.rating}>{item.rating}</Text>
                       </View>
-                      <Text style={styles.listText}>Difficulty: {item.difficulty}</Text>
-                      <Text style={styles.listText}>Total time: {((item.cooktime + item.preptime) / 60).toFixed(2)} hr</Text>
+                      <Text style={global.listText}>Difficulty: {item.difficulty}</Text>
+                      <Text style={global.listText}>Total time: {((item.cooktime + item.preptime) / 60).toFixed(2)} hr</Text>
                     </ImageBackground>
                   </TouchableOpacity>
                 )}
@@ -228,10 +229,6 @@ export default function Dashboard({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  appcontainer: {
-    height: '100%',
-    backgroundColor: '#222222',
-  },
   animationContainer: {
     position: 'absolute',
     top: 0,
@@ -323,53 +320,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginVertical: 10,
     textAlign: 'center',
-  },
-  list: {
-    height: 300,
-    alignItems: 'center',
-    padding: 15,
-    margin: 3,
-    backgroundColor: '#28466E',
-    borderRadius: 15,
-  },
-  listTitle: {
-    color: '#FFD9AC',
-    fontSize: 22,
-    paddingHorizontal: 5,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    textAlign: 'center',
-    backgroundColor: '#28466E',
-    shadowOffset: {width: 1, height: 1},
-    shadowOpacity: 1,
-    shadowRadius: 1,
-  },
-  listText: {
-    color: '#FFD9AC',
-    fontSize: 13,
-    paddingHorizontal: 5,
-    marginTop: 5,
-    textAlign: 'center',
-    backgroundColor: '#28466E',
-    shadowOffset: {width: 1, height: 1},
-    shadowOpacity: 1,
-    shadowRadius: 1,
-  },
-  ratingBar: {
-    flex: 1, 
-    marginHorizontal: 30,
-    shadowOffset: {width: 1, height: 1},
-    shadowOpacity: 1,
-    shadowRadius: 1,
-  },
-  rating: {
-    color: '#f1c40f',
-    fontSize: 15,
-    fontWeight: 'bold',
-    flex: 1,
-    shadowOffset: {width: 1, height: 1},
-    shadowOpacity: 1,
-    shadowRadius: 1,
   },
 });
 

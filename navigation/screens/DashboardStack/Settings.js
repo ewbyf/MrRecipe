@@ -1,4 +1,5 @@
 import { StyleSheet, View, Text, TextInput, Alert, Image, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
+import global from "../../../Styles";
 import { firebase } from '../../../config';
 import { useState, useEffect } from "react";
 import BackArrow from '../../../components/BackArrow';
@@ -348,7 +349,7 @@ export default function Settings({ navigation }) {
 
   return (
     <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
-      <View style={styles.appcontainer}>
+      <View style={global.appContainer}>
 
           {/* Delete account pop up */} 
           <Dialog.Container visible={deleteVisible}>
@@ -422,9 +423,9 @@ export default function Settings({ navigation }) {
           </Dialog.Container>
 
           {/* Main Content */}
-          <View style={styles.topbar}>
+          <View style={global.topbar}>
             <BackArrow navigation={navigation}/>
-            <Text style={styles.topbarTitle}>Settings</Text>
+            <Text style={global.topbarTitle}>Settings</Text>
             <SaveButton/>
           </View>
           <View style={styles.settingsContainer}>
@@ -527,24 +528,6 @@ export default function Settings({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    appcontainer: {
-      height: '100%',
-      backgroundColor: '#222222',
-    },
-    topbar: {
-      paddingTop: 30,
-      height: '13%',
-      width: '100%',
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: '#518BFF',
-    },
-    topbarTitle: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: 'white',
-    },
     save: {
       position: 'absolute',
       right: 20,

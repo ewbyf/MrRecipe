@@ -1,4 +1,5 @@
 import { StyleSheet, View, TouchableOpacity, Text, TextInput, FlatList, Alert, Image, Button} from "react-native";
+import global from "../../Styles";
 import { useState, useEffect } from "react";
 import { firebase } from '../../config';
 import BackArrow from '../../components/BackArrow';
@@ -232,7 +233,7 @@ export default function Post({ navigation }) {
 
   if (user) {
     return (
-      <View style={styles.appcontainer}>
+      <View style={global.appContainer}>
           {/* Discard changes pop up */} 
           <Dialog.Container visible={discardVisible}>
             <Dialog.Title>Unsaved Changes</Dialog.Title>
@@ -244,9 +245,9 @@ export default function Post({ navigation }) {
             <Dialog.Button label="Save" style={{color: '#518BFF'}} onPress={() => {setDiscardVisible(false); navigation.goBack(null)}}/>
           </Dialog.Container>
 
-          <View style={styles.topbar}>
+          <View style={global.topbar}>
             <Icon name='arrow-back-outline' size={30} color='white' style={styles.backArrow} onPress={() => {if (checkFieldChanged()) {setDiscardVisible(true)} else {navigation.goBack(null)}}}/>
-            <Text style={styles.topbarTitle}>Add a Recipe</Text>
+            <Text style={global.topbarTitle}>Add a Recipe</Text>
           </View>
           <ScrollView>
             <View style={styles.items}>
@@ -448,28 +449,11 @@ export default function Post({ navigation }) {
 }
   
 const styles = StyleSheet.create({
-  appcontainer: {
-    height: '100%',
-    backgroundColor: '#222222',
-  },
   backArrow: {
     position: 'absolute',
     left: 20,
     bottom: '50%',
     marginBottom: -15,
-  },
-  topbar: {
-    paddingTop: 30,
-    height: 110,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#518BFF',
-  },
-  topbarTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
   },
   photoSelect: {
     marginVertical: 20,

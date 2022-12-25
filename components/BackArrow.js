@@ -6,12 +6,12 @@ const BackArrow = ({ navigation }) => (
   )
 
 const styles = StyleSheet.create({
-backArrow: {
-    position: 'absolute',
-    left: 20,
-    bottom: '50%',
-    marginBottom: -15,
-}
+  backArrow: {
+      position: 'absolute',
+      left: 20,
+      bottom: '50%',
+      marginBottom: -15,
+  }
 });
 
 export default BackArrow;

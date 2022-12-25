@@ -1,4 +1,5 @@
 import { StyleSheet, View, Text, TextInput, Button, Alert, Image, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
+import global from "../../../Styles";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useState, useEffect } from "react";
 import { firebase } from '../../../config';
@@ -96,7 +97,7 @@ export default function Login({ navigation }){
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}> 
-      <View style={styles.appcontainer}> 
+      <View style={global.appContainer}> 
 
         {/* Forgot password pop up */} 
         <Dialog.Container visible={forgotVisible}>
@@ -112,8 +113,8 @@ export default function Login({ navigation }){
           <Dialog.Button label="Reset" style={{color: resetEmail ? 'red' : 'lightgrey'}} onPress={() => resetPassword()}/>
         </Dialog.Container>
 
-        <View style={styles.topbar}>
-          <Text style={styles.topbarTitle}>Login</Text>
+        <View style={global.topbar}>
+          <Text style={global.topbarTitle}>Login</Text>
         </View>
         <View style={styles.login}>
           <View style={styles.logoContainer}>
@@ -166,23 +167,6 @@ export default function Login({ navigation }){
 }
 
 const styles = StyleSheet.create({
-    appcontainer: {
-      height: '100%',
-      backgroundColor: '#222222',
-    },
-    topbar: {
-      paddingTop: 30,
-      height: '13%',
-      width: '100%',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: '#518BFF',
-    },
-    topbarTitle: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: 'white',
-    },
     login: {
       height: '87%',
       justifyContent: 'center',

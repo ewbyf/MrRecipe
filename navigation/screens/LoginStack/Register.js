@@ -1,4 +1,5 @@
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, Alert, Image } from "react-native";
+import global from "../../../Styles";
 import { useState } from "react";
 import { firebase } from '../../../config';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -96,10 +97,10 @@ export default function Register({ navigation }) {
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={styles.appcontainer}>
-          <View style={styles.topbar}>
+      <View style={global.appContainer}>
+          <View style={global.topbar}>
               <BackArrow navigation={navigation}/>
-              <Text style={styles.topbarTitle}>Register</Text>
+              <Text style={global.topbarTitle}>Register</Text>
           </View>
           <View style={styles.register}>
               <View style={styles.logoContainer}>
@@ -184,24 +185,6 @@ export default function Register({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    appcontainer: {
-      height: '100%',
-      backgroundColor: '#222222',
-    },
-    topbar: {
-      paddingTop: 30,
-      height: '13%',
-      width: '100%',
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: '#518BFF',
-    },
-    topbarTitle: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: 'white',
-    },
     register: {
         justifyContent: 'center',
         alignItems: 'center',

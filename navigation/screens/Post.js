@@ -55,7 +55,7 @@ export default function Post({ navigation }) {
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [3, 4],
+      aspect: [5, 3],
     });
     if (!result.canceled) {
       const source = {uri : result.assets[0].uri};
@@ -67,7 +67,7 @@ export default function Post({ navigation }) {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [3, 4],
+      aspect: [5, 3],
     });
 
     if (!result.canceled) {
@@ -269,7 +269,7 @@ export default function Post({ navigation }) {
               }
               {image && 
                 <View style={{alignItems: 'center'}}>
-                  <Image source={{uri: image.uri}} style={{width: 250, height: 250, marginTop: 20}}/>
+                  <Image source={{uri: image.uri}} style={{width: 333, height: 250, marginTop: 20}}/>
                   <TouchableOpacity onPress={() => setImage(null)}>
                     <Text style = {{...styles.addText, marginTop: 5, color: '#518BFF'}}>Remove Photo</Text>
                   </TouchableOpacity>
@@ -443,10 +443,10 @@ export default function Post({ navigation }) {
   }
 
   return (
-      <View style={styles.appcontainer}>
-          <View style={styles.topbar}>
+      <View style={global.appContainer}>
+          <View style={global.topbar}>
             <BackArrow navigation={navigation}/>
-            <Text style={styles.topbarTitle}>Recipes</Text>
+            <Text style={global.topbarTitle}>Recipes</Text>
           </View>
           <View style={{height: '74%', alignItems: 'center', justifyContent: 'center'}}>
             <Text style={{fontSize: 18, fontWeight: 'bold', color: 'white'}}>You are currently logged out.</Text>

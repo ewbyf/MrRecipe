@@ -8,10 +8,23 @@ import { useRoute } from "@react-navigation/native";
 
 export default function Dish({props, navigation}) {
     const route = useRoute();
+    const [recipeData, setRecipeData] = useState('');
+    const [initializing, setInitializing] = useState(true);
 
     useEffect(() => {
-        console.debug(route.params.doc)
+      firebase.firestore().collection('recipes').doc(route.params.doc).get()
+      .then((snapshot) => {
+        setRecipeData(snapshot.data());
+        setInitializing(false);
+      })
+      .catch((error) => {
+        alert(error.message);
+      })
     }, [])
+
+    if (initializing) {
+      return null;
+    }
 
     return (
         <View style={global.appContainer}>
@@ -19,7 +32,23 @@ export default function Dish({props, navigation}) {
                 <BackArrow navigation={navigation}/>
                 <Text style={global.topbarTitle}>Recipe</Text>
             </View>
+            <View>
+              <Text>{recipeData.name}</Text>
+              <Text>{recipeData.description}</Text>
+              <Text>{recipeData.difficulty}</Text>
+              <Text>{recipeData.cooktime}</Text>
+              <Text>{recipeData.preptime}</Text>
+              <Text>{recipeData.rating}</Text>
+              <Text>{recipeData.numratings}</Text>
 
+
+              {recipeData.ingredients.map((data, key) => (
+                <Text>{data}</Text>
+              ))}
+              {recipeData.instructions.map((data, key) => (
+                <Text>{key+1}. {data}</Text>
+              ))}
+            </View>
         </View>
     );
 }

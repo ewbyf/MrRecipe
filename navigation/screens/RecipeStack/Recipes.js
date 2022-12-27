@@ -11,12 +11,15 @@ export default function Recipes({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [userData, setUserData] = useState('');
   const [loading, setLoading] = useState(false);
+  const [initializing, setInitializing] = useState(true);
 
-  const [dataList, setDataList] = useState([]);
+  const [dataList, setDataList] = useState([{key: '1', value: {name: 'a', rating: 'a'}}]);
   const [featuredList, setFeaturedList] = useState([]);
 
+  const data = [{key: '1', value: {name: 'a', rating: 'a'}}];
+
   const windowWidth = Dimensions.get('window').width;
-  const windowsHeight = Dimensions.get('window').height;
+  const windowHeight = Dimensions.get('window').height;
 
   const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
@@ -30,6 +33,7 @@ export default function Recipes({ navigation }) {
     await Promise.all(snapshot.docs.map((doc) => {
       tempList.push({key: doc.id, value: doc.data()});
     }))
+    
     await firebase.firestore().collection('recipes').orderBy('rating', 'desc').limit(1).get()
     .then((snap) => {
       tempList2.push({key: snap.docs[0].id, value: snap.docs[0].data()});
@@ -59,8 +63,8 @@ export default function Recipes({ navigation }) {
               <Text style={global.topbarTitle}>Mr. Recipe</Text>
               <TextInput placeholder='Search for Recipe' style={global.searchbar}></TextInput>
           </View>
-          <ScrollView style={{height: windowsHeight, width: windowWidth}} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}>
-            <View style={{marginBottom: 200, width: windowWidth, height: windowsHeight}}>
+          <ScrollView style={{height: windowHeight, width: windowWidth}} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}>
+            <View style={{marginBottom: 300, width: windowWidth, height: windowHeight}}>
               <Text style={styles.titleText}>Featured Recipe</Text>
               <View style={styles.featuredContainer}>
                 <FlashList
@@ -111,9 +115,8 @@ export default function Recipes({ navigation }) {
                             <Text style={{color: 'gray'}}>{item.value.difficulty}</Text>
                             <Text style={{color: 'gray'}}>{((item.value.cooktime + item.value.preptime) / 60).toFixed(1)}+ hrs</Text>
                           </View>
-                          <View style={{flexDirection: 'row', marginTop: 'auto'}}>
+                          <View style={{flexDirection: 'row', marginTop: 'auto', alignItems: 'center'}}>
                             <Rating
-                              style={styles.ratingBar}
                               ratingCount={5}
                               imageSize={16}
                               readonly={true}
@@ -133,13 +136,48 @@ export default function Recipes({ navigation }) {
                   estimatedItemSize={10}
                   numColumns={1}
                   showsHorizontalScrollIndicator={false}
-                  // snapToAlignment={'start'}
-                  // decelerationRate={"fast"}
-                  // snapToInterval={windowWidth-20}
                   horizontal
                 />
               </View>
               <Text style={styles.titleText}>Recent</Text>
+              <View style={styles.trendingContainer}>
+                <FlashList
+                  data={dataList}
+                  extraData={dataList}
+                  renderItem={({item}) => (
+                    <TouchableOpacity style={{width: windowWidth/1.5 - 20, height: 250, borderRadius: 10}} onPress={() => navigation.navigate("DishScreen", {doc: item.key})}>
+                      <View style={[styles.list, {marginHorizontal: 10, height: 250}]}>
+                        <Image source={{uri: (item.value.image)}} style={styles.smallImage}/>
+                        <View style={{width: '100%', height: 85}}>
+                          <View style={{}}>
+                            <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>{item.value.name}</Text>
+                            <Text style={{color: 'gray'}}>{item.value.difficulty}</Text>
+                            <Text style={{color: 'gray'}}>{((item.value.cooktime + item.value.preptime) / 60).toFixed(1)}+ hrs</Text>
+                          </View>
+                          <View style={{flexDirection: 'row', marginTop: 'auto', alignItems: 'center'}}>
+                            <Rating
+                              ratingCount={5}
+                              imageSize={16}
+                              readonly={true}
+                              type={'custom'}
+                              ratingBackgroundColor={'gray'}
+                              tintColor={'#282828'}
+                              startingValue={item.value.rating}
+                            />
+                            <Text style={styles.rating}>{item.value.rating} of 5</Text>
+                            
+                          </View>
+                        </View>
+                        <Icon name='heart' color={'gray'} size={20} style={{position: 'absolute', bottom: 6, right: 20}}/>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                  estimatedItemSize={10}
+                  numColumns={1}
+                  showsHorizontalScrollIndicator={false}
+                  horizontal
+                />
+              </View>
               <View>
               </View>
             </View>
@@ -201,21 +239,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-end'
   },
-  ratingBar: {
-    shadowOffset: {width: 1, height: 1},
-    shadowOpacity: 1,
-    shadowRadius: 1,
-    elevation: 10,
-  },
   rating: {
       color: 'gray',
       fontSize: 12,
       marginHorizontal: 10,
       fontWeight: 'bold',
-      shadowOffset: {width: 1, height: 1},
-      shadowOpacity: 1,
-      shadowRadius: 1,
-      elevation: 10,
   },
 });
   

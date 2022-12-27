@@ -183,12 +183,13 @@ export default function Post({ navigation }) {
         const ref = firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid);
         
         let imgUrl = await uploadPhoto();
+        let timestamp = firebase.firestore.Timestamp.fromDate(new Date());
         
         ref.get()
         .then((snapshot) => {
           if (snapshot.exists) {
             firebase.firestore().collection('recipes').add({
-              name, description, rating: 0, numratings: 0, difficulty, cooktime, preptime, ingredients: ingredientsArray, instructions: instructionsArray, image: imgUrl, rated, comments, user: snapshot.data().name, username: snapshot.data().username, userpfp: snapshot.data().pfp, uid: firebase.auth().currentUser.uid
+              name, description, rating: 0, numratings: 0, difficulty, cooktime, preptime, ingredients: ingredientsArray, instructions: instructionsArray, image: imgUrl, rated, comments, user: snapshot.data().name, username: snapshot.data().username, userpfp: snapshot.data().pfp, uid: firebase.auth().currentUser.uid, timestamp
             })
             .then((doc) => {
               const recipes = [...snapshot.data().recipes];
@@ -230,6 +231,7 @@ export default function Post({ navigation }) {
       return false;
     }
   }
+
 
   if (user) {
     return (
@@ -492,8 +494,10 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   inputTime: {
+    textAlignVertical: 'top',
     backgroundColor: '#151515',
     paddingHorizontal: 10,
+    paddingTop: 11,
     borderRadius: 8,
     height: 40,
     width: 40,

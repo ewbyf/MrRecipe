@@ -9,41 +9,68 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 export default function Recipes({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
-  const [userData, setUserData] = useState('');
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState();
 
-  const [dataList, setDataList] = useState([{key: '1', value: {name: 'a', rating: 'a'}}]);
-  const [featuredList, setFeaturedList] = useState([]);
+  const [dataList, setDataList] = useState([{key: '1', value: {name: 'a', rating: 'a'}}, {key: '1', value: {name: 'a', rating: 'a'}}]);
+  const [recentList, setRecentList] = useState([{key: '1', value: {name: 'a', rating: 'a'}}]);
+  const [favorites, setFavorites] = useState([]);
 
-  const data = [{key: '1', value: {name: 'a', rating: 'a'}}];
 
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
+
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing)
+      setInitializing(false);
+  }
+
+  useEffect(() => {
+  const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
 
   const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
   }
 
   const fetchData = async() => {
-    var tempList = [];
-    var tempList2 = [];
+    let tempList = [];
+    let tempList2 = [];
+
+    let fav = [];
+    let tempFav = [];
+
     const snapshot = await firebase.firestore().collection('recipes').orderBy('rating', 'desc').get()
+    const snapshot2 = await firebase.firestore().collection('recipes').orderBy('timestamp', 'desc').get()
+    if (user) {
+      await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
+      .then((snap) => {
+        fav = snap.data().favorites;
+      })
+      .catch((error) => {
+        alert(error.message);
+      })
+    }
 
     await Promise.all(snapshot.docs.map((doc) => {
-      tempList.push({key: doc.id, value: doc.data()});
+      if (fav.indexOf(doc) >= 0) {
+        tempList.push({key: doc.id, value: doc.data(), favorite: 'a'});
+      }
+      else {
+        tempList.push({key: doc.id, value: doc.data(), favorite: 'b'});
+      }
     }))
-    
-    await firebase.firestore().collection('recipes').orderBy('rating', 'desc').limit(1).get()
-    .then((snap) => {
-      tempList2.push({key: snap.docs[0].id, value: snap.docs[0].data()});
-    })
-    .catch((error) => {
-      alert(error.message);
-    })
+
+    await Promise.all(snapshot2.docs.map((doc) => {
+      tempList2.push({key: doc.id, value: doc.data()});
+    }))
 
     setDataList(tempList);
-    setFeaturedList(tempList2);
+    setRecentList(tempList2);
+    setFavorites(tempFav);
   }
 
   useEffect(() => {
@@ -57,6 +84,50 @@ export default function Recipes({ navigation }) {
     wait(800).then(() => setRefreshing(false));
   }, []);
 
+  const checkFavorite = async(doc) => {
+    return 'red';
+    if (user) {
+      await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
+      .then((snap) => {
+        return true;
+        // console.debug(snap.data().favorites.includes(doc))
+        // return (snap.data().favorites.includes(doc));
+      })
+      .catch((error) => {
+        alert(error.message);
+      })
+    }
+  }
+
+  const favorite = async(doc) => {
+    if (user) {
+      let temp = [];
+      await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
+      .then((snap) => {
+        temp = snap.data().favorites;
+        if (temp.indexOf(doc) != -1) {
+          temp.splice(snap.data().favorites.indexOf(doc), 1);
+          firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: temp});
+        }
+        else {
+          temp.push(doc);
+          firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: temp});
+          setFavorites([...favorites, 1]);
+        }
+      })
+      .catch((error) => {
+        alert(error.message);
+      })
+    }
+    else {
+      Alert.alert("Not Signed In", "You msut be signed in to favorite a recipe.");
+    }
+  }
+
+  if (initializing) {
+    return null;
+  }
+
   return (
       <View style={global.appContainer}>
           <View style={global.searchTopbar}>
@@ -68,11 +139,11 @@ export default function Recipes({ navigation }) {
               <Text style={styles.titleText}>Featured Recipe</Text>
               <View style={styles.featuredContainer}>
                 <FlashList
-                  data={featuredList}
+                  data={dataList.slice(0, 1)}
                   renderItem={({item}) => (
                     <TouchableOpacity style={{width: windowWidth-40, height: 300, borderRadius: 10}} onPress={() => navigation.navigate("DishScreen", {doc: item.key})}>
                       <View style={styles.list}>
-                        <Image source={{uri: (item.value.image)}} style={styles.featuredImage}/>
+                        <Image source={{uri: (item.value.image ? item.value.image : 'https://imgur.com/hNwMcZQ.png')}} style={styles.featuredImage}/>
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <View style={{flex: 1}}>
                             <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>{item.value.name}</Text>
@@ -103,12 +174,11 @@ export default function Recipes({ navigation }) {
               <Text style={styles.titleText}>Trending</Text>
               <View style={styles.trendingContainer}>
                 <FlashList
-                  data={dataList}
-                  extraData={dataList}
+                  data={dataList.slice(1)}
                   renderItem={({item}) => (
                     <TouchableOpacity style={{width: windowWidth/1.5 - 20, height: 250, borderRadius: 10}} onPress={() => navigation.navigate("DishScreen", {doc: item.key})}>
                       <View style={[styles.list, {marginHorizontal: 10, height: 250}]}>
-                        <Image source={{uri: (item.value.image)}} style={styles.smallImage}/>
+                        <Image source={{uri: (item.value.image ? item.value.image : 'https://imgur.com/hNwMcZQ.png')}} style={styles.smallImage}/>
                         <View style={{width: '100%', height: 85}}>
                           <View style={{}}>
                             <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>{item.value.name}</Text>
@@ -126,10 +196,13 @@ export default function Recipes({ navigation }) {
                               startingValue={item.value.rating}
                             />
                             <Text style={styles.rating}>{item.value.rating} of 5</Text>
+                            <Text>{item.favorite}</Text>
                             
                           </View>
                         </View>
-                        <Icon name='heart' color={'gray'} size={20} style={{position: 'absolute', bottom: 6, right: 20}}/>
+                        <TouchableOpacity style={{position: 'absolute', bottom: 6, right: 20}} onPress={() => favorite(item.key)}>
+                          <Icon name='heart' color={item.favorite == true ? 'red' : 'gray'} size={20}/>
+                        </TouchableOpacity>
                       </View>
                     </TouchableOpacity>
                   )}
@@ -142,12 +215,11 @@ export default function Recipes({ navigation }) {
               <Text style={styles.titleText}>Recent</Text>
               <View style={styles.trendingContainer}>
                 <FlashList
-                  data={dataList}
-                  extraData={dataList}
+                  data={recentList}
                   renderItem={({item}) => (
                     <TouchableOpacity style={{width: windowWidth/1.5 - 20, height: 250, borderRadius: 10}} onPress={() => navigation.navigate("DishScreen", {doc: item.key})}>
                       <View style={[styles.list, {marginHorizontal: 10, height: 250}]}>
-                        <Image source={{uri: (item.value.image)}} style={styles.smallImage}/>
+                        <Image source={{uri: (item.value.image ? item.value.image : 'https://imgur.com/hNwMcZQ.png')}} style={styles.smallImage}/>
                         <View style={{width: '100%', height: 85}}>
                           <View style={{}}>
                             <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>{item.value.name}</Text>
@@ -168,7 +240,9 @@ export default function Recipes({ navigation }) {
                             
                           </View>
                         </View>
-                        <Icon name='heart' color={'gray'} size={20} style={{position: 'absolute', bottom: 6, right: 20}}/>
+                        <TouchableOpacity style={{position: 'absolute', bottom: 6, right: 20}} onPress={() => favorite(item.key)}>
+                          <Icon name='heart' color={checkFavorite(item.key)} size={20}/>
+                        </TouchableOpacity>
                       </View>
                     </TouchableOpacity>
                   )}

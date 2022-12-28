@@ -49,15 +49,19 @@ export default function Dish({props, navigation}) {
                 />          
               </View>
               <Text style={styles.theDesc}>{recipeData.description}</Text>
-              <Text>{recipeData.difficulty}</Text>
-              <Text>{recipeData.cooktime}</Text>
-              <Text>{recipeData.preptime}</Text>
-              <Text>{recipeData.rating}</Text>
-              <Text>{recipeData.numratings}</Text>
+              <Text style={styles.fieldText}>Difficulty: {recipeData.difficulty}</Text>
+              <View style={{flexDirection: 'row', marginTop: 'auto'}}>
+                <View style={{width: '50%'}}>
+                  <Text style={styles.fieldText}>Cook Time: {(recipeData.cooktime)/60} hrs {(recipeData.cooktime)%60} min</Text>
+                </View>
+                <View style={{width: '50%', marginLeft: 'auto'}}>
+                  <Text style={styles.fieldText}>Prep Time: {(recipeData.preptime)/60} hrs {(recipeData.preptime)%60} min</Text>
+                </View>
+              </View>
 
               <Text style={styles.theStyle}>Ingredients</Text>
               {recipeData.ingredients.map((data, key) => (
-                <Text>{data}</Text>
+                <Text style={styles.instructions}>{data}</Text>
               ))}
               <Text style={styles.theStyle}>Instructions</Text>
               {recipeData.instructions.map((data, key) => (
@@ -89,21 +93,21 @@ const styles = StyleSheet.create({
     },
     featuredImage: {
       height: 200,
-      width: 390,
       borderRadius: 20,
-      marginBottom: 10
+      marginVertical: 20,
+      marginHorizontal: 15,
     },
     theBush: {
       color: 'white',
       fontSize: 26,
       fontWeight: 'bold',
-      paddingLeft: 10,
-      paddingTop: 5,
+      paddingLeft: 15,
     },
     theDesc: {
       color: 'gray',
-      fontSize: 12,
-      marginHorizontal: 10,
+      fontSize: 14,
+      marginHorizontal: 15,
+      paddingTop: 5,
       fontWeight: 'bold',
       shadowOffset: {width: 1, height: 1},
       shadowOpacity: 1,
@@ -114,13 +118,13 @@ const styles = StyleSheet.create({
       color: 'white',
       fontSize: 20,
       fontWeight: 'bold',
-      paddingLeft: 10,
+      paddingLeft: 15,
       paddingTop: 5,
     },
     instructions: {
       color: 'grey',
       fontSize: 14,
-      paddingLeft: 5,
+      paddingLeft: 15,
       paddingTop: 5
     },
     ratingBar: {
@@ -128,7 +132,14 @@ const styles = StyleSheet.create({
       shadowOpacity: 1,
       shadowRadius: 1,
       elevation: 10,
-      marginTop: 15,
+      marginTop: 10,
       marginLeft: 20
     },
+    fieldText: {
+      color: 'white',
+      fontSize: 16,
+      fontWeigfht: 'bold',
+      paddingTop: 5,
+      paddingLeft: 15
+    }
   });

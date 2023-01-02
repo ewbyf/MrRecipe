@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TextInput, Image } from "react-native";
+import { StyleSheet, View, Text, TextInput, Image, TouchableOpacity } from "react-native";
 import global from "../../../Styles";
 import { Rating } from "react-native-ratings";
 import BackArrow from '../../../components/BackArrow';
@@ -11,6 +11,37 @@ export default function Dish({props, navigation}) {
     const route = useRoute();
     const [recipeData, setRecipeData] = useState('');
     const [initializing, setInitializing] = useState(true);
+    const [defaultRating, setdefaultRating] = useState(2);
+    const [maxRating, setmaxRating] = useState([1,2,3,4,5]);
+    const starImgFilled = 'https://raw.githubusercontent.com/tranhonghan/images/main/star_filled.png';
+    const starImgCorner = 'https://raw.githubusercontent.com/tranhonghan/images/main/star_corner.png';
+
+    const CustomRatingBar = () => {
+      return (
+        <View style={styles.ratingBar}>
+          {
+            maxRating.map((item, key) => {
+              return (
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  key={item}
+                  onPress={() => setdefaultRating(item)}
+                >
+                  <Image
+                    style={styles.starImg}
+                    source={
+                      item <= defaultRating
+                      ? {uri: starImgFilled}
+                      : {uri: starImgCorner}
+                    }
+                  />
+                </TouchableOpacity>
+              )
+            })
+          }
+        </View>
+      )
+    }
 
     useEffect(() => {
       firebase.firestore().collection('recipes').doc(route.params.doc).get()
@@ -48,7 +79,11 @@ export default function Dish({props, navigation}) {
                   startingValue={recipeData.rating}
                 />          
               </View>
-              <Text style={styles.theDesc}>{recipeData.description}</Text>
+              <View style={{flexDirection: 'row', marginTop: 'auto'}}>
+                <Text style={styles.theStyle}>By:   </Text>
+                <Image source={{uri: (recipeData.userpfp)}}style={styles.thePfp}/>
+                <Text style={styles.theStyle}>{(recipeData.username)}</Text>
+              </View>
               <Text style={styles.fieldText}>Difficulty: {recipeData.difficulty}</Text>
               <View style={{flexDirection: 'row', marginTop: 'auto'}}>
                 <View style={{width: '50%'}}>
@@ -58,7 +93,8 @@ export default function Dish({props, navigation}) {
                   <Text style={styles.fieldText}>Prep Time: {(recipeData.preptime)/60} hrs {(recipeData.preptime)%60} min</Text>
                 </View>
               </View>
-
+              <Text style={styles.theStyle}>Description</Text>
+              <Text style={styles.theDesc}>{recipeData.description}</Text>
               <Text style={styles.theStyle}>Ingredients</Text>
               {recipeData.ingredients.map((data, key) => (
                 <Text style={styles.instructions}>{data}</Text>
@@ -67,6 +103,24 @@ export default function Dish({props, navigation}) {
               {recipeData.instructions.map((data, key) => (
                 <Text style={styles.instructions}>{key+1}. {data}</Text>
               ))}
+              <View style={{marginTop: 'auto'}}>
+                <CustomRatingBar/>
+              </View>
+              <Text style={styles.theStyle}>Comments</Text>
+              <View stlyes={styles.theBy}>
+                <TextInput 
+                    style={{...styles.input, height: 100, paddingVertical: 8}}
+                    placeholder="Add Comment"
+                    placeholderTextColor='#494949'
+                    multiline={true}
+                    maxLength={200}
+                    blurOnSubmit={true}
+                    textAlignVertical='top'
+                  ></TextInput>
+                  <TouchableOpacity style={styles.button}>
+                    <Text style={styles.buttonText}>Publish</Text>
+                  </TouchableOpacity>
+              </View>
             </View>
         </View>
     );
@@ -141,5 +195,43 @@ const styles = StyleSheet.create({
       fontWeigfht: 'bold',
       paddingTop: 5,
       paddingLeft: 15
+    },
+    input: {
+      backgroundColor: '#151515',
+      paddingHorizontal: 15,
+      height: 40,
+      borderRadius: 8,
+      color: 'white',
+    },
+    theBy: {
+      color: 'white',
+      fontSize: 15,
+      fontWeight: 'bold',
+      paddingLeft: 15,
+      paddingTop: 5,
+      flexDirection: 'row',
+    },
+    thePfp: {
+      paddingLeft: 50,
+      paddingTop: 50,
+      borderRadius: 50,
+    },
+    button: {
+      backgroundColor: '#518BFF',
+      width: 175,
+      height: 40,
+      borderRadius: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginVertical: 20,
+    },
+    ratingBar: {
+      justifyContent: 'center',
+      flexDirection: 'row',
+    },
+    starImg: {
+      width: 40,
+      height: 40,
+      resizeMode: 'cover',
     }
   });

@@ -183,12 +183,13 @@ export default function Post({ navigation }) {
         const ref = firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid);
         
         let imgUrl = await uploadPhoto();
+        let timestamp = firebase.firestore.Timestamp.fromDate(new Date());
         
         ref.get()
         .then((snapshot) => {
           if (snapshot.exists) {
             firebase.firestore().collection('recipes').add({
-              name, description, rating: 0, numratings: 0, difficulty, cooktime, preptime, ingredients: ingredientsArray, instructions: instructionsArray, image: imgUrl, rated, comments, user: snapshot.data().name, username: snapshot.data().username, userpfp: snapshot.data().pfp, uid: firebase.auth().currentUser.uid
+              name, description, rating: 0, numratings: 0, difficulty, cooktime, preptime, ingredients: ingredientsArray, instructions: instructionsArray, image: imgUrl, rated, comments, user: snapshot.data().name, username: snapshot.data().username, userpfp: snapshot.data().pfp, uid: firebase.auth().currentUser.uid, timestamp
             })
             .then((doc) => {
               const recipes = [...snapshot.data().recipes];
@@ -230,6 +231,7 @@ export default function Post({ navigation }) {
       return false;
     }
   }
+
 
   if (user) {
     return (
@@ -401,7 +403,7 @@ export default function Post({ navigation }) {
                   <View style={[styles.section, {marginTop: 0, marginBottom: 6}]}>
                     <TextInput maxLength={50} placeholderTextColor={'#494949'} placeholder="Enter ingredient and amount" value={input.value} style={styles.input} onChangeText={(text)=>inputHandler(text, key+1, "ingredients")}/>
                     <TouchableOpacity onPress = {()=> deleteHandler(key+1, "ingredients")} style={{position: 'absolute', right: 10, bottom: 10}}>
-                      <Icon name="trash-outline" color='#FF4444' size={20} />
+                      <Icon name="trash-outline" color='#FF4343' size={20} />
                     </TouchableOpacity> 
                   </View>
                 ))}
@@ -422,7 +424,7 @@ export default function Post({ navigation }) {
                     <TextInput placeholderTextColor={'#494949'} placeholder="Enter a step" value={input.value} style={[styles.input, {paddingLeft: 30}]} onChangeText={(text)=>inputHandler(text, key+1, "instructions")}/>
                     <Text style={{position: 'absolute', left: 10, bottom: 10, color: '#494949'}}>{key+2}.</Text>
                     <TouchableOpacity onPress = {()=> deleteHandler(key+1, "instructions")} style={{position: 'absolute', right: 10, bottom: 10}}>
-                      <Icon name="trash-outline" color='#FF4444' size={20} />
+                      <Icon name="trash-outline" color='#FF4343' size={20} />
                     </TouchableOpacity> 
                   </View>
                 ))}
@@ -492,8 +494,10 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   inputTime: {
+    textAlignVertical: 'top',
     backgroundColor: '#151515',
     paddingHorizontal: 10,
+    paddingTop: 11,
     borderRadius: 8,
     height: 40,
     width: 40,

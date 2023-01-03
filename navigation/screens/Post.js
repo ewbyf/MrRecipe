@@ -403,7 +403,7 @@ export default function Post({ navigation }) {
                   <View style={[styles.section, {marginTop: 0, marginBottom: 6}]}>
                     <TextInput maxLength={50} placeholderTextColor={'#494949'} placeholder="Enter ingredient and amount" value={input.value} style={styles.input} onChangeText={(text)=>inputHandler(text, key+1, "ingredients")}/>
                     <TouchableOpacity onPress = {()=> deleteHandler(key+1, "ingredients")} style={{position: 'absolute', right: 10, bottom: 10}}>
-                      <Icon name="trash-outline" color='#FF4444' size={20} />
+                      <Icon name="trash-outline" color='#FF4343' size={20} />
                     </TouchableOpacity> 
                   </View>
                 ))}
@@ -424,7 +424,7 @@ export default function Post({ navigation }) {
                     <TextInput placeholderTextColor={'#494949'} placeholder="Enter a step" value={input.value} style={[styles.input, {paddingLeft: 30}]} onChangeText={(text)=>inputHandler(text, key+1, "instructions")}/>
                     <Text style={{position: 'absolute', left: 10, bottom: 10, color: '#494949'}}>{key+2}.</Text>
                     <TouchableOpacity onPress = {()=> deleteHandler(key+1, "instructions")} style={{position: 'absolute', right: 10, bottom: 10}}>
-                      <Icon name="trash-outline" color='#FF4444' size={20} />
+                      <Icon name="trash-outline" color='#FF4343' size={20} />
                     </TouchableOpacity> 
                   </View>
                 ))}

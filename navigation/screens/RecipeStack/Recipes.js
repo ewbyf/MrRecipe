@@ -17,13 +17,11 @@ export default function Recipes({ navigation }) {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
 
-  const [dataList, setDataList] = useState([{key: '1', value: {name: 'a', rating: 'a'}}, {key: '1', value: {name: 'a', rating: 'a'}}]);
-  const [recentList, setRecentList] = useState([{key: '1', value: {name: 'a', rating: 'a'}}]);
+  const [dataList, setDataList] = useState([{key: '1', value: {name: 'a', rating: 'a'}}, {key: '1', value: {name: 'a', rating: 1}}]);
+  const [recentList, setRecentList] = useState([{key: '1', value: {name: 'a', rating: 1}}]);
 
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
-
-  
 
   function onAuthStateChanged(user) {
     setUser(user);
@@ -60,7 +58,7 @@ export default function Recipes({ navigation }) {
 
     await Promise.all(snapshot.docs.map((doc) => {
       if (user && fav.indexOf(doc.id) >= 0) {
-        tempList.push({key: doc.id, value: doc.data(), favorite: 'red'});
+        tempList.push({key: doc.id, value: doc.data(), favorite: '#FF4343'});
       }
       else {
         tempList.push({key: doc.id, value: doc.data(), favorite: 'gray'});
@@ -69,7 +67,7 @@ export default function Recipes({ navigation }) {
 
     await Promise.all(snapshot2.docs.map((doc) => {
       if (user && fav.indexOf(doc.id) >= 0) {
-        tempList2.push({key: doc.id, value: doc.data(), favorite: 'red'});
+        tempList2.push({key: doc.id, value: doc.data(), favorite: '#FF4343'});
       }
       else {
         tempList2.push({key: doc.id, value: doc.data(), favorite: 'gray'});
@@ -113,8 +111,8 @@ export default function Recipes({ navigation }) {
           else {
             fav.push(doc);
             firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: fav});
-            temp[index].favorite = 'red';
-            color = 'red';
+            temp[index].favorite = '#FF4343';
+            color = '#FF4343';
           }
         })
         .catch((error) => {
@@ -132,7 +130,7 @@ export default function Recipes({ navigation }) {
 
     const onDoubleTap = useCallback(async() => {
       if (user) {
-        setLiked('red');
+        setLiked('#FF4343');
         scale.value = withSpring(1, undefined, (isFinished) => {
           if (isFinished) {
             scale.value = withDelay(500, withSpring(0));
@@ -144,7 +142,7 @@ export default function Recipes({ navigation }) {
         let doc = item.key;
         temp = dataList;
         index = dataList.findIndex(item => item.key == doc);
-        temp[index].favorite = 'red';
+        temp[index].favorite = '#FF4343';
   
         await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
         .then((snap) => {
@@ -191,7 +189,6 @@ export default function Recipes({ navigation }) {
             maxDelayMs={200}
             ref={doubleTapRef}
             numberOfTaps={2}
-            // onActivated={() => favorite(item.key)}
             onActivated={() => onDoubleTap()}
           >
             <View style={styles.list}>
@@ -201,7 +198,6 @@ export default function Recipes({ navigation }) {
                   styles.heart,
                   rStyle,
                 ]}
-                resizeMode={'center'}
               />
               <Image source={{uri: (item.value.image ? item.value.image : 'https://imgur.com/hNwMcZQ.png')}} style={styles.featuredImage}/>
               <View style={{flexDirection: 'row', width: '100%'}}>
@@ -210,7 +206,7 @@ export default function Recipes({ navigation }) {
                   <Text style={{color: 'gray'}}>{item.value.difficulty}</Text>
                   <Text style={{color: 'gray'}}>{((item.value.cooktime + item.value.preptime) / 60).toFixed(1)}+ hrs</Text>
                 </View>
-                <View style={styles.ratingContainer}>
+                <View style={[styles.ratingContainer, {paddingRight: 20}]}>
                   <Rating
                     ratingCount={5}
                     imageSize={16}
@@ -221,14 +217,14 @@ export default function Recipes({ navigation }) {
                     startingValue={item.value.rating}
                   />
                   <Text style={styles.rating}>{item.value.rating} of 5</Text>
-                  <TouchableOpacity onPress={() => favorite(item.key)}>
-                    <Icon name='heart' color={liked} size={20} />
-                  </TouchableOpacity>
                 </View>
               </View>
             </View>
           </TapGestureHandler>
         </TapGestureHandler>
+        <TouchableOpacity style={{position: 'absolute', bottom: 17, right: 20}} onPress={() => favorite(item.key)}>
+          <Icon name='heart' color={liked} size={20} />
+        </TouchableOpacity>
       </View>
     )
   }
@@ -260,8 +256,8 @@ export default function Recipes({ navigation }) {
           else {
             fav.push(doc);
             firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: fav});
-            temp[index].favorite = 'red';
-            color = 'red';
+            temp[index].favorite = '#FF4343';
+            color = '#FF4343';
           }
         })
         .catch((error) => {
@@ -284,7 +280,7 @@ export default function Recipes({ navigation }) {
 
     const onDoubleTap = useCallback(async() => {
       if (user) {
-        setLiked('red');
+        setLiked('#FF4343');
         scale.value = withSpring(1, undefined, (isFinished) => {
           if (isFinished) {
             scale.value = withDelay(500, withSpring(0));
@@ -302,7 +298,7 @@ export default function Recipes({ navigation }) {
           temp = recentList;
           index = recentList.findIndex(item => item.key == doc);
         }
-        temp[index].favorite = 'red';
+        temp[index].favorite = '#FF4343';
   
         await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
         .then((snap) => {
@@ -344,14 +340,14 @@ export default function Recipes({ navigation }) {
     }
 
     return (
-      <View style={{width: windowWidth/1.5 - 20, height: 250, borderRadius: 10}} onPress={() => navigation.navigate("DishScreen", {doc: item.key})}>
+      <View style={{width: windowWidth/1.5 - 20, height: 250, borderRadius: 10}}>
         <TapGestureHandler
           waitFor={doubleTapRef}
           onActivated={() => navigation.navigate("DishScreen", {doc: item.key})}
         >
           <TapGestureHandler
             maxDelayMs={200}
-            ref={doubleTapRef}
+            ref={doubleTapRef} 
             numberOfTaps={2}
             onActivated={() => onDoubleTap()}
           >
@@ -362,7 +358,6 @@ export default function Recipes({ navigation }) {
                   styles.heart,
                   rStyle,
                 ]}
-                resizeMode={'center'}
               />
               <Image source={{uri: (item.value.image ? item.value.image : 'https://imgur.com/hNwMcZQ.png')}} style={styles.smallImage}/>
               <View style={{width: '100%', height: 85}}>
@@ -384,12 +379,12 @@ export default function Recipes({ navigation }) {
                   <Text style={styles.rating}>{item.value.rating} of 5</Text>   
                 </View>
               </View>
-              <TouchableOpacity style={{position: 'absolute', bottom: 6, right: 20}} onPress={() => favorite(item.key, list)}>
-                <Icon name='heart' color={liked} size={20} />
-              </TouchableOpacity>
             </View>
           </TapGestureHandler>
         </TapGestureHandler>
+        <TouchableOpacity style={{position: 'absolute', bottom: 6, right: 30}} onPress={() => favorite(item.key, list)}>
+          <Icon name='heart' color={liked} size={20} />
+        </TouchableOpacity>
       </View>
     )
   }
@@ -500,10 +495,6 @@ const styles = StyleSheet.create({
     left: '50%',
     marginTop: -50,
     marginLeft: -30,
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.35,
-    shadowRadius: 35,
-    elevation: 10,
     zIndex: 10,
   },
   smallImage: {
@@ -517,7 +508,8 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 'auto',
     alignItems: 'center',
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
+    paddingBottom: 3
   },
   rating: {
       color: 'gray',

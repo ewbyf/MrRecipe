@@ -10,7 +10,7 @@ export default function Login({ navigation }){
   const [password, setPassword] = useState('');
 
   const [forgotVisible, setForgotVisible] = useState(false);
-  const[resetEmail, setResetEmail] = useState('');
+  const [resetEmail, setResetEmail] = useState('');
   
   const loginUser = async(email, password) => {
     if (!password) {

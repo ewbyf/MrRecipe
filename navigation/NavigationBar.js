@@ -12,7 +12,7 @@ import FavoritesStack from './routes/FavoritesStack';
 import LoginStack from './routes/LoginStack';
 import DashboardStack from './routes/DashboardStack';
 import PeopleStack from './routes/PeopleStack';
-import PostStack from './routes/PostStack';
+import PostScreen from './screens/Post'
 
 import { useEffect, useState } from 'react';
 
@@ -88,7 +88,7 @@ export default function NavigationBar() {
                 </View>
               )
             }}/>
-            <Tab.Screen name={'Post'} component={PostStack} options={{
+            <Tab.Screen name={'Post'} component={PostScreen} options={{
               tabBarIcon: ({focused}) => (
                 <View style={{alignItems: 'center', justifyContent: 'center'}}>
                   <Icon name={focused ? 'add' : 'add-outline'} color='white' size={30}/>
@@ -96,7 +96,8 @@ export default function NavigationBar() {
               ),
               tabBarButton: (props) => (
                 <CustomTabBarButton {...props}/>
-              )
+              ),
+              tabBarStyle: {display: 'none'}
             }}/>
             <Tab.Screen name={'Favorites'} component={FavoritesStack} options={{
               tabBarIcon: ({focused}) => (

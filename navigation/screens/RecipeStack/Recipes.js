@@ -178,7 +178,7 @@ export default function Recipes({ navigation }) {
     }
 
     return (
-      <View style={{width: windowWidth-40, height: 300, borderRadius: 10}} >
+      <View style={{width: windowWidth-40, height: (windowWidth-40) * .8, borderRadius: 10}} >
         <TapGestureHandler
           waitFor={doubleTapRef}
           onActivated={() => navigation.navigate("DishScreen", {doc: item.key})}
@@ -220,7 +220,7 @@ export default function Recipes({ navigation }) {
             </View>
           </TapGestureHandler>
         </TapGestureHandler>
-        <TouchableOpacity style={{position: 'absolute', bottom: 31, right: 20}} onPress={() => favorite(item.key)}>
+        <TouchableOpacity style={{position: 'absolute', bottom: 11, right: 20}} onPress={() => favorite(item.key)}>
           <Icon name='heart' color={liked} size={20} />
         </TouchableOpacity>
       </View>
@@ -338,7 +338,7 @@ export default function Recipes({ navigation }) {
     }
 
     return (
-      <View style={{width: windowWidth/1.5 - 20, height: 235, borderRadius: 10}}>
+      <View style={{width: windowWidth/1.5 - 20, height: windowWidth/1.5 - 25, borderRadius: 10}}>
         <TapGestureHandler
           waitFor={doubleTapRef}
           onActivated={() => navigation.navigate("DishScreen", {doc: item.key})}
@@ -349,7 +349,7 @@ export default function Recipes({ navigation }) {
             numberOfTaps={2}
             onActivated={() => onDoubleTap()}
           >
-            <View style={[styles.list, {marginHorizontal: 10, height: 235}]}>
+            <View style={[styles.list, {marginHorizontal: 10, height: windowWidth/1.5 - 25}]}>
               <AnimatedImage
                 source={require('../../../assets/heart.png')}
                 style={[
@@ -455,13 +455,13 @@ const styles = StyleSheet.create({
   },
   featuredContainer: {
     width: Dimensions.get("window").width,
-    height: 280,
+    height: (Dimensions.get("window").width-40) * .8,
     marginTop: 10,
     paddingHorizontal: 20,
   },
   trendingContainer: {
     width: '100%',
-    height: 235,
+    height: Dimensions.get("window").width/1.5 - 25,
     marginTop: 10,
     paddingLeft: 10,
   },
@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   list: {
-    height: 280,
+    height: (Dimensions.get("window").width-40) * .8,
     backgroundColor: "#282828",
     alignItems: 'center',
     padding: 20,

@@ -26,6 +26,7 @@ export default StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: 'white',
+        textAlign: 'center',
     },
     searchbar: {
         width: 300,

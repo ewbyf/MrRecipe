@@ -13,7 +13,6 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { firebase } from "../../../config";
 import { FlashList } from "@shopify/flash-list";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Rating } from "react-native-ratings";
 import { TapGestureHandler, GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 import Animated, {useAnimatedStyle, useSharedValue, withDelay, withSpring} from 'react-native-reanimated';
@@ -27,7 +26,6 @@ export default function Dashboard({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [dataList, setDataList] = useState([]);
 
-  const insets = useSafeAreaInsets();
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const wait = (timeout) => {
@@ -343,7 +341,6 @@ export default function Dashboard({ navigation }) {
           )}
           scrollEventThrottle={1}
           style={{ zIndex: 3 }}
-          contentContainerStyle={styles.scrollView}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -411,7 +408,6 @@ export default function Dashboard({ navigation }) {
             {userData && userData.recipes.length > 0 && (
               <FlashList
                 data={dataList}
-                extraData={dataList}
                 renderItem={({ item }) => (
                   <Posts item={item}/>
                 )}

@@ -23,8 +23,9 @@ export default function Recipes({ navigation }) {
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
 
-  function onAuthStateChanged(user) {
-    setUser(user);
+  function onAuthStateChanged(userParam) {
+    fetchData(userParam);
+    setUser(userParam);
     if (initializing)
       setInitializing(false);
   }
@@ -38,7 +39,7 @@ export default function Recipes({ navigation }) {
     return new Promise(resolve => setTimeout(resolve, timeout));
   }
 
-  const fetchData = async() => {
+  const fetchData = async(userParam) => {
     let tempList = [];
     let tempList2 = [];
 
@@ -46,7 +47,7 @@ export default function Recipes({ navigation }) {
 
     const snapshot = await firebase.firestore().collection('recipes').orderBy('rating', 'desc').get()
     const snapshot2 = await firebase.firestore().collection('recipes').orderBy('timestamp', 'desc').get()
-    if (user) {
+    if (userParam) {
       await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
       .then((snap) => {
         fav = snap.data().favorites;
@@ -57,7 +58,7 @@ export default function Recipes({ navigation }) {
     }
 
     await Promise.all(snapshot.docs.map((doc) => {
-      if (user && fav.indexOf(doc.id) >= 0) {
+      if (userParam && fav.indexOf(doc.id) >= 0) {
         tempList.push({key: doc.id, value: doc.data(), favorite: '#FF4343'});
       }
       else {
@@ -66,7 +67,7 @@ export default function Recipes({ navigation }) {
     }))
 
     await Promise.all(snapshot2.docs.map((doc) => {
-      if (user && fav.indexOf(doc.id) >= 0) {
+      if (userParam && fav.indexOf(doc.id) >= 0) {
         tempList2.push({key: doc.id, value: doc.data(), favorite: '#FF4343'});
       }
       else {
@@ -79,13 +80,13 @@ export default function Recipes({ navigation }) {
   }
 
   useEffect(() => {
-    fetchData();
+    if (firebase.auth().currentUser) fetchData(user);
     navigation.addListener("focus", () => {setLoading(!loading)});
   }, [navigation, loading]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    fetchData();
+    fetchData(user);
     wait(800).then(() => setRefreshing(false));
   }, []);
 

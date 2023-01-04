@@ -1,6 +1,6 @@
 import { StyleSheet, View, Text, TextInput, Image, Dimensions, ScrollView, TouchableOpacity } from "react-native";
 import global from "../../Styles";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { firebase } from '../../config';
 import { FlashList } from "@shopify/flash-list";
 import { Rating } from "react-native-ratings";
@@ -12,10 +12,11 @@ export default function Favorites({ navigation }) {
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  function onAuthStateChanged(user) {
-  setUser(user);
-  if (initializing)
-    setInitializing(false);
+  function onAuthStateChanged(userParam) {
+    fetchData(userParam);
+    setUser(userParam);
+    if (initializing)
+      setInitializing(false);
   }
 
   useEffect(() => {
@@ -23,93 +24,63 @@ export default function Favorites({ navigation }) {
     return subscriber;
   }, []);
 
-  const fetchData = async() => {
-    var tempList = [];
-    let fav = [];
-
-    await firebase
-      .firestore()
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists) {
-          setUser(snapshot.data());
-          fav = snapshot.data().favorites;
-        } else
-          Alert.alert("Unknown Error Occured", "Contact support with error.");
-      });
-
-    await Promise.all(
-      fav.map(async(doc) => {
-        return firebase
-          .firestore()
-          .collection("recipes")
-          .doc(doc)
-          .get()
-          .then((snap) => {
-            tempList.push({key: doc, value: snap.data()});
-          })
-          .catch((error) => {
-            alert(error.message);
-          });
-      }),
-    );
-    setFavorites(tempList);
+  const fetchData = async(userParam) => {
+    if (userParam) {
+      var tempList = [];
+      let fav = [];
+  
+      await firebase
+        .firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .get()
+        .then((snapshot) => {
+          if (snapshot.exists) {
+            setUser(snapshot.data());
+            fav = snapshot.data().favorites;
+          } else
+            Alert.alert("Unknown Error Occured", "Contact support with error.");
+        });
+  
+      await Promise.all(
+        fav.map(async(doc) => {
+          return firebase
+            .firestore()
+            .collection("recipes")
+            .doc(doc)
+            .get()
+            .then((snap) => {
+              tempList.push({key: doc, value: snap.data()});
+            })
+            .catch((error) => {
+              alert(error.message);
+            });
+        }),
+      );
+      setFavorites(tempList);
+    }
   };
 
   useEffect(() => {
-    if (user) fetchData();
+    fetchData(user);
     navigation.addListener("focus", () => {setLoading(!loading)});
   }, [navigation, loading]);
 
-  const Posts = ({ item }) => {
-    const unfavorite = async(doc) => {
-      let temp = favorites;
-      temp.splice(favorites.findIndex(item => item.key == doc), 1);
+  const unfavorite = async(doc) => {
+    let temp = favorites;
+    temp.splice(favorites.findIndex(item => item.key == doc), 1);
 
-      await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
-      .then((snap) => {
-        let fav = snap.data().favorites;
-        fav.splice(snap.data().favorites.indexOf(doc), 1);
-        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: fav});
-      })
-      .catch((error) => {
-        alert(error.message);
-      })
+    await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
+    .then((snap) => {
+      let fav = snap.data().favorites;
+      fav.splice(snap.data().favorites.indexOf(doc), 1);
+      firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: fav});
+    })
+    .catch((error) => {
+      alert(error.message);
+    })
 
-      setFavorites(temp);
-    }
-
-    return (
-      <TouchableOpacity style={global.itemContainer} onPress={() => navigation.navigate("DishScreen", {doc: item.key})}>
-          <View style={[global.list]}>
-            <Image source={{uri: (item.value.image ? item.value.image : 'https://imgur.com/hNwMcZQ.png')}} style={global.listImage}/>
-            <View style={{width: '100%', height: 85}}>
-              <View>
-                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>{item.value.name}</Text>
-                <Text style={{color: 'gray'}}>{item.value.difficulty}</Text>
-                <Text style={{color: 'gray'}}>{((item.value.cooktime + item.value.preptime) / 60).toFixed(1)}+ hrs</Text>
-              </View>
-              <View style={{flexDirection: 'row', marginTop: 'auto', alignItems: 'center'}}>
-                <Rating
-                  ratingCount={5}
-                  imageSize={16}
-                  readonly={true}
-                  type={'custom'}
-                  ratingBackgroundColor={'gray'}
-                  tintColor={'#282828'}
-                  startingValue={item.value.rating}
-                />
-                <Text style={global.rating}>{item.value.rating} of 5</Text>   
-              </View>
-            </View>
-          </View>
-        <TouchableOpacity style={{position: 'absolute', bottom: 6, right: 15}} onPress={() => unfavorite(item.key)}>
-          <Icon name='heart' color={'#FF4343'} size={20} />
-        </TouchableOpacity>
-      </TouchableOpacity>
-    )
+    setFavorites([...temp]);
   }
   
   if (initializing) return null;
@@ -134,14 +105,41 @@ export default function Favorites({ navigation }) {
                     textAlign: "center",
                   }}
                 >
-                  You have not posted any recipes
+                  You have no favorites
                 </Text>
               )}
               {user && favorites.length > 0 && (
                 <FlashList
                   data={favorites}
+
                   renderItem={({ item }) => (
-                    <Posts item={item}/>
+                    <TouchableOpacity style={global.itemContainer} onPress={() => navigation.navigate("DishScreen", {doc: item.key})}>
+                      <View style={[global.list]}>
+                        <Image source={{uri: (item.value.image ? item.value.image : 'https://imgur.com/hNwMcZQ.png')}} style={global.listImage}/>
+                        <View style={{width: '100%', height: 85}}>
+                          <View>
+                            <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>{item.value.name}</Text>
+                            <Text style={{color: 'gray'}}>{item.value.difficulty}</Text>
+                            <Text style={{color: 'gray'}}>{((item.value.cooktime + item.value.preptime) / 60).toFixed(1)}+ hrs</Text>
+                          </View>
+                          <View style={{flexDirection: 'row', marginTop: 'auto', alignItems: 'center'}}>
+                            <Rating
+                              ratingCount={5}
+                              imageSize={16}
+                              readonly={true}
+                              type={'custom'}
+                              ratingBackgroundColor={'gray'}
+                              tintColor={'#282828'}
+                              startingValue={item.value.rating}
+                            />
+                            <Text style={global.rating}>{item.value.rating} of 5</Text>   
+                          </View>
+                        </View>
+                      </View>
+                      <TouchableOpacity style={{position: 'absolute', bottom: 6, right: 15}} onPress={() => unfavorite(item.key)}>
+                        <Icon name='heart' color={'#FF4343'} size={20} />
+                      </TouchableOpacity>
+                    </TouchableOpacity>
                   )}
                   estimatedItemSize={10}
                   numColumns={2}

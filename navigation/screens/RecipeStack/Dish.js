@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TextInput, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, TextInput, Image, TouchableOpacity, ScrollView } from "react-native";
 import global from "../../../Styles";
 import { Rating } from "react-native-ratings";
 import BackArrow from '../../../components/BackArrow';
@@ -64,6 +64,7 @@ export default function Dish({props, navigation}) {
                 <BackArrow navigation={navigation}/>
                 <Text style={global.topbarTitle}>Recipe</Text>
             </View>
+            <ScrollView>
             <View>
               <Image source={{uri: (recipeData.image)}} style={styles.featuredImage}/>
               <View style={{flexDirection: 'row', marginTop: 'auto'}}>
@@ -122,6 +123,7 @@ export default function Dish({props, navigation}) {
                   </TouchableOpacity>
               </View>
             </View>
+          </ScrollView>
         </View>
     );
 }

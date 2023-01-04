@@ -53,7 +53,7 @@ export default function Dish({props, navigation}) {
         alert(error.message);
       })
     }, [])
-
+    
     if (initializing) {
       return null;
     }
@@ -62,28 +62,32 @@ export default function Dish({props, navigation}) {
         <View style={global.appContainer}>
             <View style={global.topbar}>
                 <BackArrow navigation={navigation}/>
-                <Text style={global.topbarTitle}>Recipe</Text>
+                <Text style={global.topbarTitle}>{recipeData.name}</Text>
             </View>
             <ScrollView>
             <View>
               <Image source={{uri: (recipeData.image)}} style={styles.featuredImage}/>
               <View style={{flexDirection: 'row', marginTop: 'auto'}}>
-                <Text style={styles.theBush}>{recipeData.name}</Text>
-                <Rating
-                  style={styles.ratingBar}
-                  ratingCount={5}
-                  imageSize={16}
-                  readonly={true}
-                  type={'custom'}
-                  ratingBackgroundColor={'gray'}
-                  tintColor={'#282828'}
-                  startingValue={recipeData.rating}
-                />          
-              </View>
-              <View style={{flexDirection: 'row', marginTop: 'auto'}}>
-                <Text style={styles.theStyle}>By:   </Text>
-                <Image source={{uri: (recipeData.userpfp)}}style={styles.thePfp}/>
-                <Text style={styles.theStyle}>{(recipeData.username)}</Text>
+                <View style={{width: '50%', justifyContent: 'center'}}>
+                  <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
+                    <View style={{flexDirection: 'row', marginTop: 'auto'}}>
+                      <Image source={{uri: (recipeData.userpfp)}}style={styles.thePfp}/>
+                      <Text style={styles.username}>{(recipeData.username)}</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+                <View style={{width: '50%', justifyContent: 'center'}}>
+                  <Rating
+                    style={styles.ratingBar}
+                    ratingCount={5}
+                    imageSize={20}
+                    readonly={true}
+                    type={'custom'}
+                    ratingBackgroundColor={'gray'}
+                    tintColor={'#282828'}
+                    startingValue={recipeData.rating}
+                  />   
+                </View>       
               </View>
               <Text style={styles.fieldText}>Difficulty: {recipeData.difficulty}</Text>
               <View style={{flexDirection: 'row', marginTop: 'auto'}}>
@@ -108,7 +112,7 @@ export default function Dish({props, navigation}) {
                 <CustomRatingBar/>
               </View>
               <Text style={styles.theStyle}>Comments</Text>
-              <View stlyes={styles.theBy}>
+              <View style={styles.theBy}>
                 <TextInput 
                     style={{...styles.input, height: 100, paddingVertical: 8}}
                     placeholder="Add Comment"
@@ -159,6 +163,13 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       paddingLeft: 15,
     },
+    username: {
+      color: 'lightgray',
+      fontSize: 18,
+      fontWeight: 'bold',
+      paddingLeft: 15,
+      paddingTop: 8
+    },
     theDesc: {
       color: 'gray',
       fontSize: 14,
@@ -189,7 +200,6 @@ const styles = StyleSheet.create({
       shadowRadius: 1,
       elevation: 10,
       marginTop: 10,
-      marginLeft: 20
     },
     fieldText: {
       color: 'white',
@@ -202,6 +212,7 @@ const styles = StyleSheet.create({
       backgroundColor: '#151515',
       paddingHorizontal: 15,
       height: 40,
+      width: '100%',
       borderRadius: 8,
       color: 'white',
     },
@@ -209,14 +220,14 @@ const styles = StyleSheet.create({
       color: 'white',
       fontSize: 15,
       fontWeight: 'bold',
-      paddingLeft: 15,
+      paddingHorizontal: 15,
       paddingTop: 5,
-      flexDirection: 'row',
     },
     thePfp: {
-      paddingLeft: 50,
-      paddingTop: 50,
+      paddingLeft: 40,
+      paddingTop: 40,
       borderRadius: 50,
+      marginLeft: 15,
     },
     button: {
       backgroundColor: '#518BFF',
@@ -232,8 +243,8 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
     },
     starImg: {
-      width: 40,
-      height: 40,
+      width: 30,
+      height: 30,
       resizeMode: 'cover',
     }
   });

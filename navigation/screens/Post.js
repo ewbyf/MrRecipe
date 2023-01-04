@@ -8,6 +8,7 @@ import {
   Alert,
   Image,
   Button,
+  ScrollView
 } from "react-native";
 import global from "../../Styles";
 import { useState, useEffect } from "react";
@@ -15,7 +16,6 @@ import { firebase } from "../../config";
 import BackArrow from "../../components/BackArrow";
 import Icon from "react-native-vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
-import { ScrollView } from "react-native-gesture-handler";
 import { SelectList } from "react-native-dropdown-select-list";
 import Dialog from "react-native-dialog";
 

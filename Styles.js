@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { Dimensions } from 'react-native';
 
 export default StyleSheet.create({
     appContainer: {
@@ -36,13 +37,26 @@ export default StyleSheet.create({
         backgroundColor: 'white',
         color: 'black',
     },
+    itemContainer: {
+        width: Dimensions.get('window').width/2 - 9,
+        height: 250,
+        height: Dimensions.get('window').height/3.5 - 27,
+        borderRadius: 15,
+        marginBottom: 6
+    },
     list: {
-        height: 300,
+        height: Dimensions.get('window').height/3.5 - 27,
         alignItems: 'center',
         padding: 15,
         margin: 3,
-        backgroundColor: '#28466E',
+        backgroundColor: '#282828',
         borderRadius: 15,
+    },
+    listImage: {
+        height: (Dimensions.get('window').width/2 - 40) * .6,
+        width: (Dimensions.get('window').width/2 - 40),
+        borderRadius: 15,
+        marginBottom: 10
     },
     listTitle: {
         color: '#FFD9AC',
@@ -78,16 +92,12 @@ export default StyleSheet.create({
         elevation: 10,
     },
     rating: {
-        color: '#f1c40f',
-        fontSize: 15,
+        color: 'gray',
+        fontSize: 12,
+        marginHorizontal: 6,
         fontWeight: 'bold',
-        flex: 1,
-        shadowOffset: {width: 1, height: 1},
-        shadowOpacity: 1,
-        shadowRadius: 1,
-        elevation: 10,
     },
     author: {
         marginTop: 'auto',
-    }
+    },
 });

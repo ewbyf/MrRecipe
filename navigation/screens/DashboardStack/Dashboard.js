@@ -2,26 +2,24 @@ import {
   StyleSheet,
   View,
   Text,
-  TextInput,
-  Button,
   Alert,
   Image,
-  ScrollView,
   TouchableOpacity,
-  Animated,
   RefreshControl,
   ImageBackground,
-  FlatList,
-  Vibration,
 } from "react-native";
 import global from "../../../Styles";
 import Icon from "react-native-vector-icons/Ionicons";
 import { firebase } from "../../../config";
-import { useState, useEffect } from "react";
 import { FlashList } from "@shopify/flash-list";
-import React, { useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Rating } from "react-native-ratings";
+import { TapGestureHandler, GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
+import Animated, {useAnimatedStyle, useSharedValue, withDelay, withSpring} from 'react-native-reanimated';
+
+const AnimatedImage = Animated.createAnimatedComponent(Image);
+const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 export default function Dashboard({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
@@ -38,6 +36,7 @@ export default function Dashboard({ navigation }) {
 
   const fetchData = async () => {
     var tempList = [];
+    let fav = [];
     let ref = "";
 
     await firebase
@@ -49,20 +48,24 @@ export default function Dashboard({ navigation }) {
         if (snapshot.exists) {
           setUserData(snapshot.data());
           ref = snapshot.data();
+          fav = snapshot.data().favorites;
         } else
           Alert.alert("Unknown Error Occured", "Contact support with error.");
       });
 
     await Promise.all(
-      ref.recipes.reverse().map((doc) => {
+      ref.recipes.reverse().map(async(doc) => {
         return firebase
           .firestore()
           .collection("recipes")
           .doc(doc)
           .get()
           .then((snap) => {
-            if (snap.exists) {
-              tempList.push(snap.data());
+            if (fav.indexOf(doc) >= 0) {
+              tempList.push({key: doc, value: snap.data(), favorite: '#FF4343'});
+            }
+            else {
+              tempList.push({key: doc, value: snap.data(), favorite: 'gray'});
             }
           })
           .catch((error) => {
@@ -86,12 +89,140 @@ export default function Dashboard({ navigation }) {
     wait(800).then(() => setRefreshing(false));
   }, []);
 
+  const Posts = ({ item }) => {
+    const favorite = async(doc) => {
+      let fav = [];
+      let temp = [];
+      let color = 'gray';
+      let index = -1;
+
+      temp = dataList;
+      index = dataList.findIndex(item => item.key == doc);
+
+      await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
+      .then((snap) => {
+        fav = snap.data().favorites;
+        if (fav.indexOf(doc) != -1) {
+          fav.splice(snap.data().favorites.indexOf(doc), 1);
+          firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: fav});
+          temp[index].favorite = 'gray';
+        }
+        else {
+          fav.push(doc);
+          firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: fav});
+          temp[index].favorite = '#FF4343';
+          color = '#FF4343';
+        }
+      })
+      .catch((error) => {
+        alert(error.message);
+      })
+
+        setDataList(temp);
+        setLiked(color);
+    }
+    const scale = useSharedValue(0);
+
+    const onDoubleTap = useCallback(async() => {
+      setLiked('#FF4343');
+      scale.value = withSpring(1, undefined, (isFinished) => {
+        if (isFinished) {
+          scale.value = withDelay(500, withSpring(0));
+        }
+      });
+      let fav = [];
+      let doc = item.key;
+      let temp = dataList;
+      let index = dataList.findIndex(item => item.key == doc);
+      temp[index].favorite = '#FF4343';
+
+      await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
+      .then((snap) => {
+        fav = snap.data().favorites;
+        if (fav.indexOf(doc) == -1) {
+          fav.push(doc);
+          firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: fav});
+        }
+        else {
+          return;
+        }
+      })
+      .catch((error) => {
+        alert(error.message);
+      })
+
+      setDataList(temp);
+    }, []);
+
+    const rStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: Math.max(scale.value, 0) }],
+    }));
+    
+
+    const doubleTapRef = useRef();
+    const lastItemId = useRef(item.key);
+    const [liked, setLiked] = useState(item.favorite);
+    if (item.key !== lastItemId.current) {
+      lastItemId.current = item.key;
+      setLiked(item.favorite);
+    }
+
+    return (
+      <View style={global.itemContainer}>
+        <TapGestureHandler
+          waitFor={doubleTapRef}
+          onActivated={() => navigation.navigate("DishScreen", {doc: item.key})}
+        >
+          <TapGestureHandler
+            maxDelayMs={200}
+            ref={doubleTapRef} 
+            numberOfTaps={2}
+            onActivated={() => onDoubleTap()}
+          >
+            <View style={[global.list]}>
+              <AnimatedImage
+                source={require('../../../assets/heart.png')}
+                style={[
+                  styles.heart,
+                  rStyle,
+                ]}
+              />
+              <Image source={{uri: (item.value.image ? item.value.image : 'https://imgur.com/hNwMcZQ.png')}} style={global.listImage}/>
+              <View style={{width: '100%', height: 85}}>
+                <View>
+                  <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>{item.value.name}</Text>
+                  <Text style={{color: 'gray'}}>{item.value.difficulty}</Text>
+                  <Text style={{color: 'gray'}}>{((item.value.cooktime + item.value.preptime) / 60).toFixed(1)}+ hrs</Text>
+                </View>
+                <View style={{flexDirection: 'row', marginTop: 'auto', alignItems: 'center'}}>
+                  <Rating
+                    ratingCount={5}
+                    imageSize={16}
+                    readonly={true}
+                    type={'custom'}
+                    ratingBackgroundColor={'gray'}
+                    tintColor={'#282828'}
+                    startingValue={item.value.rating}
+                  />
+                  <Text style={global.rating}>{item.value.rating} of 5</Text>   
+                </View>
+              </View>
+            </View>
+          </TapGestureHandler>
+        </TapGestureHandler>
+        <TouchableOpacity style={{position: 'absolute', bottom: 6, right: 15}} onPress={() => favorite(item.key)}>
+          <Icon name='heart' color={liked} size={20} />
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
   return (
-    <View style={global.appContainer}>
+    <GestureHandlerRootView style={global.appContainer}>
       {/* Header pop up */}
       <View style={styles.animationContainer}>
         <View style={{ flex: 1, height: "100%", justifyContent: "center" }}>
-          <Animated.Image
+          <AnimatedImage
             source={{
               uri: userData.pfp
                 ? userData.pfp
@@ -203,13 +334,14 @@ export default function Dashboard({ navigation }) {
       </View>
 
       <View style={styles.dashboard}>
-        <Animated.ScrollView
+        <AnimatedScrollView
           showsVerticalScrollIndicator={false}
           stickyHeaderIndices={[2]}
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
             { useNativeDriver: true },
           )}
+          scrollEventThrottle={1}
           style={{ zIndex: 3 }}
           contentContainerStyle={styles.scrollView}
           refreshControl={
@@ -224,7 +356,7 @@ export default function Dashboard({ navigation }) {
             }}
           >
             <View style={{ alignItems: "center" }}>
-              <Animated.Image
+              <AnimatedImage
                 source={{
                   uri: userData.pfp
                     ? userData.pfp
@@ -281,51 +413,16 @@ export default function Dashboard({ navigation }) {
                 data={dataList}
                 extraData={dataList}
                 renderItem={({ item }) => (
-                  <TouchableOpacity style={{ width: "100%" }}>
-                    <ImageBackground
-                      source={{ uri: item.image }}
-                      style={global.list}
-                      imageStyle={{ borderRadius: 15 }}
-                    >
-                      <Text style={global.listTitle}>{item.name}</Text>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          width: "100%",
-                        }}
-                      >
-                        <View style={{ flex: 1 }}></View>
-                        <Rating
-                          style={global.ratingBar}
-                          ratingCount={5}
-                          imageSize={16}
-                          readonly={true}
-                          type={"custom"}
-                          ratingBackgroundColor={"transparent"}
-                          tintColor={"#2E2E2E"}
-                          startingValue={item.rating}
-                        />
-                        <Text style={global.rating}>{item.rating}</Text>
-                      </View>
-                      <Text style={global.listText}>
-                        Difficulty: {item.difficulty}
-                      </Text>
-                      <Text style={global.listText}>
-                        Total time:{" "}
-                        {((item.cooktime + item.preptime) / 60).toFixed(2)} hr
-                      </Text>
-                    </ImageBackground>
-                  </TouchableOpacity>
+                  <Posts item={item}/>
                 )}
                 estimatedItemSize={10}
                 numColumns={2}
               />
             )}
           </View>
-        </Animated.ScrollView>
+        </AnimatedScrollView>
       </View>
-    </View>
+    </GestureHandlerRootView>
   );
 }
 
@@ -421,5 +518,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginVertical: 10,
     textAlign: "center",
+  },
+  heart: {
+    height: 75,
+    width: 75,
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -35,
+    marginLeft: -22,
+    zIndex: 10,
   },
 });

@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TextInput, RefreshControl, TouchableOpacity, ImageBackground, Alert, ScrollView, Dimensions, Image } from "react-native";
+import { StyleSheet, View, Text, TextInput, RefreshControl, TouchableOpacity, Alert, ScrollView, Dimensions, Image } from "react-native";
 import global from "../../../Styles";
 import { FlashList } from "@shopify/flash-list";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -6,8 +6,8 @@ import React from 'react';
 import { Rating } from "react-native-ratings";
 import { firebase } from '../../../config';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { TapGestureHandler, GestureHandlerRootView, Gesture } from "react-native-gesture-handler";
-import Animated, {useAnimatedStyle, useSharedValue, withDelay, withSpring, withTiming} from 'react-native-reanimated';
+import { TapGestureHandler, GestureHandlerRootView } from "react-native-gesture-handler";
+import Animated, {useAnimatedStyle, useSharedValue, withDelay, withSpring} from 'react-native-reanimated';
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 
@@ -137,11 +137,9 @@ export default function Recipes({ navigation }) {
           }
         });
         let fav = [];
-        let temp = [];
-        let index = -1;
         let doc = item.key;
-        temp = dataList;
-        index = dataList.findIndex(item => item.key == doc);
+        let temp = dataList;
+        let index = dataList.findIndex(item => item.key == doc);
         temp[index].favorite = '#FF4343';
   
         await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
@@ -216,13 +214,13 @@ export default function Recipes({ navigation }) {
                     tintColor={'#282828'}
                     startingValue={item.value.rating}
                   />
-                  <Text style={styles.rating}>{item.value.rating} of 5</Text>
+                  <Text style={[global.rating, {marginHorizontal: 8}]}>{item.value.rating} of 5</Text>
                 </View>
               </View>
             </View>
           </TapGestureHandler>
         </TapGestureHandler>
-        <TouchableOpacity style={{position: 'absolute', bottom: 17, right: 20}} onPress={() => favorite(item.key)}>
+        <TouchableOpacity style={{position: 'absolute', bottom: 31, right: 20}} onPress={() => favorite(item.key)}>
           <Icon name='heart' color={liked} size={20} />
         </TouchableOpacity>
       </View>
@@ -340,7 +338,7 @@ export default function Recipes({ navigation }) {
     }
 
     return (
-      <View style={{width: windowWidth/1.5 - 20, height: 250, borderRadius: 10}}>
+      <View style={{width: windowWidth/1.5 - 20, height: 235, borderRadius: 10}}>
         <TapGestureHandler
           waitFor={doubleTapRef}
           onActivated={() => navigation.navigate("DishScreen", {doc: item.key})}
@@ -351,7 +349,7 @@ export default function Recipes({ navigation }) {
             numberOfTaps={2}
             onActivated={() => onDoubleTap()}
           >
-            <View style={[styles.list, {marginHorizontal: 10, height: 250}]}>
+            <View style={[styles.list, {marginHorizontal: 10, height: 235}]}>
               <AnimatedImage
                 source={require('../../../assets/heart.png')}
                 style={[
@@ -376,13 +374,13 @@ export default function Recipes({ navigation }) {
                     tintColor={'#282828'}
                     startingValue={item.value.rating}
                   />
-                  <Text style={styles.rating}>{item.value.rating} of 5</Text>   
+                  <Text style={[global.rating, {marginHorizontal: 8}]}>{item.value.rating} of 5</Text>   
                 </View>
               </View>
             </View>
           </TapGestureHandler>
         </TapGestureHandler>
-        <TouchableOpacity style={{position: 'absolute', bottom: 6, right: 30}} onPress={() => favorite(item.key, list)}>
+        <TouchableOpacity style={{position: 'absolute', bottom: 9, right: 30}} onPress={() => favorite(item.key, list)}>
           <Icon name='heart' color={liked} size={20} />
         </TouchableOpacity>
       </View>
@@ -457,13 +455,13 @@ const styles = StyleSheet.create({
   },
   featuredContainer: {
     width: Dimensions.get("window").width,
-    height: 300,
+    height: 280,
     marginTop: 10,
     paddingHorizontal: 20,
   },
   trendingContainer: {
     width: '100%',
-    height: 250,
+    height: 235,
     marginTop: 10,
     paddingLeft: 10,
   },
@@ -475,15 +473,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   list: {
-    height: 300,
+    height: 280,
     backgroundColor: "#282828",
     alignItems: 'center',
     padding: 20,
     borderRadius: 30,
   },
   featuredImage: {
-    height: 200,
-    width: Dimensions.get("window").width-80,
+    height: (Dimensions.get("window").width-80) * .6,
+    width: '100%',
     borderRadius: 20,
     marginBottom: 10
   },
@@ -498,7 +496,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   smallImage: {
-    height: 125,
+    height: (Dimensions.get("window").width/1.5-80) * .6,
     width: '100%',
     borderRadius: 20,
     marginBottom: 10
@@ -510,12 +508,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-end',
     paddingBottom: 3
-  },
-  rating: {
-      color: 'gray',
-      fontSize: 12,
-      marginHorizontal: 10,
-      fontWeight: 'bold',
   },
 });
   

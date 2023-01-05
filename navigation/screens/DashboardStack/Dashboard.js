@@ -6,7 +6,7 @@ import {
   Image,
   TouchableOpacity,
   RefreshControl,
-  ImageBackground,
+  Dimensions
 } from "react-native";
 import global from "../../../Styles";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -20,7 +20,7 @@ import Animated, {useAnimatedStyle, useSharedValue, withDelay, withSpring} from 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-export default function Dashboard({ navigation }) {
+export default function Dashboard({ navigation, props }) {
   const [refreshing, setRefreshing] = useState(false);
   const [userData, setUserData] = useState("");
   const [loading, setLoading] = useState(false);
@@ -160,13 +160,15 @@ export default function Dashboard({ navigation }) {
     const doubleTapRef = useRef();
     const lastItemId = useRef(item.key);
     const [liked, setLiked] = useState(item.favorite);
+    const [opened, setOpened] = useState(false);
+
     if (item.key !== lastItemId.current) {
       lastItemId.current = item.key;
       setLiked(item.favorite);
     }
 
     return (
-      <View style={global.itemContainer}>
+      <TouchableOpacity style={global.itemContainer}>
         <TapGestureHandler
           waitFor={doubleTapRef}
           onActivated={() => navigation.navigate("DishScreen", {doc: item.key})}
@@ -192,26 +194,26 @@ export default function Dashboard({ navigation }) {
                   <Text style={{color: 'gray'}}>{item.value.difficulty}</Text>
                   <Text style={{color: 'gray'}}>{((item.value.cooktime + item.value.preptime) / 60).toFixed(1)}+ hrs</Text>
                 </View>
-                <View style={{flexDirection: 'row', marginTop: 'auto', alignItems: 'center'}}>
-                  <Rating
-                    ratingCount={5}
-                    imageSize={16}
-                    readonly={true}
-                    type={'custom'}
-                    ratingBackgroundColor={'gray'}
-                    tintColor={'#282828'}
-                    startingValue={item.value.rating}
-                  />
-                  <Text style={global.rating}>{item.value.rating} of 5</Text>   
-                </View>
               </View>
             </View>
           </TapGestureHandler>
         </TapGestureHandler>
-        <TouchableOpacity style={{position: 'absolute', bottom: 6, right: 15}} onPress={() => favorite(item.key)}>
-          <Icon name='heart' color={liked} size={20} />
-        </TouchableOpacity>
-      </View>
+        <View style={global.ratingContainer}>
+          <Rating
+            ratingCount={5}
+            imageSize={16}
+            readonly={true}
+            type={'custom'}
+            ratingBackgroundColor={'gray'}
+            tintColor={'#282828'}
+            startingValue={item.value.rating}
+          />
+          <Text style={global.rating}>{item.value.rating} of 5</Text>   
+          <TouchableOpacity style={{marginLeft: 'auto'}} onPress={() => favorite(item.key)}>
+            <Icon name='heart' color={liked} size={20} />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
     )
   }
 

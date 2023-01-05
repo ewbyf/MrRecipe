@@ -205,25 +205,25 @@ export default function Recipes({ navigation }) {
                   <Text style={{color: 'gray'}}>{item.value.difficulty}</Text>
                   <Text style={{color: 'gray'}}>{((item.value.cooktime + item.value.preptime) / 60).toFixed(1)}+ hrs</Text>
                 </View>
-                <View style={[styles.ratingContainer, {paddingRight: 20}]}>
-                  <Rating
-                    ratingCount={5}
-                    imageSize={16}
-                    readonly={true}
-                    type={'custom'}
-                    ratingBackgroundColor={'gray'}
-                    tintColor={'#282828'}
-                    startingValue={item.value.rating}
-                  />
-                  <Text style={[global.rating, {marginHorizontal: 8}]}>{item.value.rating} of 5</Text>
-                </View>
               </View>
             </View>
           </TapGestureHandler>
         </TapGestureHandler>
-        <TouchableOpacity style={{position: 'absolute', bottom: 11, right: 20}} onPress={() => favorite(item.key)}>
-          <Icon name='heart' color={liked} size={20} />
-        </TouchableOpacity>
+        <View style={styles.featuredRating}>
+          <Rating
+            ratingCount={5}
+            imageSize={16}
+            readonly={true}
+            type={'custom'}
+            ratingBackgroundColor={'gray'}
+            tintColor={'#282828'}
+            startingValue={item.value.rating}
+          />
+          <Text style={[global.rating, {marginHorizontal: 8}]}>{item.value.rating} of 5</Text>
+          <TouchableOpacity style={{marginLeft: 8}} onPress={() => favorite(item.key)}>
+            <Icon name='heart' color={liked} size={20} />
+          </TouchableOpacity>
+        </View>
       </View>
     )
   }
@@ -365,25 +365,27 @@ export default function Recipes({ navigation }) {
                   <Text style={{color: 'gray'}}>{item.value.difficulty}</Text>
                   <Text style={{color: 'gray'}}>{((item.value.cooktime + item.value.preptime) / 60).toFixed(1)}+ hrs</Text>
                 </View>
-                <View style={{flexDirection: 'row', marginTop: 'auto', alignItems: 'center'}}>
-                  <Rating
-                    ratingCount={5}
-                    imageSize={16}
-                    readonly={true}
-                    type={'custom'}
-                    ratingBackgroundColor={'gray'}
-                    tintColor={'#282828'}
-                    startingValue={item.value.rating}
-                  />
-                  <Text style={[global.rating, {marginHorizontal: 8}]}>{item.value.rating} of 5</Text>   
-                </View>
               </View>
             </View>
           </TapGestureHandler>
         </TapGestureHandler>
-        <TouchableOpacity style={{position: 'absolute', bottom: 9, right: 30}} onPress={() => favorite(item.key, list)}>
-          <Icon name='heart' color={liked} size={20} />
-        </TouchableOpacity>
+        <View style={styles.ratingContainer}>
+          <View style={{flexDirection: 'row'}}>
+            <Rating
+              ratingCount={5}
+              imageSize={16}
+              readonly={true}
+              type={'custom'}
+              ratingBackgroundColor={'gray'}
+              tintColor={'#282828'}
+              startingValue={item.value.rating}
+            />
+            <Text style={[global.rating, {marginHorizontal: 8}]}>{item.value.rating} of 5</Text> 
+          </View>
+          <TouchableOpacity onPress={() => favorite(item.key, list)}>
+            <Icon name='heart' color={liked} size={20} />
+          </TouchableOpacity>  
+        </View>
       </View>
     )
   }
@@ -502,13 +504,22 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 10
   },
-  ratingContainer: {
+  featuredRating: {
+    position: 'absolute',
+    bottom: 8,
+    right: 20,
     flexDirection: 'row',
-    flex: 1,
-    marginTop: 'auto',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    paddingBottom: 3
   },
+  ratingContainer: {
+    position: 'absolute',
+    left: 30,
+    bottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: Dimensions.get('window').width/2 - 10,
+  }
 });
   

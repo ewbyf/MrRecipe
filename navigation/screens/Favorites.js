@@ -122,23 +122,23 @@ export default function Favorites({ navigation }) {
                             <Text style={{color: 'gray'}}>{item.value.difficulty}</Text>
                             <Text style={{color: 'gray'}}>{((item.value.cooktime + item.value.preptime) / 60).toFixed(1)}+ hrs</Text>
                           </View>
-                          <View style={{flexDirection: 'row', marginTop: 'auto', alignItems: 'center'}}>
-                            <Rating
-                              ratingCount={5}
-                              imageSize={16}
-                              readonly={true}
-                              type={'custom'}
-                              ratingBackgroundColor={'gray'}
-                              tintColor={'#282828'}
-                              startingValue={item.value.rating}
-                            />
-                            <Text style={global.rating}>{item.value.rating} of 5</Text>   
-                          </View>
                         </View>
                       </View>
-                      <TouchableOpacity style={{position: 'absolute', bottom: 6, right: 15}} onPress={() => unfavorite(item.key)}>
-                        <Icon name='heart' color={'#FF4343'} size={20} />
-                      </TouchableOpacity>
+                      <View style={global.ratingContainer}>
+                        <Rating
+                          ratingCount={5}
+                          imageSize={16}
+                          readonly={true}
+                          type={'custom'}
+                          ratingBackgroundColor={'gray'}
+                          tintColor={'#282828'}
+                          startingValue={item.value.rating}
+                        />
+                        <Text style={global.rating}>{item.value.rating} of 5</Text>   
+                        <TouchableOpacity style={{marginLeft: 'auto'}} onPress={() => unfavorite(item.key)}>
+                          <Icon name='heart' color={'#FF4343'} size={20} />
+                        </TouchableOpacity>
+                      </View>
                     </TouchableOpacity>
                   )}
                   estimatedItemSize={10}

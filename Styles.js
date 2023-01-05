@@ -40,7 +40,6 @@ export default StyleSheet.create({
     },
     itemContainer: {
         width: Dimensions.get('window').width/2 - 9,
-        height: 250,
         height: Dimensions.get('window').height/3.5 - 27,
         borderRadius: 15,
         marginBottom: 6
@@ -97,6 +96,13 @@ export default StyleSheet.create({
         fontSize: 12,
         marginHorizontal: 6,
         fontWeight: 'bold',
+    },
+    ratingContainer: {
+        flexDirection: 'row',
+        marginTop: 'auto',
+        alignItems: 'center',
+        left: 15,
+        width: Dimensions.get('window').width/2.5,
     },
     author: {
         marginTop: 'auto',

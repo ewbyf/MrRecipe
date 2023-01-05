@@ -556,6 +556,7 @@ export default function Post({ navigation }) {
                   style={[styles.section, { marginTop: 0, marginBottom: 6 }]}
                 >
                   <TextInput
+                    key={key}
                     maxLength={50}
                     placeholderTextColor={"#494949"}
                     placeholder="Enter ingredient and amount"
@@ -609,6 +610,7 @@ export default function Post({ navigation }) {
               {instructions.slice(1).map((input, key) => (
                 <View
                   maxLength={200}
+                  key={key}
                   style={[styles.section, { marginTop: 0, marginBottom: 6 }]}
                 >
                   <TextInput

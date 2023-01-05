@@ -219,7 +219,7 @@ export default function Recipes({ navigation }) {
             tintColor={'#282828'}
             startingValue={item.value.rating}
           />
-          <Text style={[global.rating, {marginHorizontal: 8}]}>{item.value.rating} of 5</Text>
+          <Text style={[global.rating, {marginHorizontal: 8}]}>{item.value.rating} ({item.value.numratings})</Text>
           <TouchableOpacity style={{marginLeft: 8}} onPress={() => favorite(item.key)}>
             <Icon name='heart' color={liked} size={20} />
           </TouchableOpacity>
@@ -370,7 +370,7 @@ export default function Recipes({ navigation }) {
           </TapGestureHandler>
         </TapGestureHandler>
         <View style={styles.ratingContainer}>
-          <View style={{flexDirection: 'row'}}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Rating
               ratingCount={5}
               imageSize={16}
@@ -380,7 +380,7 @@ export default function Recipes({ navigation }) {
               tintColor={'#282828'}
               startingValue={item.value.rating}
             />
-            <Text style={[global.rating, {marginHorizontal: 8}]}>{item.value.rating} of 5</Text> 
+            <Text style={[global.rating, {marginHorizontal: 8}]}>{item.value.rating} ({item.value.numratings})</Text> 
           </View>
           <TouchableOpacity onPress={() => favorite(item.key, list)}>
             <Icon name='heart' color={liked} size={20} />

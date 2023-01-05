@@ -208,7 +208,7 @@ export default function Dashboard({ navigation, props }) {
             tintColor={'#282828'}
             startingValue={item.value.rating}
           />
-          <Text style={global.rating}>{item.value.rating} of 5</Text>   
+          <Text style={global.rating}>{item.value.rating} ({item.value.numratings})</Text>   
           <TouchableOpacity style={{marginLeft: 'auto'}} onPress={() => favorite(item.key)}>
             <Icon name='heart' color={liked} size={20} />
           </TouchableOpacity>

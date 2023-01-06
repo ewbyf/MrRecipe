@@ -4,10 +4,8 @@ import {
   TouchableOpacity,
   Text,
   TextInput,
-  FlatList,
   Alert,
   Image,
-  Button,
   ScrollView
 } from "react-native";
 import global from "../../Styles";

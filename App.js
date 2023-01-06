@@ -1,8 +1,11 @@
-import NavigationBar from './navigation/NavigationBar';
+import NavigationBar from "./navigation/NavigationBar";
+import { MenuProvider } from "react-native-popup-menu";
 
 export function App() {
   return (
-    <NavigationBar/>
+    <MenuProvider>
+        <NavigationBar />
+    </MenuProvider>
   );
 }
 

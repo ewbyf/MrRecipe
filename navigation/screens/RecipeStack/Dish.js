@@ -1,11 +1,13 @@
-import { StyleSheet, View, Text, TextInput, Image, TouchableOpacity, ScrollView, Dimensions } from "react-native";
+import { StyleSheet, View, Text, TextInput, Image, TouchableOpacity, ScrollView, Dimensions, Touchable } from "react-native";
 import global from "../../../Styles";
 import { AirbnbRating, Rating } from "react-native-ratings";
 import BackArrow from '../../../components/BackArrow';
 import { useState, useEffect } from "react";
 import { firebase } from '../../../config';
 import { useRoute } from "@react-navigation/native";
-
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import Icon from "react-native-vector-icons/Ionicons";
+import { FlashList } from "@shopify/flash-list";
 
 export default function Dish({props, navigation}) {
     const route = useRoute();
@@ -36,10 +38,14 @@ export default function Dish({props, navigation}) {
         <View style={global.topbar}>
             <BackArrow navigation={navigation}/>
             <Text style={global.topbarTitle}>{recipeData.name}</Text>
+            {recipeData.username == userData.username &&
+              <TouchableOpacity style={styles.dotsContainer}>
+                <Text style={styles.dots}>...</Text>
+              </TouchableOpacity>
+            }
         </View>
-        <ScrollView showsVerticalScrollIndicator={false} style={{padding: 15}}>
+        <KeyboardAwareScrollView showsVerticalScrollIndicator={false} style={{padding: 15}}>
           <Image source={{uri: (recipeData.image ? recipeData.image : 'https://imgur.com/hNwMcZQ.png')}} style={styles.image}/>
-          {/* <Text style={styles.sectionTitle}>Description</Text> */}
           <View style={styles.details}>
             <Text style={styles.desc}><Text style={{color: '#518BFF', fontWeight: 'bold'}}>Description: </Text>{recipeData.description}</Text>
             <View style={styles.timeContainer}>
@@ -74,12 +80,12 @@ export default function Dish({props, navigation}) {
             </View>
           </View>
           
-          <View style={{marginBottom: 15}}>
+          <View style={styles.recipeContainer}>
             <Text style={styles.title}>Ingredients</Text>
             {recipeData.ingredients.map((data, key) => (
               <View key={key} style={styles.listContainer}>
                 <Text style={[styles.listText, {fontWeight: 'bold'}]}>• </Text>
-                <Text style={[styles.listText, {paddingRight: 15}]}>{data}pdskjajsddjsfiodfjioadjiosjfioajiofdjiodfsdofjifdsjiojio</Text>
+                <Text style={[styles.listText, {paddingRight: 15}]}>{data}</Text>
               </View>
             ))}
 
@@ -87,7 +93,7 @@ export default function Dish({props, navigation}) {
             {recipeData.instructions.map((data, key) => (
               <View key={key} style={styles.listContainer}>
                 <Text style={styles.listText}>{key+1}. </Text>
-                <Text style={[styles.listText, {paddingRight: 15}]}>{data}pdskjajsddjsfiodfjioadjiosjfioajiofdjiodfsdofjifdsjiojio</Text>
+                <Text style={[styles.listText, {paddingRight: 15}]}>{data}</Text>
               </View>
             ))}
           </View>
@@ -105,33 +111,43 @@ export default function Dish({props, navigation}) {
           </View>
           
           <Text style={styles.commentsTitle}>{recipeData.comments.length} Comments</Text>
-          <View style={styles.theBy}>
+          <View style={styles.commentContainer}>
+            <Image source={{uri: (recipeData.userpfp)}} style={styles.smallPfp}/>
             <TextInput 
-                style={{...styles.input, height: 100, paddingVertical: 8}}
-                placeholder="Leave a comment..."
+                style={{...styles.input, height: 35, paddingVertical: 8}}
+                placeholder="Add a comment..."
                 placeholderTextColor='#494949'
                 multiline={true}
                 maxLength={200}
                 blurOnSubmit={true}
-                textAlignVertical='top'
               ></TextInput>
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>Publish</Text>
-              </TouchableOpacity>
+              <Icon name="send" size={20} color={'#518BFF'} style={{marginLeft: 'auto'}}/>
           </View>
-        </ScrollView>
+
+        </KeyboardAwareScrollView>
       </View>
     );
 }
 
 const styles = StyleSheet.create({
+  dotsContainer: {
+    position: 'absolute',
+    right: 20,
+    bottom: '50%',
+    marginBottom: -10,
+  },
+  dots: {
+    color: 'white',
+    fontSize: 26,
+    fontWeight: 'bold'
+  },
   image: {
     height: 200,
     borderRadius: 20,
   },
   details: {
     width: "100%",
-    marginVertical: 8,
+    marginVertical: 10,
     paddingBottom: 15,
     borderBottomWidth: 1,
     borderBottomColor: "#363636",
@@ -182,7 +198,13 @@ const styles = StyleSheet.create({
     color: '#518BFF',
     fontSize: 18,
     fontWeight: 'bold',
-    paddingTop: 5,    
+  },
+  recipeContainer: {
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#363636",
+    backgroundColor: "#222222",
+    paddingBottom: 10,
   },
   listContainer: {
     flexDirection: 'row',
@@ -197,28 +219,41 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
-    paddingTop: 5,
+    paddingVertical: 8,
   },
-  theBy: {
+  commentContainer: {
     color: 'white',
     fontSize: 15,
     fontWeight: 'bold',
-    paddingTop: 5,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  smallPfp: {
+    height: 35,
+    width: 35,
+    borderRadius: 50,
+    marginRight: 10,
   },
   input: {
     backgroundColor: '#151515',
     height: 40,
-    width: '100%',
+    paddingHorizontal: 10,
+    width: Dimensions.get('window').width - 100,
     borderRadius: 8,
     color: 'white',
   },
   button: {
     backgroundColor: '#518BFF',
-    width: 175,
+    width: 100,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 20,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

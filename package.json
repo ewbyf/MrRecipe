@@ -26,6 +26,7 @@
     "react-native-dialog": "^9.3.0",
     "react-native-dropdown-select-list": "^2.0.4",
     "react-native-gesture-handler": "~2.8.0",
+    "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-material-dropdown": "^0.11.1",
     "react-native-ratings": "^8.1.0",
     "react-native-reanimated": "~2.12.0",

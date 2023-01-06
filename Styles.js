@@ -9,6 +9,7 @@ export default StyleSheet.create({
     topbar: {
         paddingTop: 30,
         height: 110,
+        flexDirection: 'row',
         width: '100%',
         alignItems: 'center',
         justifyContent: 'center',

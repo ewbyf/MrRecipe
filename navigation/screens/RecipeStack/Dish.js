@@ -154,7 +154,8 @@ export default function Dish({ props, navigation }) {
   const submitComment = async() => {
     if (userData) {
       if (comment.replace(/\s/g, "")) {
-        let data = '';
+        let timestamp = firebase.firestore.Timestamp.fromDate(new Date());
+        let comments = recipeData.comments;
 
         await firebase
         .firestore()
@@ -162,11 +163,8 @@ export default function Dish({ props, navigation }) {
         .doc(firebase.auth().currentUser.uid)
         .get()
         .then((snap) => {
-            data = snap.data();
+          comments.push({uid: firebase.auth().currentUser.uid, username: snap.data().username, pfp: snap.data().pfp, comment, timestamp})
         });
-        
-        let comments = recipeData.comments;
-        comments.push({uid: firebase.auth().currentUser.uid, username: data.username, pfp: data.pfp, comment})
 
         await firebase
         .firestore()
@@ -188,53 +186,64 @@ export default function Dish({ props, navigation }) {
     }
   }
 
-  const Comment = ({ item }) => {
-    const [data, setData] = useState('');
-    let comments = recipeData.comments;
-    let deleted = 0;
+  const Comments = () => {
+    const [comments, setComments] = useState([]);
 
     const getData = async() => {
-      await firebase
-      .firestore()
-      .collection("users")
-      .doc(item.user)
-      .get()
-      .then((snap) => {
-        if (snap.exists) {
-          console.debug('b')
-          setData(snap.data());
-        }
-        else {
-          comments.splice(comments.indexOf(item.user), 1);
-          deleted++;
-        }
-      });
-      
-      if (deleted) {
-        await firebase
-        .firestore()
-        .collection("recipes")
-        .doc(route.params.doc)
-        .update({ comments });
-      }
+      let tempComments = recipeData.comments;
+
+      await Promise.all(
+        tempComments.map((item) => {
+          firebase
+          .firestore()
+          .collection("users")
+          .doc(item.user)
+          .get()
+          .then((snap) => {
+            console.debug('a')
+            if (!snap.exists) {
+              tempComments.splice(tempComments.indexOf(item.user), 1);
+              firebase
+              .firestore()
+              .collection("recipes")
+              .doc(route.params.doc)
+              .update({ comments: tempComments });
+            }
+          });
+        })
+      )
+      console.debug('b')
+      setComments(tempComments);
     }
 
-    // getData();
+    useEffect(() => {
+      getData();
+    }, []);
+
+    if (comments.length == 0) {
+      return null;
+    }
 
     return (
-      <View style={{minHeight: 40}}>
-        <View style={{flexDirection: 'row'}}>
-          <Image source={{uri: (data.pfp ? data.pfp : "https://imgur.com/hNwMcZQ.png")}} style={styles.smallPfp} />
-          <View>
-            <Text style={[styles.username, {fontSize: 15}]}>{data.username}</Text>
-            <Text>{item.comment}</Text>
+      <View style={{height: 200}}>
+      <FlashList
+        data={comments}
+        renderItem={({ item }) => (
+          <View style={{minHeight: 40, marginTop: 15}}>
+            <View style={{flexDirection: 'row'}}>
+              <Image source={{uri: (item.pfp ? item.pfp : "https://imgur.com/hNwMcZQ.png")}} style={styles.smallPfp} />
+              <View style={{maxWidth: '85%'}}>
+                <Text style={[styles.username, {fontSize: 15, marginBottom: 5}]}>dasdad{item.username}</Text>
+                <Text style={{color: 'white', fontSize: 15}}>{item.comment}</Text>
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
+        )}
+        estimatedItemSize={10}
+      /> 
+    </View>
     );
-  };
-
-  const temp = [{user: "c6tbExo3VCZ1sS5mnKgZume7ECF2", comment: "hsdf"}];
+  }
 
   if (initializing) {
     return null;
@@ -451,15 +460,7 @@ export default function Dish({ props, navigation }) {
             onPress={() => submitComment()}
           />
         </View>
-        <View style={{height: 200}}>
-          <FlashList
-            data={temp}
-            renderItem={({ item }) => (
-              <Comment item={item}/>
-            )}
-            estimatedItemSize={10}
-          />
-        </View>
+        <Comments/>
       </KeyboardAwareScrollView>
     </View>
   );

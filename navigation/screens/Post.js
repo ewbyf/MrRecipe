@@ -192,7 +192,7 @@ export default function Post({ navigation }) {
       const instructionsArray = [];
       const rated = new Map();
       const comments = [];
-
+      
       for (let i = 0; i < ingredients.length; i++) {
         if (ingredients[i].value) {
           ingredientsArray.push(ingredients[i].value);
@@ -222,6 +222,7 @@ export default function Post({ navigation }) {
               .add({
                 name,
                 description,
+                weight: 0,
                 rating: 0,
                 numratings: 0,
                 difficulty,

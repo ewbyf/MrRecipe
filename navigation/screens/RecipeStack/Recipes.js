@@ -71,7 +71,7 @@ export default function Recipes({ navigation }) {
     const snapshot = await firebase
       .firestore()
       .collection("recipes")
-      .orderBy("rating", "desc")
+      .orderBy("weight", "desc")
       .get();
     const snapshot2 = await firebase
       .firestore()
@@ -237,7 +237,6 @@ export default function Recipes({ navigation }) {
     const rStyle = useAnimatedStyle(() => ({
       transform: [{ scale: Math.max(scale.value, 0) }],
     }));
-
     const doubleTapRef = useRef();
     const lastItemId = useRef(item.key);
     const [liked, setLiked] = useState(item.favorite);
@@ -443,6 +442,7 @@ export default function Recipes({ navigation }) {
     }));
 
     const doubleTapRef = useRef();
+    
     const lastItemId = useRef(item.key);
     const [liked, setLiked] = useState(item.favorite);
     if (item.key !== lastItemId.current) {
@@ -568,7 +568,6 @@ export default function Recipes({ navigation }) {
           <View style={styles.trendingContainer}>
             <FlashList
               data={dataList.slice(1)}
-              extraData={dataList}
               renderItem={({ item }) => (
                 <RecipeList item={item} list={"trending"} />
               )}

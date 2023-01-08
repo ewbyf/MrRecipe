@@ -36,6 +36,7 @@ export default function Dish({ props, navigation }) {
   const [userData, setUserData] = useState();
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [comment, setComment] = useState('');
+  const [comments, setComments] = useState([]);
 
   function onAuthStateChanged(userParam) {
     if (userParam) fetchUser();
@@ -178,6 +179,14 @@ export default function Dish({ props, navigation }) {
             message: "Comment successfully posted!",
             type: "success",
           });
+          firebase
+          .firestore()
+          .collection("recipes")
+          .doc(route.params.doc)
+          .get()
+          .then((snapshot) => {
+            setRecipeData(snapshot.data());
+          });
          });
       }
     }
@@ -186,38 +195,39 @@ export default function Dish({ props, navigation }) {
     }
   }
 
-  const Comments = () => {
-    const [comments, setComments] = useState([]);
+  const getCommentData = async() => {
+    let tempComments = recipeData.comments;
+    let deleted = 0;
 
-    const getData = async() => {
-      let tempComments = recipeData.comments;
+    await Promise.all(
+      tempComments.map(async(item) => {
+        await firebase
+        .firestore()
+        .collection("users")
+        .doc(item.uid)
+        .get()
+        .then((snap) => {
+          if (!snap.exists) {
+            tempComments.splice(tempComments.indexOf(item.uid), 1);
+            deleted++;
+          }
+        });
+      })
+    )
 
-      await Promise.all(
-        tempComments.map((item) => {
-          firebase
-          .firestore()
-          .collection("users")
-          .doc(item.user)
-          .get()
-          .then((snap) => {
-            console.debug('a')
-            if (!snap.exists) {
-              tempComments.splice(tempComments.indexOf(item.user), 1);
-              firebase
-              .firestore()
-              .collection("recipes")
-              .doc(route.params.doc)
-              .update({ comments: tempComments });
-            }
-          });
-        })
-      )
-      console.debug('b')
-      setComments(tempComments);
+    if (deleted) {
+      firebase
+      .firestore()
+      .collection("recipes")
+      .doc(route.params.doc)
+      .update({ comments: tempComments });
     }
+    setComments(tempComments);
+  }
 
+  const Comments = () => {
     useEffect(() => {
-      getData();
+      getCommentData();
     }, []);
 
     if (comments.length == 0) {
@@ -225,23 +235,26 @@ export default function Dish({ props, navigation }) {
     }
 
     return (
-      <View style={{height: 200}}>
-      <FlashList
-        data={comments}
-        renderItem={({ item }) => (
-          <View style={{minHeight: 40, marginTop: 15}}>
-            <View style={{flexDirection: 'row'}}>
-              <Image source={{uri: (item.pfp ? item.pfp : "https://imgur.com/hNwMcZQ.png")}} style={styles.smallPfp} />
-              <View style={{maxWidth: '85%'}}>
-                <Text style={[styles.username, {fontSize: 15, marginBottom: 5}]}>dasdad{item.username}</Text>
-                <Text style={{color: 'white', fontSize: 15}}>{item.comment}</Text>
+      <View style={{height: '100%', marginBottom: 40}}>
+        <FlashList
+          data={comments}
+          renderItem={({ item }) => (
+            <View style={{minHeight: 40, marginTop: 15}}>
+              <View style={{flexDirection: 'row'}}>
+                <Image source={{uri: (item.pfp ? item.pfp : "https://imgur.com/hNwMcZQ.png")}} style={styles.smallPfp} />
+                <View style={{maxWidth: '85%'}}>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={[styles.username, {fontSize: 15, marginBottom: 3}]}>{item.username}</Text>
+                    <Text style={{color: 'gray'}}> • {item.timestamp.toDate().toDateString()}</Text>
+                  </View>
+                  <Text style={{color: 'white', fontSize: 15}}>{item.comment}</Text>
+                </View>
               </View>
             </View>
-          </View>
-        )}
-        estimatedItemSize={10}
-      /> 
-    </View>
+          )}
+          estimatedItemSize={10}
+        /> 
+      </View>
     );
   }
 

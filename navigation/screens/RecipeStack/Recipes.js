@@ -396,9 +396,8 @@ export default function Recipes({ navigation }) {
 
   return (
     <GestureHandlerRootView style={global.appContainer}>
-      <View style={global.searchTopbar}>
+      <View style={global.topbar}>
           <Text style={global.topbarTitle}>Mr. Recipe</Text>
-          <TextInput placeholder='Search for Recipe' style={global.searchbar}></TextInput>
       </View>
       <ScrollView style={{height: windowHeight, width: windowWidth}} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}>
         <View style={{marginBottom: 300, width: windowWidth, height: windowHeight}}>

@@ -11,7 +11,7 @@ import RecipesStack from './routes/RecipesStack';
 import FavoritesStack from './routes/FavoritesStack';
 import LoginStack from './routes/LoginStack';
 import DashboardStack from './routes/DashboardStack';
-import PeopleStack from './routes/PeopleStack';
+import SearchStack from './routes/SearchStack';
 import PostScreen from './screens/Post'
 
 import { useEffect, useState } from 'react';
@@ -78,12 +78,12 @@ export default function NavigationBar() {
                 </View> 
               )
             }}/>
-            <Tab.Screen name={'People'} component={PeopleStack} options={{
+            <Tab.Screen name={'Search'} component={SearchStack} options={{
               tabBarIcon: ({focused}) => (
                 <View style={{alignItems: 'center', justifyContent: 'center', top: 10}}>
-                  <Icon name={focused ? 'people' : 'people-outline'} color={focused ? '#FFDDA1' : 'white'} size={25}/>
+                  <Icon name={focused ? 'search' : 'search-outline'} color={focused ? '#FFDDA1' : 'white'} size={25}/>
                   <Text style={{fontSize: 13, color: focused ? '#FFDDA1' : 'white'}}>
-                    People
+                    Search
                   </Text>
                 </View>
               )

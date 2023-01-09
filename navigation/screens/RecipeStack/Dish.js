@@ -26,6 +26,7 @@ import {
 } from "react-native-popup-menu";
 import Dialog from 'react-native-dialog';
 import { showMessage } from "react-native-flash-message";
+import Edit from "./Edit";
 
 export default function Dish({ props, navigation }) {
   const route = useRoute();
@@ -300,7 +301,7 @@ export default function Dish({ props, navigation }) {
                 }
               />
               <MenuOption
-                onSelect={() => alert(`Edit`)}
+                onSelect={() => navigation.navigate("EditScreen")}
                 children={
                   <View
                     style={styles.popup}
@@ -461,7 +462,7 @@ export default function Dish({ props, navigation }) {
             style={{ ...styles.input }}
             placeholder="Add a comment..."
             placeholderTextColor="#494949"
-            maxLength={200}
+            maxLength={150}
             blurOnSubmit={true}
             onChangeText={(comment) => setComment(comment)}
           ></TextInput>

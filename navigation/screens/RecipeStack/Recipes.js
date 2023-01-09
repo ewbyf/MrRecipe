@@ -287,9 +287,9 @@ export default function Recipes({ navigation }) {
                   </Text>
                   <Text style={{ color: "gray" }}>{item.value.difficulty}</Text>
                   <Text style={{ color: "gray" }}>
-                    {((item.value.cooktime + item.value.preptime) / 60).toFixed(
-                      1,
-                    )}
+                    {parseFloat(((item.value.cooktime + item.value.preptime) / 60).toFixed(
+                      2
+                    ))}
                     + hrs
                   </Text>
                 </View>
@@ -308,7 +308,7 @@ export default function Recipes({ navigation }) {
             startingValue={item.value.rating}
           />
           <Text style={[global.rating, { marginHorizontal: 8 }]}>
-            {item.value.rating} ({item.value.numratings})
+            {item.value.rating >= 0 ? parseFloat(item.value.rating.toFixed(2)) : 0} ({item.value.numratings})
           </Text>
           <TouchableOpacity
             style={{ marginLeft: 8 }}
@@ -497,9 +497,9 @@ export default function Recipes({ navigation }) {
                   </Text>
                   <Text style={{ color: "gray" }}>{item.value.difficulty}</Text>
                   <Text style={{ color: "gray" }}>
-                    {((item.value.cooktime + item.value.preptime) / 60).toFixed(
-                      1,
-                    )}
+                    {parseFloat(((item.value.cooktime + item.value.preptime) / 60).toFixed(
+                      2
+                    ))}
                     + hrs
                   </Text>
                 </View>
@@ -519,7 +519,7 @@ export default function Recipes({ navigation }) {
               startingValue={item.value.rating}
             />
             <Text style={[global.rating, { marginHorizontal: 8 }]}>
-              {item.value.rating} ({item.value.numratings})
+              {item.value.rating >= 0 ? parseFloat(item.value.rating.toFixed(2)) : 0} ({item.value.numratings})
             </Text>
           </View>
           <TouchableOpacity onPress={() => favorite(item.key, list)}>

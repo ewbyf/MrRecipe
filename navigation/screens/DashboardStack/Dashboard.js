@@ -311,7 +311,7 @@ export default function Dashboard({ navigation, props }) {
         </View>
       </View>
 
-      <View style={styles.topbar}>
+      <View style={global.topbar}>
         <Animated.View
           style={{
             opacity: scrollY.interpolate({
@@ -329,7 +329,7 @@ export default function Dashboard({ navigation, props }) {
             ],
           }}
         >
-          <Text style={styles.topbarTitle}>Profile</Text>
+          <Text style={global.topbarTitle}>Profile</Text>
         </Animated.View>
       </View>
 
@@ -437,26 +437,6 @@ const styles = StyleSheet.create({
     elevation: 2,
     paddingTop: 30,
     height: 110,
-  },
-  backArrow: {
-    position: "absolute",
-    left: 20,
-    bottom: "50%",
-    marginBottom: -12,
-  },
-  topbar: {
-    paddingTop: 30,
-    height: 110,
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#518BFF",
-  },
-  topbarTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
   },
   gear: {
     alignSelf: "flex-end",

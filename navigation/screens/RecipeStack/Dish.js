@@ -26,7 +26,6 @@ import {
 } from "react-native-popup-menu";
 import Dialog from 'react-native-dialog';
 import { showMessage } from "react-native-flash-message";
-import Edit from "./Edit";
 
 export default function Dish({ props, navigation }) {
   const route = useRoute();
@@ -242,12 +241,17 @@ export default function Dish({ props, navigation }) {
           renderItem={({ item }) => (
             <View style={{minHeight: 40, marginTop: 15}}>
               <View style={{flexDirection: 'row'}}>
-                <Image source={{uri: (item.pfp ? item.pfp : "https://imgur.com/hNwMcZQ.png")}} style={styles.smallPfp} />
-                <View style={{maxWidth: '85%'}}>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text style={[styles.username, {fontSize: 15, marginBottom: 3}]}>{item.username}</Text>
-                    <Text style={{color: 'gray'}}> • {item.timestamp.toDate().toDateString()}</Text>
-                  </View>
+                  <TouchableOpacity onPress={() => navigation.navigate("ProfileScreen", {id: item.uid})}>
+                    <Image source={{uri: (item.pfp ? item.pfp : "https://imgur.com/hNwMcZQ.png")}} style={styles.smallPfp} />
+                  </TouchableOpacity>
+                  <View style={{maxWidth: '85%'}}>
+                    <View style={{flexDirection: 'row'}}>
+                      <TouchableOpacity onPress={() => navigation.navigate("ProfileScreen", {id: item.uid})}>
+                        <Text style={[styles.username, {fontSize: 15, marginBottom: 3}]}>{item.username}</Text>
+                      </TouchableOpacity>
+                      <Text style={{color: 'gray'}}> • {item.timestamp.toDate().toDateString()}</Text>
+                    </View>
+                  
                   <Text style={{color: 'white', fontSize: 15}}>{item.comment}</Text>
                 </View>
               </View>
@@ -276,7 +280,7 @@ export default function Dish({ props, navigation }) {
       </Dialog.Container>
 
       <View style={global.topbar}>
-        <BackArrow navigation={navigation} />
+        <BackArrow navigation={navigation}/>
         <Text style={global.topbarTitle}>{recipeData.name}</Text>
         {userData && recipeData.username == userData.username && (
           <Menu style={styles.dotsContainer}>
@@ -286,7 +290,6 @@ export default function Dish({ props, navigation }) {
             />
             <MenuOptions customStyles={optionsStyles}>
               <MenuOption
-                onSelect={() => alert(`Edit`)}
                 disabled={true}
                 children={
                   <View
@@ -401,7 +404,7 @@ export default function Dish({ props, navigation }) {
                   startingValue={recipeData.rating}
                 />
                 <Text style={[global.rating, { marginRight: 0 }]}>
-                  {recipeData.rating} ({recipeData.numratings})
+                  {parseFloat(recipeData.rating.toFixed(2))} ({recipeData.numratings})
                 </Text>
               </View>
             </View>

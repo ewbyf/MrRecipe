@@ -26,8 +26,9 @@ export default function Favorites({ navigation }) {
 
   const fetchData = async(userParam) => {
     if (userParam) {
-      var tempList = [];
+      let tempList = [];
       let fav = [];
+      let deleted = 0;
   
       await firebase
         .firestore()
@@ -50,13 +51,30 @@ export default function Favorites({ navigation }) {
             .doc(doc)
             .get()
             .then((snap) => {
-              tempList.push({key: doc, value: snap.data()});
+              if (snap.exists) {
+                tempList.push({key: doc, value: snap.data()});
+              }
+              else {
+                fav.splice(fav.indexOf(doc), 1);
+                deleted++;
+              }
             })
             .catch((error) => {
               alert(error.message);
             });
         }),
       );
+
+      if (deleted) {
+        await firebase
+        .firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({
+          favorites: fav
+        });
+      }
+
       setFavorites(tempList);
     }
   };
@@ -134,7 +152,7 @@ export default function Favorites({ navigation }) {
                           tintColor={'#282828'}
                           startingValue={item.value.rating}
                         />
-                        <Text style={global.rating}>{item.value.rating} of 5</Text>   
+                        <Text style={global.rating}>{item.value.rating} ({item.value.numratings})</Text>   
                         <TouchableOpacity style={{marginLeft: 'auto'}} onPress={() => unfavorite(item.key)}>
                           <Icon name='heart' color={'#FF4343'} size={20} />
                         </TouchableOpacity>

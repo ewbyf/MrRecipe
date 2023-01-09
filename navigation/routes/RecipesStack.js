@@ -6,6 +6,8 @@ import { StyleSheet } from "react-native";
 
 import Recipes from "../screens/RecipeStack/Recipes"
 import Dish from "../screens/RecipeStack/Dish"
+import Profile from "../screens/RecipeStack/Profile"
+import Edit from "../screens/RecipeStack/Edit";
 
 const Stack = createStackNavigator();
 
@@ -24,6 +26,8 @@ export default function RecipesStack({ navigation, route }) {
         })}>
             <Stack.Screen name="RecipesScreen" component={Recipes} />
             <Stack.Screen name="DishScreen" component={Dish} />
+            <Stack.Screen name="ProfileScreen" component={Profile} />
+            <Stack.Screen name="EditScreen" component={Edit} />
         </Stack.Navigator>
       );
 }

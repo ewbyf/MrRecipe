@@ -11,6 +11,7 @@ const styles = StyleSheet.create({
       left: 20,
       bottom: '50%',
       marginBottom: -15,
+      zIndex: 10,
   }
 });
 

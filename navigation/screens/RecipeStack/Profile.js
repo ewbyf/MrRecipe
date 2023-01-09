@@ -9,6 +9,7 @@ import {
   Dimensions
 } from "react-native";
 import global from "../../../Styles";
+import BackArrow from '../../../components/BackArrow';
 import Icon from "react-native-vector-icons/Ionicons";
 import { firebase } from "../../../config";
 import { FlashList } from "@shopify/flash-list";
@@ -16,11 +17,13 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Rating } from "react-native-ratings";
 import { TapGestureHandler, GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 import Animated, {useAnimatedStyle, useSharedValue, withDelay, withSpring} from 'react-native-reanimated';
+import { useRoute } from "@react-navigation/native";
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-export default function Dashboard({ navigation, props }) {
+export default function Profile({ navigation, props }) {
+  const route = useRoute();
   const [refreshing, setRefreshing] = useState(false);
   const [userData, setUserData] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,7 +43,7 @@ export default function Dashboard({ navigation, props }) {
     await firebase
       .firestore()
       .collection("users")
-      .doc(firebase.auth().currentUser.uid)
+      .doc(route.params.id)
       .get()
       .then((snapshot) => {
         if (snapshot.exists) {
@@ -97,17 +100,17 @@ export default function Dashboard({ navigation, props }) {
       temp = dataList;
       index = dataList.findIndex(item => item.key == doc);
 
-      await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
+      await firebase.firestore().collection('users').doc(route.params.id).get()
       .then((snap) => {
         fav = snap.data().favorites;
         if (fav.indexOf(doc) != -1) {
           fav.splice(snap.data().favorites.indexOf(doc), 1);
-          firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: fav});
+          firebase.firestore().collection('users').doc(route.params.id).update({favorites: fav});
           temp[index].favorite = 'gray';
         }
         else {
           fav.push(doc);
-          firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: fav});
+          firebase.firestore().collection('users').doc(route.params.id).update({favorites: fav});
           temp[index].favorite = '#FF4343';
           color = '#FF4343';
         }
@@ -134,12 +137,12 @@ export default function Dashboard({ navigation, props }) {
       let index = dataList.findIndex(item => item.key == doc);
       temp[index].favorite = '#FF4343';
 
-      await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
+      await firebase.firestore().collection('users').doc(route.params.id).get()
       .then((snap) => {
         fav = snap.data().favorites;
         if (fav.indexOf(doc) == -1) {
           fav.push(doc);
-          firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: fav});
+          firebase.firestore().collection('users').doc(route.params.id).update({favorites: fav});
         }
         else {
           return;
@@ -218,10 +221,11 @@ export default function Dashboard({ navigation, props }) {
   }
 
   return (
-    <GestureHandlerRootView style={global.appContainer}>
+    <View style={global.appContainer}>
       {/* Header pop up */}
       <View style={styles.animationContainer}>
         <View style={{ flex: 1, height: "100%", justifyContent: "center" }}>
+          <BackArrow navigation={navigation}/>
           <AnimatedImage
             source={{
               uri: userData.pfp
@@ -300,18 +304,10 @@ export default function Dashboard({ navigation, props }) {
             </Text>
           </Animated.View>
         </View>
-        <View style={{ flex: 1 }}>
-          <Icon
-            name="cog-outline"
-            color="white"
-            size={35}
-            style={styles.gear}
-            onPress={() => navigation.navigate("SettingsScreen")}
-          />
-        </View>
+        <View style={{flex: 1}}></View>
       </View>
 
-      <View style={global.topbar}>
+      <View style={global.topbar}>     
         <Animated.View
           style={{
             opacity: scrollY.interpolate({
@@ -420,7 +416,7 @@ export default function Dashboard({ navigation, props }) {
           </View>
         </AnimatedScrollView>
       </View>
-    </GestureHandlerRootView>
+    </View>
   );
 }
 

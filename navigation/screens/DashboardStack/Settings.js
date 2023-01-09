@@ -353,9 +353,9 @@ export default function Settings({ navigation }) {
 
           {/* Delete account pop up */} 
           <Dialog.Container visible={deleteVisible}>
-            <Dialog.Title>Account Delete</Dialog.Title>
+            <Dialog.Title>Delete Account</Dialog.Title>
             <Dialog.Description>
-              Do you want to delete this account? You cannot undo this action.
+              Are you sure you want to delete this account? You cannot undo this action.
             </Dialog.Description>
             <Dialog.Input
               placeholder="Enter password"

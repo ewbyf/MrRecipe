@@ -9,5 +9,5 @@
     "**/.dll": true
   },
   "explorerExclude.backup": {},
-  "editor.formatOnSave": true
+  "editor.formatOnSave": false
 }

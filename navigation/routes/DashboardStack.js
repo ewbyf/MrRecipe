@@ -22,7 +22,7 @@ export default function DashboardStack({ navigation, route }) {
         <Stack.Navigator initialRouteName="DashboardScreen" screenOptions={({route}) => ({
             headerShown: false,
         })}>
-            <Stack.Screen name="DashboardScreen" component={Dashboard} />
+            <Stack.Screen name="DashboardScreen" component={Dashboard}/>
             <Stack.Screen name="SettingsScreen" component={Settings}/>
         </Stack.Navigator>
       );

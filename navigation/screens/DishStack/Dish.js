@@ -238,7 +238,7 @@ export default function Dish({ navigation }) {
     return (
       <View style={{height: '100%', marginBottom: 40}}>
         <FlashList
-          data={comments}
+          data={comments.reverse()}
           renderItem={({ item }) => (
             <View style={{minHeight: 40, marginTop: 15}}>
               <View style={{flexDirection: 'row'}}>

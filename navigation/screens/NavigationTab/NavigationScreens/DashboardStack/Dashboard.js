@@ -171,7 +171,7 @@ export default function Dashboard({ navigation, props }) {
       <TouchableOpacity style={global.itemContainer}>
         <TapGestureHandler
           waitFor={doubleTapRef}
-          onActivated={() => navigation.navigate("DishScreen", {doc: item.key})}
+          onActivated={() => navigation.navigate("DishStack", {doc: item.key, id: firebase.auth().currentUser.uid})}
         >
           <TapGestureHandler
             maxDelayMs={200}
@@ -192,7 +192,7 @@ export default function Dashboard({ navigation, props }) {
                 <View>
                   <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>{item.value.name}</Text>
                   <Text style={{color: 'gray'}}>{item.value.difficulty}</Text>
-                  <Text style={{color: 'gray'}}>{((item.value.cooktime + item.value.preptime) / 60).toFixed(1)}+ hrs</Text>
+                  <Text style={{color: 'gray'}}>{parseFloat(((item.value.cooktime + item.value.preptime) / 60).toFixed(2))}+ hrs</Text>
                 </View>
               </View>
             </View>

@@ -519,10 +519,10 @@ export default function Settings({ navigation }) {
                 <Text style={styles.signOutText}>Sign Out</Text>
               </TouchableOpacity>
               <TouchableOpacity disabled={inProgress} onPress={async() => {if (await verify()) setDeleteVisible(true)}}>
-                <Text style={{...styles.deleteText, marginTop : 5}}>Delete Account</Text>
+                <Text style={{...styles.deleteText, marginTop : 10}}>Delete Account</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => Alert.alert("GG", "Please email austinzkarimi@gmail.com")}>
-                <Text style={{...styles.changeText, marginTop: 5}}>Support</Text>
+              <TouchableOpacity onPress={() => Alert.alert("Contact Support", "Please email austinzkarimi@gmail.com for support.")}>
+                <Text style={{...styles.changeText, marginTop: 15}}>Contact Support</Text>
               </TouchableOpacity>
           </View>
       </View>
@@ -541,7 +541,6 @@ const styles = StyleSheet.create({
     },
     settingsContainer: {
       flexDirection: 'column',
-      maxHeight: '75%'
     },
     profile: {
       justifyContent: 'center',
@@ -597,8 +596,9 @@ const styles = StyleSheet.create({
       marginLeft: 'auto',
     },
     footer: {
-      marginTop: 'auto',
+      height: '25%',
       width: '100%',
+      justifyContent: 'center',
       alignItems: 'center',
       paddingBottom: 30,
     },
@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
     deleteText: {
       fontSize: 20,
       fontWeight: 'bold',
-      color: 'red',
+      color: '#FF4343',
       textAlign: 'center'
     },
   });

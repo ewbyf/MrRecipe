@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TextInput, Image, Dimensions, ScrollView, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, TextInput, Image, Dimensions, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
 import global from "../../../../Styles";
 import { useState, useEffect, useRef } from "react";
 import { firebase } from '../../../../config';
@@ -106,66 +106,71 @@ export default function Favorites({ navigation }) {
   if (user) {
     return (
       <View style={global.appContainer}>
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
           <View style={global.searchTopbar}>
               <Text style={global.topbarTitle}>Favorites</Text>
-              <TextInput placeholder='Search for Favorites' style={global.searchbar}></TextInput>
+              <View>
+                <TextInput placeholder='Search for Recipes and Users' style={global.searchbar}></TextInput>
+                <Icon name="search-outline" style={{position: 'absolute', bottom: 10, left: 10}} size={16} color="lightgray"/>
+            </View>
           </View>
-          <ScrollView
+        </TouchableWithoutFeedback>
+        <ScrollView
           showsVerticalScrollIndicator={false}
           style={{ zIndex: 3}}
-          >
-            <View style={styles.postsContainer}>
-              {favorites.length == 0 && (
-                <Text
-                  style={{
-                    color: "lightgrey",
-                    fontSize: 16,
-                    textAlign: "center",
-                  }}
-                >
-                  You have no favorites
-                </Text>
-              )}
-              {user && favorites.length > 0 && (
-                <FlashList
-                  data={favorites}
+        >
+          <View style={styles.postsContainer}>
+            {favorites.length == 0 && (
+              <Text
+                style={{
+                  color: "lightgrey",
+                  fontSize: 16,
+                  textAlign: "center",
+                }}
+              >
+                You have no favorites
+              </Text>
+            )}
+            {user && favorites.length > 0 && (
+              <FlashList
+                data={favorites}
 
-                  renderItem={({ item }) => (
-                    <TouchableOpacity style={global.itemContainer} onPress={() => navigation.navigate("DishScreen", {doc: item.key})}>
-                      <View style={[global.list]}>
-                        <Image source={{uri: (item.value.image ? item.value.image : 'https://imgur.com/hNwMcZQ.png')}} style={global.listImage}/>
-                        <View style={{width: '100%', height: 85}}>
-                          <View>
-                            <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>{item.value.name}</Text>
-                            <Text style={{color: 'gray'}}>{item.value.difficulty}</Text>
-                            <Text style={{color: 'gray'}}>{((item.value.cooktime + item.value.preptime) / 60).toFixed(1)}+ hrs</Text>
-                          </View>
+                renderItem={({ item }) => (
+                  <TouchableOpacity style={global.itemContainer} onPress={() => navigation.navigate("DishStack", {doc: item.key})}>
+                    <View style={[global.list]}>
+                      <Image source={{uri: (item.value.image ? item.value.image : 'https://imgur.com/hNwMcZQ.png')}} style={global.listImage}/>
+                      <View style={{width: '100%', height: 85}}>
+                        <View>
+                          <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>{item.value.name}</Text>
+                          <Text style={{color: 'gray'}}>{item.value.difficulty}</Text>
+                          <Text style={{color: 'gray'}}>{parseFloat(((item.value.cooktime + item.value.preptime) / 60).toFixed(2))}+ hrs</Text>
                         </View>
                       </View>
-                      <View style={global.ratingContainer}>
-                        <Rating
-                          ratingCount={5}
-                          imageSize={16}
-                          readonly={true}
-                          type={'custom'}
-                          ratingBackgroundColor={'gray'}
-                          tintColor={'#282828'}
-                          startingValue={item.value.rating}
-                        />
-                        <Text style={global.rating}>{item.value.rating} ({item.value.numratings})</Text>   
-                        <TouchableOpacity style={{marginLeft: 'auto'}} onPress={() => unfavorite(item.key)}>
-                          <Icon name='heart' color={'#FF4343'} size={20} />
-                        </TouchableOpacity>
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                  estimatedItemSize={10}
-                  numColumns={2}
-                  showsVerticalScrollIndicator={false}
-                />
-              )}
-            </View>
-          </ScrollView>
+                    </View>
+                    <View style={global.ratingContainer}>
+                      <Rating
+                        ratingCount={5}
+                        imageSize={16}
+                        readonly={true}
+                        type={'custom'}
+                        ratingBackgroundColor={'gray'}
+                        tintColor={'#282828'}
+                        startingValue={item.value.rating}
+                      />
+                      <Text style={global.rating}>{item.value.rating} ({item.value.numratings})</Text>   
+                      <TouchableOpacity style={{marginLeft: 'auto'}} onPress={() => unfavorite(item.key)}>
+                        <Icon name='heart' color={'#FF4343'} size={20} />
+                      </TouchableOpacity>
+                    </View>
+                  </TouchableOpacity>
+                )}
+                estimatedItemSize={10}
+                numColumns={2}
+                showsVerticalScrollIndicator={false}
+              />
+            )}
+          </View>
+        </ScrollView>
       </View>
     );
   }
@@ -174,7 +179,10 @@ export default function Favorites({ navigation }) {
       <View style={global.appContainer}>
           <View style={global.searchTopbar}>
               <Text style={global.topbarTitle}>Favorites</Text>
-              <TextInput placeholder='Search for Favorites' style={global.searchbar}></TextInput>
+              <View>
+                <TextInput placeholder='Search for Favorites' style={global.searchbar}></TextInput>
+                <Icon name="search-outline" style={{position: 'absolute', bottom: 10, left: 10}} size={16} color="lightgray"/>
+              </View>
           </View>
           <View style={{height: Dimensions.get('window').height - 284, alignItems: 'center', justifyContent: 'center'}}>
             <Text style={{fontSize: 18, fontWeight: 'bold', color: 'white'}}>You are currently logged out.</Text>

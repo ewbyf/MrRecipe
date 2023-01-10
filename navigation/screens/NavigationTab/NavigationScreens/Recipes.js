@@ -547,7 +547,7 @@ export default function Recipes({ navigation }) {
       >
         <View
           style={{
-            marginBottom: 300,
+            marginBottom: 250,
             width: windowWidth,
             height: windowHeight,
           }}
@@ -586,7 +586,6 @@ export default function Recipes({ navigation }) {
               horizontal
             />
           </View>
-          <View></View>
         </View>
       </ScrollView>
     </GestureHandlerRootView>

@@ -515,12 +515,15 @@ export default function Settings({ navigation }) {
           </View>
 
           <View style={styles.footer}>
-            <TouchableOpacity disabled={inProgress} onPress={() => firebase.auth().signOut()} style={{...styles.button, backgroundColor: '#518BFF'}}>
-              <Text style={styles.buttonText}>Sign Out</Text>
-            </TouchableOpacity>
-            <TouchableOpacity disabled={inProgress} onPress={async() => {if (await verify()) setDeleteVisible(true)}} style={{...styles.button, backgroundColor: 'red'}}>
-              <Text style={styles.buttonText}>Delete Account</Text>
-            </TouchableOpacity>
+              <TouchableOpacity disabled={inProgress} onPress={() => firebase.auth().signOut()}>
+                <Text style={styles.signOutText}>Sign Out</Text>
+              </TouchableOpacity>
+              <TouchableOpacity disabled={inProgress} onPress={async() => {if (await verify()) setDeleteVisible(true)}}>
+                <Text style={{...styles.deleteText, marginTop : 5}}>Delete Account</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => Alert.alert("GG", "Please email austinzkarimi@gmail.com")}>
+                <Text style={{...styles.changeText, marginTop: 5}}>Support</Text>
+              </TouchableOpacity>
           </View>
       </View>
     </TouchableWithoutFeedback>
@@ -597,19 +600,27 @@ const styles = StyleSheet.create({
       marginTop: 'auto',
       width: '100%',
       alignItems: 'center',
-      paddingBottom: 40,
+      paddingBottom: 30,
     },
     button: {
-      width: 200,
+      width: 1,
       height: 40,
       borderRadius: 20,
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: 20,
+      marginHorizontal: 8,
     },
-    buttonText: {
+    signOutText: {
       fontSize: 20,
       fontWeight: 'bold',
-      color: 'white'
+      color: '#518BFF',
+      textAlign: 'center'
+    },
+    deleteText: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: 'red',
+      textAlign: 'center'
     },
   });

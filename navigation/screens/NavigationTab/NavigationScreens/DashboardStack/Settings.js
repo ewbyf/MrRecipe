@@ -317,8 +317,42 @@ export default function Settings({ navigation }) {
           let imageRef = firebase.storage().refFromURL(userData.pfp);
           imageRef.delete();
         }
-        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).delete();
-        firebase.auth().currentUser.delete()
+
+        // Deletes comments user left
+        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
+        .then(async(snap) => {
+          await snap.data().comments.map((item) => {
+            firebase.firestore().collection('recipes').doc(item.recipe).get()
+            .then(async(snap2) => {
+              if (snap2.exists) {
+                let temp = snap2.data().comments;
+                temp.splice(temp.findIndex((i) => i.key == item.key), 1);
+                await firebase.firestore().collection('recipes').doc(item.recipe).update({comments: temp});
+              }
+            })
+          })
+
+          // Deletes ratings user left
+          await snap.data().ratings.map((doc) => {
+            firebase.firestore().collection('recipes').doc(doc).get()
+            .then(async(snap2) => {
+              if (snap2.exists) {
+                let temp = snap2.data().rated;
+                let numratings = snap2.data().numratings - 1;
+                let rating = (snap2.data().rating * snap2.data().numratings - temp[firebase.auth().currentUser.uid]) / numratings;
+                let weight = rating + (5 * (1 - Math.E ** (-numratings / 50)));
+
+                delete temp[firebase.auth().currentUser.uid];
+
+                await firebase.firestore().collection('recipes').doc(doc).update({rated: temp, numratings, rating, weight});
+              }
+            })
+          })
+        })
+
+
+        await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).delete();
+        await firebase.auth().currentUser.delete()
         .then(() => {
           firebase.auth().signOut();
         })

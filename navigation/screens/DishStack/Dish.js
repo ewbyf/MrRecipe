@@ -36,7 +36,7 @@ export default function Dish({ navigation }) {
   const [userData, setUserData] = useState();
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [comment, setComment] = useState('');
-  const [comments, setComments] = useState([]);
+  const [commentsData, setCommentsData] = useState([]);
   const [pressed, setPressed] = useState(false);
 
   function onAuthStateChanged(userParam) {
@@ -48,7 +48,7 @@ export default function Dish({ navigation }) {
     return subscriber;
   }, []);
 
-  const fetchUser = async () => {
+  const fetchUser = async() => {
     await firebase
       .firestore()
       .collection("users")
@@ -60,6 +60,17 @@ export default function Dish({ navigation }) {
         }
       });
   };
+
+  const fetchRecipe = async() => {
+    firebase
+    .firestore()
+    .collection("recipes")
+    .doc(route.params.doc)
+    .get()
+    .then((snapshot) => {
+      setRecipeData(snapshot.data());
+    });
+  }
 
   useEffect(() => {
     firebase
@@ -114,14 +125,7 @@ export default function Dish({ navigation }) {
         .doc(route.params.doc)
         .update({ rating: newRating, numratings: numRatings, rated, weight });
 
-      firebase
-        .firestore()
-        .collection("recipes")
-        .doc(route.params.doc)
-        .get()
-        .then((snapshot) => {
-          setRecipeData(snapshot.data());
-        });
+      fetchRecipe();
     } else {
       Alert.alert("Not Logged In", "You must be logged in to leave a rating.");
     }
@@ -140,6 +144,11 @@ export default function Dish({ navigation }) {
 
     await firebase.firestore().collection('recipes').doc(route.params.doc).delete()
     .then(() => {
+      if (recipeData.image) {
+        let imageRef = firebase.storage().refFromURL(recipeData.image);
+        imageRef.delete();
+      }
+
       firebase
       .firestore()
       .collection("users")
@@ -157,7 +166,7 @@ export default function Dish({ navigation }) {
     if (userData) {
       if (comment.replace(/\s/g, "")) {
         let timestamp = firebase.firestore.Timestamp.fromDate(new Date());
-        let comments = recipeData.comments;
+        let tempComments = recipeData.comments;
 
         await firebase
         .firestore()
@@ -165,29 +174,36 @@ export default function Dish({ navigation }) {
         .doc(firebase.auth().currentUser.uid)
         .get()
         .then((snap) => {
-          comments.push({uid: firebase.auth().currentUser.uid, username: snap.data().username, pfp: snap.data().pfp, comment, timestamp})
+          let key = timestamp + snap.data().username
+          let temp = snap.data().comments;
+          temp.push({key, recipe: route.params.doc});
+
+          firebase
+          .firestore()
+          .collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .update({
+            comments: temp
+          });
+
+          tempComments.push({key, uid: firebase.auth().currentUser.uid, username: snap.data().username, pfp: snap.data().pfp, comment, timestamp})
         });
+
 
         await firebase
         .firestore()
         .collection("recipes")
         .doc(route.params.doc)
         .update({ 
-          comments
+          comments: tempComments
          })
          .then(() => {
           showMessage({
             message: "Comment successfully posted!",
             type: "success",
           });
-          firebase
-          .firestore()
-          .collection("recipes")
-          .doc(route.params.doc)
-          .get()
-          .then((snapshot) => {
-            setRecipeData(snapshot.data());
-          });
+          fetchRecipe();
+          setComment('');
          });
       }
     }
@@ -223,7 +239,8 @@ export default function Dish({ navigation }) {
       .doc(route.params.doc)
       .update({ comments: tempComments });
     }
-    setComments(tempComments);
+
+    setCommentsData(tempComments);
   }
 
   const Comments = () => {
@@ -231,14 +248,14 @@ export default function Dish({ navigation }) {
       getCommentData();
     }, []);
 
-    if (comments.length == 0) {
+    if (commentsData.length == 0) {
       return null;
     }
 
     return (
       <View style={{height: '100%', marginBottom: 40}}>
         <FlashList
-          data={comments.reverse()}
+          data={commentsData}
           renderItem={({ item }) => (
             <View style={{minHeight: 40, marginTop: 15}}>
               <View style={{flexDirection: 'row'}}>
@@ -373,7 +390,7 @@ export default function Dish({ navigation }) {
             <Text style={{ color: "#518BFF", fontWeight: "bold" }}>
               Description:{" "}
             </Text>
-            {recipeData.description}
+            {recipeData.description ? recipeData.description : "No description provided"}
           </Text>
           <View style={styles.timeContainer}>
             <Text style={styles.timeText}>
@@ -499,6 +516,7 @@ export default function Dish({ navigation }) {
             placeholderTextColor="#494949"
             maxLength={150}
             blurOnSubmit={true}
+            value={comment}
             onChangeText={(comment) => setComment(comment)}
           ></TextInput>
           <Icon

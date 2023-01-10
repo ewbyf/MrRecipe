@@ -72,6 +72,8 @@ export default function Register({ navigation }) {
               pfp: "",
               recipes: [],
               favorites: [],
+              comments: [],
+              ratings: [],
               uid: firebase.auth().currentUser.uid,
             });
           firebase

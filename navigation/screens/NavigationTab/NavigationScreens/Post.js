@@ -190,7 +190,7 @@ export default function Post({ navigation }) {
       const cooktime = Number(cookMin) + Number(cookHrs) * 60;
       const ingredientsArray = [];
       const instructionsArray = [];
-      const rated = new Map();
+      const rated = {};
       const comments = [];
       
       for (let i = 0; i < ingredients.length; i++) {

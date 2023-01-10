@@ -9,11 +9,11 @@ import {
   Alert,
   Image,
 } from "react-native";
-import global from "../../../Styles";
+import global from "../../../../../Styles";
 import { useState } from "react";
-import { firebase } from "../../../config";
+import { firebase } from "../../../../../config";
 import Icon from "react-native-vector-icons/Ionicons";
-import BackArrow from "../../../components/BackArrow";
+import BackArrow from "../../../../../components/BackArrow";
 
 export default function Register({ navigation }) {
   const [name, setName] = useState("");

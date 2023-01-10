@@ -10,12 +10,12 @@ import {
   Dimensions,
   Image,
 } from "react-native";
-import global from "../../../Styles";
+import global from "../../../../Styles";
 import { FlashList } from "@shopify/flash-list";
 import { useState, useEffect, useRef, useCallback } from "react";
 import React from "react";
 import { Rating } from "react-native-ratings";
-import { firebase } from "../../../config";
+import { firebase } from "../../../../config";
 import Icon from "react-native-vector-icons/Ionicons";
 import {
   TapGestureHandler,
@@ -256,7 +256,7 @@ export default function Recipes({ navigation }) {
         <TapGestureHandler
           waitFor={doubleTapRef}
           onActivated={() =>
-            navigation.navigate("DishScreen", { doc: item.key })
+            navigation.navigate("DishStack", { doc: item.key })
           }
         >
           <TapGestureHandler
@@ -267,7 +267,7 @@ export default function Recipes({ navigation }) {
           >
             <View style={styles.list}>
               <AnimatedImage
-                source={require("../../../assets/heart.png")}
+                source={require("../../../../assets/heart.png")}
                 style={[styles.heart, rStyle]}
               />
               <Image
@@ -461,7 +461,7 @@ export default function Recipes({ navigation }) {
         <TapGestureHandler
           waitFor={doubleTapRef}
           onActivated={() =>
-            navigation.navigate("DishScreen", { doc: item.key })
+            navigation.navigate("DishStack", { doc: item.key })
           }
         >
           <TapGestureHandler
@@ -477,7 +477,7 @@ export default function Recipes({ navigation }) {
               ]}
             >
               <AnimatedImage
-                source={require("../../../assets/heart.png")}
+                source={require("../../../../assets/heart.png")}
                 style={[styles.heart, rStyle]}
               />
               <Image

@@ -8,10 +8,10 @@ import {
   Image,
   ScrollView
 } from "react-native";
-import global from "../../Styles";
+import global from "../../../../Styles";
 import { useState, useEffect } from "react";
-import { firebase } from "../../config";
-import BackArrow from "../../components/BackArrow";
+import { firebase } from "../../../../config";
+import BackArrow from "../../../../components/BackArrow";
 import Icon from "react-native-vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
 import { SelectList } from "react-native-dropdown-select-list";

@@ -158,34 +158,7 @@ export default function Post({ navigation }) {
   };
 
   const publish = async () => {
-    if (!name) {
-      Alert.alert("Missing Name", "Please enter a name for your recipe");
-      setPublishing(false);
-    } else if (!difficulty) {
-      Alert.alert(
-        "Missing Difficulty",
-        "Please select a difficulty for your recipe"
-      );
-      setPublishing(false);
-    } else if (cookHrs == 0 && cookMin == 0) {
-      Alert.alert(
-        "Invalid Cook Time",
-        "Please enter a valid cook time for your recipe"
-      );
-      setPublishing(false);
-    } else if (!ingredients[0].value) {
-      Alert.alert(
-        "Missing Ingredient",
-        "Please enter at least one ingredient for your recipe"
-      );
-      setPublishing(false);
-    } else if (!instructions[0].value) {
-      Alert.alert(
-        "Missing Step",
-        "Please enter at least one step for your recipe"
-      );
-      setPublishing(false);
-    } else {
+    if (name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value) {
       const preptime = Number(prepMin) + Number(prepHrs) * 60;
       const cooktime = Number(cookMin) + Number(cookHrs) * 60;
       const ingredientsArray = [];
@@ -257,16 +230,19 @@ export default function Post({ navigation }) {
           alert(error.message);
         });
     }
+    else {
+      setPublishing(false);
+    }
   };
 
   const reset = () => {
     setImage(null);
     setName("");
     setDescription("");
-    setCookHrs(0);
-    setCookMin(0);
-    setPrepHrs(0);
-    setPrepMin(0);
+    setCookHrs('');
+    setCookMin('');
+    setPrepHrs('');
+    setPrepMin('');
     setInstructions([{ key: 0, value: "" }]);
     setIngredients([{ key: 0, value: "" }]);
   };
@@ -343,14 +319,14 @@ export default function Post({ navigation }) {
           />
           <Text style={global.topbarTitle}>Add a Recipe</Text>
           <TouchableOpacity
-              disabled={publishing}
+              disabled={publishing || !(name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value)}
               onPress={() => {
                 setPublishing(true);
                 publish();
               }}
               style={styles.button}
             >
-              <Text style={styles.buttonText}>Publish</Text>
+              <Text style={[styles.buttonText, {color: (name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value) ? "white" : "gray"}]}>Post</Text>
             </TouchableOpacity>
         </View>
         <ScrollView>
@@ -437,6 +413,7 @@ export default function Post({ navigation }) {
               <SelectList
                 data={data}
                 setSelected={(diff) => setDifficulty(diff)}
+                defaultOption={{key: "Easy", value: "Easy"}}
                 search={false}
                 disabled={publishing}
                 inputStyles={{ color: "white" }}
@@ -701,6 +678,16 @@ const styles = StyleSheet.create({
     bottom: "50%",
     marginBottom: -15,
   },
+  button: {
+    position: "absolute",
+    top: '50%',
+    marginTop: 21,
+    right: 20,
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
   photoSelect: {
     marginVertical: 20,
     alignItems: "center",
@@ -715,6 +702,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 30,
+    marginBottom: 30,
   },
   title: {
     color: "#518BFF",
@@ -753,23 +741,6 @@ const styles = StyleSheet.create({
   addText: {
     fontSize: 16,
     color: "#494949",
-  },
-  button: {
-    backgroundColor: "#518BFF",
-    width: 70,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 20,
-    position: "absolute",
-    top: 30,
-    right: 10,
-  },
-  buttonText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
   },
   timeText: {
     fontSize: 14,

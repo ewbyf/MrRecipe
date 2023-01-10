@@ -555,7 +555,7 @@ export default function Recipes({ navigation }) {
           <Text style={styles.titleText}>Featured Recipe</Text>
           <View style={styles.featuredContainer}>
             <FlashList
-              data={dataList.slice(1, 2)}
+              data={dataList.slice(0, 1)}
               renderItem={({ item }) => <Featured item={item} />}
               estimatedItemSize={1}
             />

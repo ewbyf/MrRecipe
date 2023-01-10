@@ -40,18 +40,9 @@ export default function Edit({ navigation }) {
     { key: "Hard", value: "Hard" },
   ];
 
-  // Check if users signed in
-  function onAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
-
   useEffect(() => {
-    const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
-  }, []);
 
-  if (initializing) return null;
+  }, []);
 
   const takePhoto = async () => {
     if ((await ImagePicker.getCameraPermissionsAsync()).granted == false) {
@@ -263,10 +254,10 @@ export default function Edit({ navigation }) {
     setImage(null);
     setName("");
     setDescription("");
-    setCookHrs(0);
-    setCookMin(0);
-    setPrepHrs(0);
-    setPrepMin(0);
+    setCookHrs('');
+    setCookMin('');
+    setPrepHrs('');
+    setPrepMin('');
     setInstructions([{ key: 0, value: "" }]);
     setIngredients([{ key: 0, value: "" }]);
   };
@@ -291,178 +282,219 @@ export default function Edit({ navigation }) {
     }
   };
 
-  if (user) {
-    return (
-      <View style={global.appContainer}>
-        {/* Discard changes pop up */}
-        <Dialog.Container visible={discardVisible}>
-          <Dialog.Title>Unsaved Changes</Dialog.Title>
-          <Dialog.Description>
-            Your current changes are unsaved. Would you like to discard or save
-            them? Note: Your saved changes will be lost if you close the app or
-            sign out.
-          </Dialog.Description>
-          <Dialog.Button
-            label="Cancel"
-            onPress={() => {
-              setDiscardVisible(false);
-            }}
-          />
-          <Dialog.Button
-            label="Discard"
-            style={{ color: "red" }}
-            onPress={() => {
-              setDiscardVisible(false);
-              reset();
-              navigation.goBack(null);
-            }}
-          />
-          <Dialog.Button
-            label="Save"
-            style={{ color: "#518BFF" }}
-            onPress={() => {
-              setDiscardVisible(false);
-              navigation.goBack(null);
-            }}
-          />
-        </Dialog.Container>
+  return (
+    <View style={global.appContainer}>
+      {/* Discard changes pop up */}
+      <Dialog.Container visible={discardVisible}>
+        <Dialog.Title>Unsaved Changes</Dialog.Title>
+        <Dialog.Description>
+          Your current changes are unsaved. Would you like to discard or save
+          them? Note: Your saved changes will be lost if you close the app or
+          sign out.
+        </Dialog.Description>
+        <Dialog.Button
+          label="Cancel"
+          onPress={() => {
+            setDiscardVisible(false);
+          }}
+        />
+        <Dialog.Button
+          label="Discard"
+          style={{ color: "red" }}
+          onPress={() => {
+            setDiscardVisible(false);
+            reset();
+            navigation.goBack(null);
+          }}
+        />
+        <Dialog.Button
+          label="Save"
+          style={{ color: "#518BFF" }}
+          onPress={() => {
+            setDiscardVisible(false);
+            navigation.goBack(null);
+          }}
+        />
+      </Dialog.Container>
 
-        <View style={global.topbar}>
-          <Icon
-            name="arrow-back-outline"
-            size={30}
-            color="white"
-            style={styles.backArrow}
+      <View style={global.topbar}>
+        <Icon
+          name="arrow-back-outline"
+          size={30}
+          color="white"
+          style={styles.backArrow}
+          onPress={() => {
+            if (checkFieldChanged()) {
+              setDiscardVisible(true);
+            } else if (navigation.canGoBack()) {
+              navigation.goBack(null);
+            }
+          }}
+        />
+        <Text style={global.topbarTitle}>Edit Recipe</Text>
+        <TouchableOpacity
+            disabled={publishing || !(name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value)}
             onPress={() => {
-              if (checkFieldChanged()) {
-                setDiscardVisible(true);
-              } else if (navigation.canGoBack()) {
-                navigation.goBack(null);
-              }
+              setPublishing(true);
+              publish();
             }}
-          />
-          <Text style={global.topbarTitle}>Add a Recipe</Text>
-          <TouchableOpacity
-              disabled={publishing}
-              onPress={() => {
-                setPublishing(true);
-                publish();
-              }}
-              style={styles.button}
-            >
-              <Text style={styles.buttonText}>Save</Text>
-            </TouchableOpacity>
-        </View>
-        <ScrollView>
-          <View style={styles.items}>
-            {!image && (
-              <View style={styles.photoSelect}>
-                <Icon name="image" size={75} color={"gray"} />
-                <View style={{ alignItems: "center", marginVertical: 5 }}>
-                  <TouchableOpacity onPress={choosePhoto}>
-                    <Text style={[styles.addText, { color: "#518BFF" }]}>
-                      Choose Photo
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-                <Text style={{ color: "gray", fontSize: 15 }}>or</Text>
-                <View style={{ alignItems: "center", marginTop: 5 }}>
-                  <TouchableOpacity onPress={takePhoto}>
-                    <Text style={[styles.addText, { color: "#518BFF" }]}>
-                      Take Photo
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-            {image && (
-              <View style={{ alignItems: "center" }}>
-                <Image
-                  source={{ uri: image.uri }}
-                  style={{ width: 333, height: 250, marginTop: 20 }}
-                />
-                <TouchableOpacity onPress={() => setImage(null)}>
-                  <Text
-                    style={{
-                      ...styles.addText,
-                      marginTop: 5,
-                      color: "#518BFF",
-                    }}
-                  >
-                    Remove Photo
+            style={styles.button}
+          >
+            <Text style={[styles.buttonText, {color: (name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value) ? "white" : "gray"}]}>Save</Text>
+          </TouchableOpacity>
+      </View>
+      <ScrollView>
+        <View style={styles.items}>
+          {!image && (
+            <View style={styles.photoSelect}>
+              <Icon name="image" size={75} color={"gray"} />
+              <View style={{ alignItems: "center", marginVertical: 5 }}>
+                <TouchableOpacity onPress={choosePhoto}>
+                  <Text style={[styles.addText, { color: "#518BFF" }]}>
+                    Choose Photo
                   </Text>
                 </TouchableOpacity>
               </View>
-            )}
-
-            <View style={styles.section}>
-              <Text style={styles.title}>NAME</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter the name of your recipe"
-                placeholderTextColor="#494949"
-                maxLength={50}
-                value={name}
-                editable={!publishing}
-                onChangeText={(title) => setName(title)}
-              ></TextInput>
+              <Text style={{ color: "gray", fontSize: 15 }}>or</Text>
+              <View style={{ alignItems: "center", marginTop: 5 }}>
+                <TouchableOpacity onPress={takePhoto}>
+                  <Text style={[styles.addText, { color: "#518BFF" }]}>
+                    Take Photo
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={styles.section}>
-              <Text style={styles.title}>DESCRIPTION</Text>
-              <TextInput
-                style={{ ...styles.input, height: 100, paddingVertical: 8 }}
-                placeholder="Enter a description for your recipe"
-                placeholderTextColor="#494949"
-                multiline={true}
-                maxLength={200}
-                blurOnSubmit={true}
-                textAlignVertical="top"
-                value={description}
-                editable={!publishing}
-                onChangeText={(desc) => setDescription(desc)}
-              ></TextInput>
-              <Text
+          )}
+          {image && (
+            <View style={{ alignItems: "center" }}>
+              <Image
+                source={{ uri: image.uri }}
+                style={{ width: 333, height: 250, marginTop: 20 }}
+              />
+              <TouchableOpacity onPress={() => setImage(null)}>
+                <Text
+                  style={{
+                    ...styles.addText,
+                    marginTop: 5,
+                    color: "#518BFF",
+                  }}
+                >
+                  Remove Photo
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          <View style={styles.section}>
+            <Text style={styles.title}>NAME</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter the name of your recipe"
+              placeholderTextColor="#494949"
+              maxLength={50}
+              value={name}
+              editable={!publishing}
+              onChangeText={(title) => setName(title)}
+            ></TextInput>
+          </View>
+          <View style={styles.section}>
+            <Text style={styles.title}>DESCRIPTION</Text>
+            <TextInput
+              style={{ ...styles.input, height: 100, paddingVertical: 8 }}
+              placeholder="Enter a description for your recipe"
+              placeholderTextColor="#494949"
+              multiline={true}
+              maxLength={200}
+              blurOnSubmit={true}
+              textAlignVertical="top"
+              value={description}
+              editable={!publishing}
+              onChangeText={(desc) => setDescription(desc)}
+            ></TextInput>
+            <Text
+              style={{
+                color: "#494949",
+                position: "absolute",
+                right: 10,
+                bottom: 5,
+              }}
+            >
+              {description.length}/200
+            </Text>
+          </View>
+          <View style={styles.section}>
+            <Text style={styles.title}>DIFFICULTY</Text>
+            <SelectList
+              data={data}
+              setSelected={(diff) => setDifficulty(diff)}
+              search={false}
+              disabled={publishing}
+              inputStyles={{ color: "white" }}
+              boxStyles={{
+                borderWidth: 0,
+                backgroundColor: "#151515",
+                paddingHorizontal: 10,
+                borderRadius: 8,
+              }}
+              arrowicon={
+                <View style={{ justifyContent: "center", right: 6 }}>
+                  <Icon
+                    name="chevron-down-outline"
+                    size={16}
+                    style={{ color: "#494949" }}
+                  />
+                </View>
+              }
+              dropdownStyles={{ backgroundColor: "#151515", borderWidth: 0 }}
+              dropdownTextStyles={{ color: "#adadad" }}
+              dropdownItemStyles={{ borderWidth: 0 }}
+            />
+          </View>
+          <View style={{ flexDirection: "row" }}>
+            <View style={[styles.section, { width: "50%" }]}>
+              <Text style={styles.title}>PREP TIME</Text>
+              <View
                 style={{
-                  color: "#494949",
-                  position: "absolute",
-                  right: 10,
-                  bottom: 5,
+                  ...styles.section,
+                  flexDirection: "row",
+                  marginTop: 0,
                 }}
               >
-                {description.length}/200
-              </Text>
+                <TextInput
+                  style={styles.inputTime}
+                  placeholder="0"
+                  placeholderTextColor="#494949"
+                  keyboardType="numeric"
+                  maxLength={2}
+                  multiline={true}
+                  numberOfLines={1}
+                  value={prepHrs}
+                  editable={!publishing}
+                  onChangeText={(text) => setPrepHrs(convertNumber(text))}
+                />
+                <View style={{ justifyContent: "center" }}>
+                  <Text style={styles.timeText}>hrs</Text>
+                </View>
+                <TextInput
+                  style={{ ...styles.inputTime, marginLeft: 10 }}
+                  placeholder="0"
+                  placeholderTextColor="#494949"
+                  keyboardType="numeric"
+                  maxLength={2}
+                  multiline={true}
+                  numberOfLines={1}
+                  value={prepMin}
+                  editable={!publishing}
+                  onChangeText={(text) => setPrepMin(convertNumber(text))}
+                />
+                <View style={{ justifyContent: "center" }}>
+                  <Text style={styles.timeText}>min</Text>
+                </View>
+              </View>
             </View>
-            <View style={styles.section}>
-              <Text style={styles.title}>DIFFICULTY</Text>
-              <SelectList
-                data={data}
-                setSelected={(diff) => setDifficulty(diff)}
-                search={false}
-                disabled={publishing}
-                inputStyles={{ color: "white" }}
-                boxStyles={{
-                  borderWidth: 0,
-                  backgroundColor: "#151515",
-                  paddingHorizontal: 10,
-                  borderRadius: 8,
-                }}
-                arrowicon={
-                  <View style={{ justifyContent: "center", right: 6 }}>
-                    <Icon
-                      name="chevron-down-outline"
-                      size={16}
-                      style={{ color: "#494949" }}
-                    />
-                  </View>
-                }
-                dropdownStyles={{ backgroundColor: "#151515", borderWidth: 0 }}
-                dropdownTextStyles={{ color: "#adadad" }}
-                dropdownItemStyles={{ borderWidth: 0 }}
-              />
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <View style={[styles.section, { width: "50%" }]}>
-                <Text style={styles.title}>PREP TIME</Text>
+            <View style={[styles.section, { width: "50%" }]}>
+              <View style={{ marginLeft: "auto" }}>
+                <Text style={styles.title}>COOK TIME</Text>
                 <View
                   style={{
                     ...styles.section,
@@ -478,9 +510,9 @@ export default function Edit({ navigation }) {
                     maxLength={2}
                     multiline={true}
                     numberOfLines={1}
-                    value={prepHrs}
+                    value={cookHrs}
                     editable={!publishing}
-                    onChangeText={(text) => setPrepHrs(convertNumber(text))}
+                    onChangeText={(text) => setCookHrs(convertNumber(text))}
                   />
                   <View style={{ justifyContent: "center" }}>
                     <Text style={styles.timeText}>hrs</Text>
@@ -493,117 +525,102 @@ export default function Edit({ navigation }) {
                     maxLength={2}
                     multiline={true}
                     numberOfLines={1}
-                    value={prepMin}
+                    value={cookMin}
                     editable={!publishing}
-                    onChangeText={(text) => setPrepMin(convertNumber(text))}
+                    onChangeText={(text) => setCookMin(convertNumber(text))}
                   />
                   <View style={{ justifyContent: "center" }}>
                     <Text style={styles.timeText}>min</Text>
                   </View>
                 </View>
               </View>
-              <View style={[styles.section, { width: "50%" }]}>
-                <View style={{ marginLeft: "auto" }}>
-                  <Text style={styles.title}>COOK TIME</Text>
-                  <View
-                    style={{
-                      ...styles.section,
-                      flexDirection: "row",
-                      marginTop: 0,
-                    }}
-                  >
-                    <TextInput
-                      style={styles.inputTime}
-                      placeholder="0"
-                      placeholderTextColor="#494949"
-                      keyboardType="numeric"
-                      maxLength={2}
-                      multiline={true}
-                      numberOfLines={1}
-                      value={cookHrs}
-                      editable={!publishing}
-                      onChangeText={(text) => setCookHrs(convertNumber(text))}
-                    />
-                    <View style={{ justifyContent: "center" }}>
-                      <Text style={styles.timeText}>hrs</Text>
-                    </View>
-                    <TextInput
-                      style={{ ...styles.inputTime, marginLeft: 10 }}
-                      placeholder="0"
-                      placeholderTextColor="#494949"
-                      keyboardType="numeric"
-                      maxLength={2}
-                      multiline={true}
-                      numberOfLines={1}
-                      value={cookMin}
-                      editable={!publishing}
-                      onChangeText={(text) => setCookMin(convertNumber(text))}
-                    />
-                    <View style={{ justifyContent: "center" }}>
-                      <Text style={styles.timeText}>min</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
             </View>
+          </View>
 
-            <View style={styles.section}>
-              <Text style={styles.title}>INGREDIENTS</Text>
-              <View style={[styles.section, { marginTop: 0, marginBottom: 6 }]}>
+          <View style={styles.section}>
+            <Text style={styles.title}>INGREDIENTS</Text>
+            <View style={[styles.section, { marginTop: 0, marginBottom: 6 }]}>
+              <TextInput
+                maxLength={50}
+                placeholderTextColor={"#494949"}
+                placeholder="Enter ingredient and amount"
+                value={ingredients[0].value}
+                style={styles.input}
+                editable={!publishing}
+                onChangeText={(text) => inputHandler(text, 0, "ingredients")}
+              />
+            </View>
+            {ingredients.slice(1).map((input, key) => (
+              <View
+                style={[styles.section, { marginTop: 0, marginBottom: 6 }]}
+              >
                 <TextInput
+                  key={key}
                   maxLength={50}
                   placeholderTextColor={"#494949"}
                   placeholder="Enter ingredient and amount"
-                  value={ingredients[0].value}
+                  value={input.value}
                   style={styles.input}
                   editable={!publishing}
-                  onChangeText={(text) => inputHandler(text, 0, "ingredients")}
+                  onChangeText={(text) =>
+                    inputHandler(text, key + 1, "ingredients")
+                  }
                 />
-              </View>
-              {ingredients.slice(1).map((input, key) => (
-                <View
-                  style={[styles.section, { marginTop: 0, marginBottom: 6 }]}
+                <TouchableOpacity
+                  onPress={() => deleteHandler(key + 1, "ingredients")}
+                  style={{ position: "absolute", right: 10, bottom: 10 }}
                 >
-                  <TextInput
-                    key={key}
-                    maxLength={50}
-                    placeholderTextColor={"#494949"}
-                    placeholder="Enter ingredient and amount"
-                    value={input.value}
-                    style={styles.input}
-                    editable={!publishing}
-                    onChangeText={(text) =>
-                      inputHandler(text, key + 1, "ingredients")
-                    }
-                  />
-                  <TouchableOpacity
-                    onPress={() => deleteHandler(key + 1, "ingredients")}
-                    style={{ position: "absolute", right: 10, bottom: 10 }}
-                  >
-                    <Icon name="trash-outline" color="#FF4343" size={20} />
-                  </TouchableOpacity>
-                </View>
-              ))}
-              <TouchableOpacity
-                onPress={() => addHandler("ingredients")}
-                style={[styles.addContainer, { justifyContent: "center" }]}
-              >
-                <Icon name="add-circle-outline" color="#494949" size={20} />
-                <Text style={styles.addText}>Add Ingredient</Text>
-              </TouchableOpacity>
-            </View>
+                  <Icon name="trash-outline" color="#FF4343" size={20} />
+                </TouchableOpacity>
+              </View>
+            ))}
+            <TouchableOpacity
+              onPress={() => addHandler("ingredients")}
+              style={[styles.addContainer, { justifyContent: "center" }]}
+            >
+              <Icon name="add-circle-outline" color="#494949" size={20} />
+              <Text style={styles.addText}>Add Ingredient</Text>
+            </TouchableOpacity>
+          </View>
 
-            <View style={styles.section}>
-              <Text style={styles.title}>INSTRUCTIONS</Text>
-              <View style={[styles.section, { marginTop: 0, marginBottom: 6 }]}>
+          <View style={styles.section}>
+            <Text style={styles.title}>INSTRUCTIONS</Text>
+            <View style={[styles.section, { marginTop: 0, marginBottom: 6 }]}>
+              <TextInput
+                maxLength={200}
+                placeholderTextColor={"#494949"}
+                placeholder="Enter a step"
+                style={[styles.input, { paddingLeft: 30 }]}
+                value={instructions[0].value}
+                editable={!publishing}
+                onChangeText={(text) => inputHandler(text, 0, "instructions")}
+              />
+              <Text
+                style={{
+                  position: "absolute",
+                  left: 10,
+                  bottom: 10,
+                  color: "#494949",
+                }}
+              >
+                1.
+              </Text>
+            </View>
+            {instructions.slice(1).map((input, key) => (
+              <View
+                maxLength={200}
+                key={key}
+                style={[styles.section, { marginTop: 0, marginBottom: 6 }]}
+              >
                 <TextInput
-                  maxLength={200}
                   placeholderTextColor={"#494949"}
                   placeholder="Enter a step"
-                  style={[styles.input, { paddingLeft: 30 }]}
-                  value={instructions[0].value}
+                  value={input.value}
                   editable={!publishing}
-                  onChangeText={(text) => inputHandler(text, 0, "instructions")}
+                  style={[styles.input, { paddingLeft: 30 }]}
+                  onChangeText={(text) =>
+                    inputHandler(text, key + 1, "instructions")
+                  }
                 />
                 <Text
                   style={{
@@ -613,84 +630,27 @@ export default function Edit({ navigation }) {
                     color: "#494949",
                   }}
                 >
-                  1.
+                  {key + 2}.
                 </Text>
-              </View>
-              {instructions.slice(1).map((input, key) => (
-                <View
-                  maxLength={200}
-                  key={key}
-                  style={[styles.section, { marginTop: 0, marginBottom: 6 }]}
+                <TouchableOpacity
+                  onPress={() => deleteHandler(key + 1, "instructions")}
+                  style={{ position: "absolute", right: 10, bottom: 10 }}
                 >
-                  <TextInput
-                    placeholderTextColor={"#494949"}
-                    placeholder="Enter a step"
-                    value={input.value}
-                    editable={!publishing}
-                    style={[styles.input, { paddingLeft: 30 }]}
-                    onChangeText={(text) =>
-                      inputHandler(text, key + 1, "instructions")
-                    }
-                  />
-                  <Text
-                    style={{
-                      position: "absolute",
-                      left: 10,
-                      bottom: 10,
-                      color: "#494949",
-                    }}
-                  >
-                    {key + 2}.
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => deleteHandler(key + 1, "instructions")}
-                    style={{ position: "absolute", right: 10, bottom: 10 }}
-                  >
-                    <Icon name="trash-outline" color="#FF4343" size={20} />
-                  </TouchableOpacity>
-                </View>
-              ))}
-              <TouchableOpacity
-                onPress={() => addHandler("instructions")}
-                style={[styles.addContainer, { justifyContent: "center" }]}
-              >
-                <Icon name="add-circle-outline" color="#494949" size={20} />
-                <Text style={styles.addText}>Add Step</Text>
-              </TouchableOpacity>
-            </View>
-            
+                  <Icon name="trash-outline" color="#FF4343" size={20} />
+                </TouchableOpacity>
+              </View>
+            ))}
+            <TouchableOpacity
+              onPress={() => addHandler("instructions")}
+              style={[styles.addContainer, { justifyContent: "center" }]}
+            >
+              <Icon name="add-circle-outline" color="#494949" size={20} />
+              <Text style={styles.addText}>Add Step</Text>
+            </TouchableOpacity>
           </View>
-        </ScrollView>
-      </View>
-    );
-  }
-
-  return (
-    <View style={global.appContainer}>
-      <View style={global.topbar}>
-        <BackArrow navigation={navigation} />
-        <Text style={global.topbarTitle}>Recipes</Text>
-      </View>
-      <View
-        style={{
-          height: "74%",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Text style={{ fontSize: 18, fontWeight: "bold", color: "white" }}>
-          You are currently logged out.
-        </Text>
-        <Text style={{ fontSize: 18, marginTop: 15, color: "white" }}>
-          <Text
-            onPress={() => navigation.navigate("Login")}
-            style={{ fontSize: 18, color: "#518BFF" }}
-          >
-            Sign in
-          </Text>{" "}
-          to post recipes
-        </Text>
-      </View>
+          
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -701,6 +661,16 @@ const styles = StyleSheet.create({
     left: 20,
     bottom: "50%",
     marginBottom: -15,
+  },
+  button: {
+    position: "absolute",
+    top: '50%',
+    marginTop: 21,
+    right: 20,
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: "bold",
   },
   photoSelect: {
     marginVertical: 20,
@@ -754,23 +724,6 @@ const styles = StyleSheet.create({
   addText: {
     fontSize: 16,
     color: "#494949",
-  },
-  button: {
-    backgroundColor: "#518BFF",
-    width: 50,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 20,
-    position: "absolute",
-    top: 30,
-    right: 10,
-  },
-  buttonText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
   },
   timeText: {
     fontSize: 14,

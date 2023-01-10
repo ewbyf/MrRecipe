@@ -4,8 +4,8 @@ import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import React from "react";
 import { StyleSheet } from "react-native";
 
-import Dashboard from "../screens/DashboardStack/Dashboard";
-import Settings from "../screens/DashboardStack/Settings";
+import Dashboard from "../screens/NavigationTab/NavigationScreens/DashboardStack/Dashboard";
+import Settings from "../screens/NavigationTab/NavigationScreens/DashboardStack/Settings";
 
 const Stack = createStackNavigator();
 

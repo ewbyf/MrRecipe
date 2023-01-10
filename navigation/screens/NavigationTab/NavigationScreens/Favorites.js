@@ -1,7 +1,7 @@
 import { StyleSheet, View, Text, TextInput, Image, Dimensions, ScrollView, TouchableOpacity } from "react-native";
-import global from "../../Styles";
+import global from "../../../../Styles";
 import { useState, useEffect, useRef } from "react";
-import { firebase } from '../../config';
+import { firebase } from '../../../../config';
 import { FlashList } from "@shopify/flash-list";
 import { Rating } from "react-native-ratings";
 import Icon from "react-native-vector-icons/Ionicons";

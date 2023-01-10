@@ -342,6 +342,16 @@ export default function Post({ navigation }) {
             }}
           />
           <Text style={global.topbarTitle}>Add a Recipe</Text>
+          <TouchableOpacity
+              disabled={publishing}
+              onPress={() => {
+                setPublishing(true);
+                publish();
+              }}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>Publish</Text>
+            </TouchableOpacity>
         </View>
         <ScrollView>
           <View style={styles.items}>
@@ -648,17 +658,6 @@ export default function Post({ navigation }) {
                 <Text style={styles.addText}>Add Step</Text>
               </TouchableOpacity>
             </View>
-
-            <TouchableOpacity
-              disabled={publishing}
-              onPress={() => {
-                setPublishing(true);
-                publish();
-              }}
-              style={styles.button}
-            >
-              <Text style={styles.buttonText}>Publish</Text>
-            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>
@@ -757,12 +756,15 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#518BFF",
-    width: 175,
+    width: 70,
     height: 40,
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
     marginVertical: 20,
+    position: "absolute",
+    top: 30,
+    right: 10,
   },
   buttonText: {
     fontSize: 20,

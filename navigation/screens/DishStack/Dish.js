@@ -27,7 +27,7 @@ import {
 import Dialog from 'react-native-dialog';
 import { showMessage } from "react-native-flash-message";
 
-export default function Dish({ props, navigation }) {
+export default function Dish({ navigation }) {
   const route = useRoute();
   const [recipeData, setRecipeData] = useState("");
   const [initializing, setInitializing] = useState(true);
@@ -37,6 +37,7 @@ export default function Dish({ props, navigation }) {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
+  const [pressed, setPressed] = useState(false);
 
   function onAuthStateChanged(userParam) {
     if (userParam) fetchUser();
@@ -241,12 +242,32 @@ export default function Dish({ props, navigation }) {
           renderItem={({ item }) => (
             <View style={{minHeight: 40, marginTop: 15}}>
               <View style={{flexDirection: 'row'}}>
-                  <TouchableOpacity onPress={() => navigation.navigate("ProfileScreen", {id: item.uid})}>
+                  <TouchableOpacity 
+                    disabled={pressed}
+                    onPress={() => {
+                      if (item.uid == route.params.id) {
+                        setPressed(true);
+                        navigation.goBack(null);
+                      }
+                      else {
+                        navigation.push("ProfileScreen", {doc: route.params.doc, id: item.uid});
+                      }
+                    }}>
                     <Image source={{uri: (item.pfp ? item.pfp : "https://imgur.com/hNwMcZQ.png")}} style={styles.smallPfp} />
                   </TouchableOpacity>
                   <View style={{maxWidth: '85%'}}>
                     <View style={{flexDirection: 'row'}}>
-                      <TouchableOpacity onPress={() => navigation.navigate("ProfileScreen", {id: item.uid})}>
+                      <TouchableOpacity 
+                        disabled={pressed}
+                        onPress={() => {
+                          if (item.uid == route.params.id) {
+                            setPressed(true);
+                            navigation.goBack(null);
+                          }
+                          else {
+                            navigation.push("ProfileScreen", {doc: route.params.doc, id: item.uid});
+                          }
+                        }}>
                         <Text style={[styles.username, {fontSize: 15, marginBottom: 3}]}>{item.username}</Text>
                       </TouchableOpacity>
                       <Text style={{color: 'gray'}}> • {item.timestamp.toDate().toDateString()}</Text>
@@ -304,7 +325,7 @@ export default function Dish({ props, navigation }) {
                 }
               />
               <MenuOption
-                onSelect={() => navigation.navigate("EditScreen")}
+                onSelect={() => navigation.navigate("EditScreen", {doc: route.params.doc})}
                 children={
                   <View
                     style={styles.popup}
@@ -374,7 +395,18 @@ export default function Dish({ props, navigation }) {
             <View style={{ flexDirection: "row" }}>
               <TouchableOpacity
                 style={{ flexDirection: "row", alignItems: "center" }}
-                onPress={() => navigation.navigate("ProfileScreen")}
+                disabled={pressed}
+                onPress={() => {
+                  if (authorData.uid == route.params.id) {
+                    if (navigation.canGoBack()) {
+                      setPressed(true);
+                      navigation.goBack(null);
+                    }
+                  }
+                  else {
+                    navigation.push("ProfileScreen", {doc: route.params.doc, id: authorData.uid});
+                  }
+                }}
               >
                 <Image
                   source={{ uri: recipeData.userpfp }}

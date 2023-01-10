@@ -8,9 +8,9 @@ import {
   RefreshControl,
   Dimensions
 } from "react-native";
-import global from "../../../Styles";
+import global from "../../../../../Styles";
 import Icon from "react-native-vector-icons/Ionicons";
-import { firebase } from "../../../config";
+import { firebase } from "../../../../../config";
 import { FlashList } from "@shopify/flash-list";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Rating } from "react-native-ratings";
@@ -181,7 +181,7 @@ export default function Dashboard({ navigation, props }) {
           >
             <View style={[global.list]}>
               <AnimatedImage
-                source={require('../../../assets/heart.png')}
+                source={require('../../../../../assets/heart.png')}
                 style={[
                   styles.heart,
                   rStyle,

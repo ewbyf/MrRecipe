@@ -8,10 +8,10 @@ import {
   RefreshControl,
   Dimensions
 } from "react-native";
-import global from "../../../Styles";
-import BackArrow from '../../../components/BackArrow';
+import global from "../../Styles";
+import BackArrow from '../../components/BackArrow';
 import Icon from "react-native-vector-icons/Ionicons";
-import { firebase } from "../../../config";
+import { firebase } from "../../config";
 import { FlashList } from "@shopify/flash-list";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Rating } from "react-native-ratings";
@@ -22,7 +22,7 @@ import { useRoute } from "@react-navigation/native";
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-export default function Profile({ navigation, props }) {
+export default function Profile({ navigation }) {
   const route = useRoute();
   const [refreshing, setRefreshing] = useState(false);
   const [userData, setUserData] = useState("");
@@ -100,7 +100,7 @@ export default function Profile({ navigation, props }) {
       temp = dataList;
       index = dataList.findIndex(item => item.key == doc);
 
-      await firebase.firestore().collection('users').doc(route.params.id).get()
+      await firebase.firestore().collection('users').doc(route?.params?.id).get()
       .then((snap) => {
         fav = snap.data().favorites;
         if (fav.indexOf(doc) != -1) {
@@ -163,7 +163,6 @@ export default function Profile({ navigation, props }) {
     const doubleTapRef = useRef();
     const lastItemId = useRef(item.key);
     const [liked, setLiked] = useState(item.favorite);
-    const [opened, setOpened] = useState(false);
 
     if (item.key !== lastItemId.current) {
       lastItemId.current = item.key;
@@ -174,7 +173,14 @@ export default function Profile({ navigation, props }) {
       <TouchableOpacity style={global.itemContainer}>
         <TapGestureHandler
           waitFor={doubleTapRef}
-          onActivated={() => navigation.navigate("DishScreen", {doc: item.key})}
+          onActivated={() => {
+            if (route.params.doc == item.key) {
+              navigation.navigate("DishStack", {doc: item.key, id: route.params.id});
+            }
+            else {
+              navigation.push("DishStack", {doc: item.key, id: route.params.id});
+            }
+          }}
         >
           <TapGestureHandler
             maxDelayMs={200}
@@ -184,7 +190,7 @@ export default function Profile({ navigation, props }) {
           >
             <View style={[global.list]}>
               <AnimatedImage
-                source={require('../../../assets/heart.png')}
+                source={require('../../assets/heart.png')}
                 style={[
                   styles.heart,
                   rStyle,
@@ -400,7 +406,7 @@ export default function Profile({ navigation, props }) {
                   textAlign: "center",
                 }}
               >
-                You have not posted any recipes
+                User has not posted any recipes
               </Text>
             )}
             {userData && userData.recipes.length > 0 && (

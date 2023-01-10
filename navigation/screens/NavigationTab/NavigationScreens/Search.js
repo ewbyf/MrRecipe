@@ -1,7 +1,7 @@
 import { StyleSheet, View, Text, TextInput } from "react-native";
-import global from "../../Styles";
+import global from "../../../../Styles";
 import { useState, useEffect } from "react";
-import { firebase } from '../../config';
+import { firebase } from '../../../../config';
 
 export default function Search({ navigation }) {
   const [initializing, setInitializing] = useState(true);

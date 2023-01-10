@@ -1,8 +1,8 @@
 import { StyleSheet, View, Text, TextInput, Button, Alert, Image, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
-import global from "../../../Styles";
+import global from "../../../../../Styles";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useState, useEffect } from "react";
-import { firebase } from '../../../config';
+import { firebase } from '../../../../../config';
 import Dialog from 'react-native-dialog';
 
 export default function Login({ navigation }){

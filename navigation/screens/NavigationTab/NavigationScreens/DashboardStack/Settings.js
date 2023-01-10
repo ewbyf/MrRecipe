@@ -1,8 +1,8 @@
 import { StyleSheet, View, Text, TextInput, Alert, Image, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
-import global from "../../../Styles";
-import { firebase } from '../../../config';
+import global from "../../../../../Styles";
+import { firebase } from '../../../../../config';
 import { useState, useEffect } from "react";
-import BackArrow from '../../../components/BackArrow';
+import BackArrow from '../../../../../components/BackArrow';
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import Dialog from 'react-native-dialog';

@@ -29,6 +29,7 @@ import { showMessage } from "react-native-flash-message";
 
 export default function Dish({ navigation }) {
   const route = useRoute();
+  const [posting, setPosting] = useState(false);
   const [recipeData, setRecipeData] = useState("");
   const [initializing, setInitializing] = useState(true);
   const [rating, setRating] = useState(0);
@@ -194,6 +195,7 @@ export default function Dish({ navigation }) {
           });
 
           tempComments.push({key, uid: firebase.auth().currentUser.uid, username: snap.data().username, pfp: snap.data().pfp, comment, timestamp})
+          setPosting(false);
         });
 
 
@@ -494,10 +496,14 @@ export default function Dish({ navigation }) {
           ></TextInput>
           <Icon
             name="send"
+            disabled={posting}
             size={20}
             color={comment.replace(/\s/g, "") ? "#518BFF" : 'gray'}
             style={{ marginLeft: "auto" }}
-            onPress={() => submitComment()}
+            onPress={() => {
+              setPosting(true);
+              submitComment();
+            }}
           />
         </View>
         <Comments/>

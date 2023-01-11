@@ -11,23 +11,22 @@ import {
 import global from "../../../Styles";
 import { useState, useEffect } from "react";
 import { firebase } from "../../../config";
-import BackArrow from "../../../components/BackArrow";
 import Icon from "react-native-vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
 import { SelectList } from "react-native-dropdown-select-list";
 import Dialog from "react-native-dialog";
+import { useRoute } from "@react-navigation/native";
 
 export default function Edit({ navigation }) {
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
+  const route = useRoute();
   const [image, setImage] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [difficulty, setDifficulty] = useState("Easy");
-  const [cookHrs, setCookHrs] = useState("0");
-  const [cookMin, setCookMin] = useState("0");
-  const [prepHrs, setPrepHrs] = useState("0");
-  const [prepMin, setPrepMin] = useState("0");
+  const [cookHrs, setCookHrs] = useState("");
+  const [cookMin, setCookMin] = useState("");
+  const [prepHrs, setPrepHrs] = useState("");
+  const [prepMin, setPrepMin] = useState("");
   const [ingredients, setIngredients] = useState([{ key: 0, value: "" }]);
   const [instructions, setInstructions] = useState([{ key: 0, value: "" }]);
 
@@ -41,7 +40,27 @@ export default function Edit({ navigation }) {
   ];
 
   useEffect(() => {
+    firebase.firestore().collection('recipes').doc(route.params.doc).get()
+    .then((snap) => {
+      setImage(snap.data().image);
+      setName(snap.data().name);
+      setDescription(snap.data().description);
+      setDifficulty(snap.data().difficulty);
+      setCookHrs(((snap.data().cooktime - (snap.data().cooktime % 60)) / 60).toString());
+      setCookMin((snap.data().cooktime % 60).toString());
+      setPrepMin((snap.data().preptime % 60).toString());
+      setPrepHrs(((snap.data().preptime - (snap.data().preptime % 60)) / 60).toString());
+      
+      let temp = [];
+      for(let i = 0; i < snap.data().instructions.length; i++){
+        temp.push({key: i, value: snap.data.instructions[i]});
+      }
+      setInstructions(temp);
 
+      snap.data().ingredients
+
+      
+    })
   }, []);
 
   const takePhoto = async () => {
@@ -181,7 +200,7 @@ export default function Edit({ navigation }) {
       const cooktime = Number(cookMin) + Number(cookHrs) * 60;
       const ingredientsArray = [];
       const instructionsArray = [];
-      const rated = new Map();
+      const rated = {};
       const comments = [];
       
       for (let i = 0; i < ingredients.length; i++) {
@@ -201,7 +220,6 @@ export default function Edit({ navigation }) {
         .doc(firebase.auth().currentUser.uid);
 
       let imgUrl = await uploadPhoto();
-      let timestamp = firebase.firestore.Timestamp.fromDate(new Date());
 
       await ref
         .get()
@@ -210,7 +228,7 @@ export default function Edit({ navigation }) {
             firebase
               .firestore()
               .collection("recipes")
-              .add({
+              .update({
                 name,
                 description,
                 weight: 0,
@@ -224,11 +242,6 @@ export default function Edit({ navigation }) {
                 image: imgUrl,
                 rated,
                 comments,
-                user: snapshot.data().name,
-                username: snapshot.data().username,
-                userpfp: snapshot.data().pfp,
-                uid: firebase.auth().currentUser.uid,
-                timestamp,
               })
               .then((doc) => {
                 const recipes = [...snapshot.data().recipes];
@@ -248,18 +261,6 @@ export default function Edit({ navigation }) {
           alert(error.message);
         });
     }
-  };
-
-  const reset = () => {
-    setImage(null);
-    setName("");
-    setDescription("");
-    setCookHrs('');
-    setCookMin('');
-    setPrepHrs('');
-    setPrepMin('');
-    setInstructions([{ key: 0, value: "" }]);
-    setIngredients([{ key: 0, value: "" }]);
   };
 
   const checkFieldChanged = () => {
@@ -303,15 +304,6 @@ export default function Edit({ navigation }) {
           style={{ color: "red" }}
           onPress={() => {
             setDiscardVisible(false);
-            reset();
-            navigation.goBack(null);
-          }}
-        />
-        <Dialog.Button
-          label="Save"
-          style={{ color: "#518BFF" }}
-          onPress={() => {
-            setDiscardVisible(false);
             navigation.goBack(null);
           }}
         />
@@ -343,7 +335,7 @@ export default function Edit({ navigation }) {
             <Text style={[styles.buttonText, {color: (name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value) ? "white" : "gray"}]}>Save</Text>
           </TouchableOpacity>
       </View>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.items}>
           {!image && (
             <View style={styles.photoSelect}>
@@ -368,7 +360,7 @@ export default function Edit({ navigation }) {
           {image && (
             <View style={{ alignItems: "center" }}>
               <Image
-                source={{ uri: image.uri }}
+                source={{ uri: (image.uri ? image.uri : image) }}
                 style={{ width: 333, height: 250, marginTop: 20 }}
               />
               <TouchableOpacity onPress={() => setImage(null)}>
@@ -427,6 +419,7 @@ export default function Edit({ navigation }) {
             <SelectList
               data={data}
               setSelected={(diff) => setDifficulty(diff)}
+              defaultOption={{key: difficulty, value: difficulty}}
               search={false}
               disabled={publishing}
               inputStyles={{ color: "white" }}

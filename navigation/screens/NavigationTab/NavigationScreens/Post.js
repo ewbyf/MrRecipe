@@ -329,7 +329,7 @@ export default function Post({ navigation }) {
               <Text style={[styles.buttonText, {color: (name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value) ? "white" : "gray"}]}>Post</Text>
             </TouchableOpacity>
         </View>
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.items}>
             {!image && (
               <View style={styles.photoSelect}>

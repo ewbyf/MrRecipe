@@ -190,39 +190,36 @@ export default function Post({ navigation }) {
         .then((snapshot) => {
           if (snapshot.exists) {
             firebase
-              .firestore()
-              .collection("recipes")
-              .add({
-                name,
-                description,
-                weight: 0,
-                rating: 0,
-                numratings: 0,
-                difficulty,
-                cooktime,
-                preptime,
-                ingredients: ingredientsArray,
-                instructions: instructionsArray,
-                image: imgUrl,
-                rated,
-                comments,
-                user: snapshot.data().name,
-                username: snapshot.data().username,
-                userpfp: snapshot.data().pfp,
-                uid: firebase.auth().currentUser.uid,
-                timestamp,
-              })
-              .then((doc) => {
-                const recipes = [...snapshot.data().recipes];
-                recipes.push(doc.id);
-                ref.update({ recipes });
-                reset();
-                navigation.goBack(null);
-                setPublishing(false);
-              })
-              .catch((error) => {
-                alert(error.message);
-              });
+            .firestore()
+            .collection("recipes")
+            .add({
+              name,
+              description,
+              weight: 0,
+              rating: 0,
+              numratings: 0,
+              difficulty,
+              cooktime,
+              preptime,
+              ingredients: ingredientsArray,
+              instructions: instructionsArray,
+              image: imgUrl,
+              rated,
+              comments,
+              uid: snapshot.data().uid,
+              timestamp,
+            })
+            .then((doc) => {
+              const recipes = snapshot.data().recipes;
+              recipes.push(doc.id);
+              ref.update({ recipes });
+              reset();
+              navigation.goBack(null);
+              setPublishing(false);
+            })
+            .catch((error) => {
+              alert(error.message);
+            });
           } else
             Alert.alert("Unknown Error Occured", "Contact support with error.");
         })

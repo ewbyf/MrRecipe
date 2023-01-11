@@ -86,6 +86,10 @@ export default function Settings({ navigation }) {
         if (imgUrl == null && userData.pfp) {
           imgUrl = userData.pfp;
         }
+        else {
+          let imageRef = firebase.storage().refFromURL(userData.pfp);
+          imageRef.delete();
+        }
 
         await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update(
           {name, username, bio, username_lowercase: username.toLowerCase(), pfp: imgUrl}

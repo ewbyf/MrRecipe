@@ -183,7 +183,6 @@ export default function Dish({ navigation }) {
         .then((snap) => {
           let key = timestamp + snap.data().username;
           let temp = snap.data().comments;
-          console.debug(snap.data())
           temp.push({key, recipe: route.params.doc});
 
           firebase
@@ -194,7 +193,7 @@ export default function Dish({ navigation }) {
             comments: temp
           });
 
-          tempComments.push({key, uid: firebase.auth().currentUser.uid, username: snap.data().username, pfp: snap.data().pfp, comment, timestamp})
+          tempComments.push({key, uid: snap.data().uid, comment, timestamp})
         });
 
 
@@ -222,7 +221,6 @@ export default function Dish({ navigation }) {
   }
 
   const Comments = () => {
-
     if (recipeData.comments.length == 0) {
       return null;
     }
@@ -232,46 +230,67 @@ export default function Dish({ navigation }) {
         <FlashList
           data={recipeData.comments}
           renderItem={({ item }) => (
-            <View style={{minHeight: 40, marginTop: 15}}>
-              <View style={{flexDirection: 'row'}}>
-                  <TouchableOpacity 
-                    disabled={pressed}
-                    onPress={() => {
-                      if (item.uid == route.params.id) {
-                        setPressed(true);
-                        navigation.goBack(null);
-                      }
-                      else {
-                        navigation.push("ProfileScreen", {doc: route.params.doc, id: item.uid});
-                      }
-                    }}>
-                    <Image source={{uri: (item.pfp ? item.pfp : "https://imgur.com/hNwMcZQ.png")}} style={styles.smallPfp} />
-                  </TouchableOpacity>
-                  <View style={{maxWidth: '85%'}}>
-                    <View style={{flexDirection: 'row'}}>
-                      <TouchableOpacity 
-                        disabled={pressed}
-                        onPress={() => {
-                          if (item.uid == route.params.id) {
-                            setPressed(true);
-                            navigation.goBack(null);
-                          }
-                          else {
-                            navigation.push("ProfileScreen", {doc: route.params.doc, id: item.uid});
-                          }
-                        }}>
-                        <Text style={[styles.username, {fontSize: 15, marginBottom: 3}]}>{item.username}</Text>
-                      </TouchableOpacity>
-                      <Text style={{color: 'gray'}}> • {item.timestamp.toDate().toDateString()}</Text>
-                    </View>
-                  
-                  <Text style={{color: 'white', fontSize: 15}}>{item.comment}</Text>
-                </View>
-              </View>
-            </View>
+            <CommentRender item={item}/>
           )}
           estimatedItemSize={10}
         /> 
+      </View>
+    );
+  }
+
+  const CommentRender = ({item}) => {
+    const [commenterData, setCommenterData] = useState();
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      firebase.firestore().collection('users').doc(item.uid).get()
+      .then((snap) => {
+        if (snap.exists) {
+          setCommenterData(snap.data());
+        }
+        setLoading(false);
+      });
+    }, []);
+
+    if (loading) return null;
+    
+    return (
+      <View style={{minHeight: 40, marginTop: 15}}>
+        <View style={{flexDirection: 'row'}}>
+            <TouchableOpacity 
+              disabled={pressed}
+              onPress={() => {
+                if (item.uid == route.params.id) {
+                  setPressed(true);
+                  navigation.goBack(null);
+                }
+                else {
+                  navigation.push("ProfileScreen", {doc: route.params.doc, id: item.uid});
+                }
+              }}>
+              <Image source={{uri: (commenterData.pfp ? commenterData.pfp : "https://imgur.com/hNwMcZQ.png")}} style={styles.smallPfp} />
+            </TouchableOpacity>
+            <View style={{maxWidth: '85%'}}>
+              <View style={{flexDirection: 'row'}}>
+                <TouchableOpacity 
+                  disabled={pressed}
+                  onPress={() => {
+                    if (item.uid == route.params.id) {
+                      setPressed(true);
+                      navigation.goBack(null);
+                    }
+                    else {
+                      navigation.push("ProfileScreen", {doc: route.params.doc, id: item.uid});
+                    }
+                  }}>
+                  <Text style={[styles.username, {fontSize: 15, marginBottom: 3}]}>{commenterData.username}</Text>
+                </TouchableOpacity>
+                <Text style={{color: 'gray'}}> • {item.timestamp.toDate().toDateString()}</Text>
+              </View>
+            
+            <Text style={{color: 'white', fontSize: 15}}>{item.comment}</Text>
+          </View>
+        </View>
       </View>
     );
   }
@@ -401,11 +420,11 @@ export default function Dish({ navigation }) {
                 }}
               >
                 <Image
-                  source={{ uri: (recipeData.userpfp ? recipeData.userpfp : 'https://imgur.com/hNwMcZQ.png') }}
+                  source={{ uri: (authorData.pfp ? authorData.pfp : 'https://imgur.com/hNwMcZQ.png') }}
                   style={styles.authorPfp}
                 />
                 <View style={{ marginLeft: 10 }}>
-                  <Text style={styles.username}>{recipeData.username}</Text>
+                  <Text style={styles.username}>{authorData.username}</Text>
                   <Text style={{ color: "gray" }}>
                     {authorData.recipes.length} Posts
                   </Text>

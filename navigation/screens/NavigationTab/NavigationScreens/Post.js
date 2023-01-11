@@ -540,9 +540,9 @@ export default function Post({ navigation }) {
               {ingredients.slice(1).map((input, key) => (
                 <View
                   style={[styles.section, { marginTop: 0, marginBottom: 6 }]}
+                  key={key}
                 >
                   <TextInput
-                    key={key}
                     maxLength={50}
                     placeholderTextColor={"#494949"}
                     placeholder="Enter ingredient and amount"

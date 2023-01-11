@@ -24,10 +24,10 @@ export default function Post({ navigation }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [difficulty, setDifficulty] = useState("Easy");
-  const [cookHrs, setCookHrs] = useState("0");
-  const [cookMin, setCookMin] = useState("0");
-  const [prepHrs, setPrepHrs] = useState("0");
-  const [prepMin, setPrepMin] = useState("0");
+  const [cookHrs, setCookHrs] = useState('');
+  const [cookMin, setCookMin] = useState('');
+  const [prepHrs, setPrepHrs] = useState('');
+  const [prepMin, setPrepMin] = useState('');
   const [ingredients, setIngredients] = useState([{ key: 0, value: "" }]);
   const [instructions, setInstructions] = useState([{ key: 0, value: "" }]);
 

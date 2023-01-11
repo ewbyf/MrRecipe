@@ -318,8 +318,8 @@ export default function Settings({ navigation }) {
           imageRef.delete();
         }
 
-        // Deletes comments user left
-        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
+        // Deletes comments
+        await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
         .then(async(snap) => {
           await snap.data().comments.map((item) => {
             firebase.firestore().collection('recipes').doc(item.recipe).get()
@@ -332,7 +332,7 @@ export default function Settings({ navigation }) {
             })
           })
 
-          // Deletes ratings user left
+          // Deletes ratings
           await snap.data().ratings.map((doc) => {
             firebase.firestore().collection('recipes').doc(doc).get()
             .then(async(snap2) => {
@@ -348,8 +348,22 @@ export default function Settings({ navigation }) {
               }
             })
           })
-        })
 
+          // Deletes recipes
+          await snap.data().recipes.map((doc) => {
+            firebase.firestore().collection('recipes').doc(doc).get()
+            .then((snap2) => {
+              if (snap2.exists) {
+                if (snap2.data().image) {
+                  let imageRef = firebase.storage().refFromURL(snap2.data().image);
+                  imageRef.delete();
+                }
+              }
+            })
+
+            firebase.firestore().collection('recipes').doc(doc).delete();
+          });
+        })
 
         await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).delete();
         await firebase.auth().currentUser.delete()
@@ -361,22 +375,22 @@ export default function Settings({ navigation }) {
         });
       }
       catch(error) {
-          switch(error.code) {
-              case 'auth/wrong-password':
-                  Alert.alert(
-                      "Invalid Password",
-                      "The current password you have entered is incorrect. Please try again."
-                  );
-                  break;
-              case 'auth/too-many-requests':
-                  Alert.alert(
-                      "Too Many Requests",
-                      "You are creating too many requests. Please try again later."
-                  );
-                  break;
-              default:
-                  alert(error.code);
-          }
+        switch(error.code) {
+          case 'auth/wrong-password':
+            Alert.alert(
+                "Invalid Password",
+                "The current password you have entered is incorrect. Please try again."
+            );
+            break;
+          case 'auth/too-many-requests':
+            Alert.alert(
+                "Too Many Requests",
+                "You are creating too many requests. Please try again later."
+            );
+            break;
+          default:
+            alert(error.code);
+        }
       }
     }
   }

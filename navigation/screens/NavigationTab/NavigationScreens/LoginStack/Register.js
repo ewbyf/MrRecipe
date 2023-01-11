@@ -57,9 +57,9 @@ export default function Register({ navigation }) {
       await firebase
         .auth()
         .createUserWithEmailAndPassword(email, password)
-        .then(() => {
+        .then(async() => {
           let username_lowercase = username.toLowerCase();
-          firebase
+          await firebase
             .firestore()
             .collection("users")
             .doc(firebase.auth().currentUser.uid)
@@ -76,7 +76,7 @@ export default function Register({ navigation }) {
               ratings: [],
               uid: firebase.auth().currentUser.uid,
             });
-          firebase
+          await firebase
             .auth()
             .currentUser.sendEmailVerification({
               handleCodeInApp: true,

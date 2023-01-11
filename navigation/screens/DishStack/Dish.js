@@ -36,7 +36,6 @@ export default function Dish({ navigation }) {
   const [userData, setUserData] = useState();
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [comment, setComment] = useState('');
-  const [commentsData, setCommentsData] = useState([]);
   const [pressed, setPressed] = useState(false);
 
   function onAuthStateChanged(userParam) {
@@ -115,6 +114,13 @@ export default function Dish({ navigation }) {
             (recipeData.numratings + 1);
         numRatings++;
         rated[userData.uid] = rating;
+
+        firebase.firestore().collection("users").doc(userData.uid).get()
+        .then((snap) => {
+          let temp = snap.data().ratings;
+          temp.push(route.params.doc);
+          firebase.firestore().collection("users").doc(userData.uid).update({ratings: temp});
+        })
       }
 
       let weight = newRating + (5 * (1 - Math.E ** (-numRatings / 50)));
@@ -174,8 +180,9 @@ export default function Dish({ navigation }) {
         .doc(firebase.auth().currentUser.uid)
         .get()
         .then((snap) => {
-          let key = timestamp + snap.data().username
+          let key = timestamp + snap.data().username;
           let temp = snap.data().comments;
+          console.debug(snap.data())
           temp.push({key, recipe: route.params.doc});
 
           firebase
@@ -212,50 +219,16 @@ export default function Dish({ navigation }) {
     }
   }
 
-  const getCommentData = async() => {
-    let tempComments = recipeData.comments;
-    let deleted = 0;
-
-    await Promise.all(
-      tempComments.map(async(item) => {
-        await firebase
-        .firestore()
-        .collection("users")
-        .doc(item.uid)
-        .get()
-        .then((snap) => {
-          if (!snap.exists) {
-            tempComments.splice(tempComments.indexOf(item.uid), 1);
-            deleted++;
-          }
-        });
-      })
-    )
-
-    if (deleted) {
-      firebase
-      .firestore()
-      .collection("recipes")
-      .doc(route.params.doc)
-      .update({ comments: tempComments });
-    }
-
-    setCommentsData(tempComments);
-  }
-
   const Comments = () => {
-    useEffect(() => {
-      getCommentData();
-    }, []);
 
-    if (commentsData.length == 0) {
+    if (recipeData.comments.length == 0) {
       return null;
     }
 
     return (
       <View style={{height: '100%', marginBottom: 40}}>
         <FlashList
-          data={commentsData}
+          data={recipeData.comments}
           renderItem={({ item }) => (
             <View style={{minHeight: 40, marginTop: 15}}>
               <View style={{flexDirection: 'row'}}>
@@ -426,7 +399,7 @@ export default function Dish({ navigation }) {
                 }}
               >
                 <Image
-                  source={{ uri: recipeData.userpfp }}
+                  source={{ uri: (recipeData.userpfp ? recipeData.userpfp : 'https://imgur.com/hNwMcZQ.png') }}
                   style={styles.authorPfp}
                 />
                 <View style={{ marginLeft: 10 }}>

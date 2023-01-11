@@ -51,13 +51,18 @@ export default function Edit({ navigation }) {
       setPrepMin((snap.data().preptime % 60).toString());
       setPrepHrs(((snap.data().preptime - (snap.data().preptime % 60)) / 60).toString());
       
-      let temp = [];
+      let tempIns = [];
       for(let i = 0; i < snap.data().instructions.length; i++){
-        temp.push({key: i, value: snap.data.instructions[i]});
+        tempIns.push({key: i, value: snap.data().instructions[i]});
       }
-      setInstructions(temp);
+      setInstructions(tempIns);
+      
+      let tempIng = [];
+      for(let i = 0; i < snap.data().ingredients.length; i++){
+        tempIng.push({key: i, value: snap.data().ingredients[i]});
+      }
+      setIngredients(tempIng);
 
-      snap.data().ingredients
 
       
     })

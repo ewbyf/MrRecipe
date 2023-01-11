@@ -195,7 +195,6 @@ export default function Dish({ navigation }) {
           });
 
           tempComments.push({key, uid: firebase.auth().currentUser.uid, username: snap.data().username, pfp: snap.data().pfp, comment, timestamp})
-          setPosting(false);
         });
 
 
@@ -219,6 +218,7 @@ export default function Dish({ navigation }) {
     else {
       Alert.alert("Not Signed In", "You must be signed in to post a comment.");
     }
+    setPosting(false);
   }
 
   const Comments = () => {

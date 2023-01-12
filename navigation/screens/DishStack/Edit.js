@@ -344,7 +344,7 @@ export default function Edit({ navigation }) {
             <View style={{ alignItems: "center" }}>
               <Image
                 source={{ uri: (image.uri ? image.uri : image) }}
-                style={{ width: 333, height: 250, marginTop: 20 }}
+                style={{ width: 350, height: undefined, marginTop: 20, aspectRatio: 5/3 }}
               />
               <TouchableOpacity onPress={() => {setImage(null); if (!changed) setChanged(true);}}>
                 <Text

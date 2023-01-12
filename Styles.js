@@ -55,8 +55,9 @@ export default StyleSheet.create({
         borderRadius: 15,
     },
     listImage: {
-        height: (Dimensions.get('window').width/2 - 40) * .6,
+        height: undefined,
         width: (Dimensions.get('window').width/2 - 40),
+        aspectRatio: 5/3,
         borderRadius: 15,
         marginBottom: 10
     },

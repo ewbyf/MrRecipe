@@ -623,8 +623,9 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   featuredImage: {
-    height: (Dimensions.get("window").width - 80) * 0.6,
+    height: undefined,
     width: "100%",
+    aspectRatio: 5/3,
     borderRadius: 20,
     marginBottom: 10,
   },
@@ -639,8 +640,9 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   smallImage: {
-    height: (Dimensions.get("window").width / 1.5 - 80) * 0.6,
+    height: undefined,
     width: "100%",
+    aspectRatio: 5/3,
     borderRadius: 20,
     marginBottom: 10,
   },

@@ -483,7 +483,7 @@ export default function Dish({ navigation }) {
       return (
         <View style={{height: '100%', marginBottom: 40}}>
           <FlashList
-            data={commentsData.reverse()}
+            data={commentsData.slice().reverse()}
             renderItem={({ item }) => (
               <CommentRender item={item}/>
             )}

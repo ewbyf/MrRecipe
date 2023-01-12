@@ -37,6 +37,7 @@ export default function Dish({ navigation }) {
   const [userData, setUserData] = useState();
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [pressed, setPressed] = useState(false);
+  const [reload, setReload] = useState(false);
 
 
   function onAuthStateChanged(userParam) {
@@ -75,27 +76,30 @@ export default function Dish({ navigation }) {
   useEffect(() => {
     dayjs.extend(relativeTime);
     firebase
-      .firestore()
-      .collection("recipes")
-      .doc(route.params.doc)
-      .get()
-      .then((snapshot) => {
-        setRecipeData(snapshot.data());
-        let user = firebase.auth().currentUser;
-        if (user && Object.keys(snapshot.data().rated).includes(user.uid)) {
-          setRating(snapshot.data().rated[user.uid]);
-        }
-        firebase
-          .firestore()
-          .collection("users")
-          .doc(snapshot.data().uid)
-          .get()
-          .then((snap) => {
-            setAuthorData(snap.data());
-            setInitializing(false);
-          });
-      });
-  }, []);
+    .firestore()
+    .collection("recipes")
+    .doc(route.params.doc)
+    .get()
+    .then((snapshot) => {
+      setRecipeData(snapshot.data());
+      let user = firebase.auth().currentUser;
+      if (user && Object.keys(snapshot.data().rated).includes(user.uid)) {
+        setRating(snapshot.data().rated[user.uid]);
+      }
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(snapshot.data().uid)
+        .get()
+        .then((snap) => {
+          setAuthorData(snap.data());
+          setInitializing(false);
+        });
+    });
+    navigation.addListener("focus", () => {
+      setReload(!reload);
+    });
+  }, [navigation, reload]);
 
 
 
@@ -333,7 +337,7 @@ export default function Dish({ navigation }) {
                 <View style={{ marginLeft: 10 }}>
                   <Text style={styles.username} numberOfLines={1}>{authorData.username}</Text>
                   <Text style={{ color: "gray" }}>
-                    {authorData.recipes.length} Posts
+                    {authorData.recipes.length} {(authorData.recipes.length == 1 ? "Post" : "Posts")}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -580,7 +584,7 @@ export default function Dish({ navigation }) {
               >
                 <Text style={[styles.username, {fontSize: 15}]} numberOfLines={1}>{commenterData.name}<Text style={{color: 'gray', fontSize: 12.5, fontWeight: 'normal'}}> @{commenterData.username}</Text></Text>
               </TouchableOpacity>
-              <Text style={{color: 'gray', fontSize: 12.5, fontWeight: 'normal'}}> • {dayjs(item.timestamp.toDate()).fromNow()}</Text>
+              <Text style={{color: 'gray', fontSize: 12.5, marginTop: 2.5}}> • {dayjs(item.timestamp.toDate()).fromNow()}</Text>
             </View>
             <Text style={{color: 'white', fontSize: 15, marginTop: 3}}>{item.comment}</Text>
           </View>

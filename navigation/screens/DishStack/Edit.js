@@ -6,7 +6,6 @@ import {
   TextInput,
   Alert,
   Image,
-  ScrollView
 } from "react-native";
 import global from "../../../Styles";
 import { useState, useEffect } from "react";
@@ -16,9 +15,12 @@ import * as ImagePicker from "expo-image-picker";
 import { SelectList } from "react-native-dropdown-select-list";
 import Dialog from "react-native-dialog";
 import { useRoute } from "@react-navigation/native";
+import { showMessage } from "react-native-flash-message";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default function Edit({ navigation }) {
   const route = useRoute();
+  const [recipeData, setRecipeData] = useState();
   const [image, setImage] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -29,6 +31,7 @@ export default function Edit({ navigation }) {
   const [prepMin, setPrepMin] = useState("");
   const [ingredients, setIngredients] = useState([{ key: 0, value: "" }]);
   const [instructions, setInstructions] = useState([{ key: 0, value: "" }]);
+  const [changed, setChanged] = useState(false);
 
   const [discardVisible, setDiscardVisible] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -42,14 +45,15 @@ export default function Edit({ navigation }) {
   useEffect(() => {
     firebase.firestore().collection('recipes').doc(route.params.doc).get()
     .then((snap) => {
+      setRecipeData(snap.data());
       setImage(snap.data().image);
       setName(snap.data().name);
       setDescription(snap.data().description);
       setDifficulty(snap.data().difficulty);
-      setCookHrs(((snap.data().cooktime - (snap.data().cooktime % 60)) / 60).toString());
+      setCookHrs(Math.floor(snap.data().cooktime / 60).toString());
       setCookMin((snap.data().cooktime % 60).toString());
       setPrepMin((snap.data().preptime % 60).toString());
-      setPrepHrs(((snap.data().preptime - (snap.data().preptime % 60)) / 60).toString());
+      setPrepHrs(Math.floor(snap.data().preptime / 60).toString());
       
       let tempIns = [];
       for(let i = 0; i < snap.data().instructions.length; i++){
@@ -62,9 +66,6 @@ export default function Edit({ navigation }) {
         tempIng.push({key: i, value: snap.data().ingredients[i]});
       }
       setIngredients(tempIng);
-
-
-      
     })
   }, []);
 
@@ -80,6 +81,7 @@ export default function Edit({ navigation }) {
     if (!result.canceled) {
       const source = { uri: result.assets[0].uri };
       setImage(source);
+      if (!changed) setChanged(true);
     }
   };
 
@@ -91,17 +93,23 @@ export default function Edit({ navigation }) {
     });
 
     if (!result.canceled) {
-      const source = { uri: result.assets[0].uri };
+      const source = result.assets[0].uri;
       setImage(source);
+      if (!changed) setChanged(true);
     }
   };
 
   const uploadPhoto = async () => {
     if (image == null) return null;
+  
+    if (image == recipeData.image) return image;
 
-    const response = await fetch(image.uri);
+    let imageRef = firebase.storage().refFromURL(recipeData.image);
+    imageRef.delete();
+
+    const response = await fetch(image);
     const blob = await response.blob();
-    const filename = image.uri.substring(image.uri.lastIndexOf("/") + 1);
+    const filename = image.substring(image.lastIndexOf("/") + 1);
     var ref = firebase.storage().ref().child(filename).put(blob);
     try {
       await ref;
@@ -173,40 +181,11 @@ export default function Edit({ navigation }) {
   };
 
   const publish = async () => {
-    if (!name) {
-      Alert.alert("Missing Name", "Please enter a name for your recipe");
-      setPublishing(false);
-    } else if (!difficulty) {
-      Alert.alert(
-        "Missing Difficulty",
-        "Please select a difficulty for your recipe"
-      );
-      setPublishing(false);
-    } else if (cookHrs == 0 && cookMin == 0) {
-      Alert.alert(
-        "Invalid Cook Time",
-        "Please enter a valid cook time for your recipe"
-      );
-      setPublishing(false);
-    } else if (!ingredients[0].value) {
-      Alert.alert(
-        "Missing Ingredient",
-        "Please enter at least one ingredient for your recipe"
-      );
-      setPublishing(false);
-    } else if (!instructions[0].value) {
-      Alert.alert(
-        "Missing Step",
-        "Please enter at least one step for your recipe"
-      );
-      setPublishing(false);
-    } else {
+    if (name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value) {
       const preptime = Number(prepMin) + Number(prepHrs) * 60;
       const cooktime = Number(cookMin) + Number(cookHrs) * 60;
       const ingredientsArray = [];
       const instructionsArray = [];
-      const rated = {};
-      const comments = [];
       
       for (let i = 0; i < ingredients.length; i++) {
         if (ingredients[i].value) {
@@ -218,7 +197,6 @@ export default function Edit({ navigation }) {
           instructionsArray.push(instructions[i].value);
         }
       }
-
       const ref = firebase
         .firestore()
         .collection("users")
@@ -233,28 +211,25 @@ export default function Edit({ navigation }) {
             firebase
               .firestore()
               .collection("recipes")
+              .doc(route.params.doc)
               .update({
                 name,
                 description,
-                weight: 0,
-                rating: 0,
-                numratings: 0,
                 difficulty,
                 cooktime,
                 preptime,
                 ingredients: ingredientsArray,
                 instructions: instructionsArray,
                 image: imgUrl,
-                rated,
-                comments,
               })
-              .then((doc) => {
-                const recipes = [...snapshot.data().recipes];
-                recipes.push(doc.id);
-                ref.update({ recipes });
-                reset();
+              .then(() => {
                 navigation.goBack(null);
                 setPublishing(false);
+                showMessage({
+                  message: "Recipe successfully edited!",
+                  type: "success",
+                });
+                setChanged(false);
               })
               .catch((error) => {
                 alert(error.message);
@@ -269,23 +244,26 @@ export default function Edit({ navigation }) {
   };
 
   const checkFieldChanged = () => {
-    if (
-      image ||
-      name ||
-      description ||
-      cookHrs != 0 ||
-      cookMin != 0 ||
-      prepHrs != 0 ||
-      prepMin != 0 ||
-      instructions[0].value ||
-      ingredients[0].value ||
-      instructions.length > 1 ||
-      ingredients.length > 1
-    ) {
-      return true;
-    } else {
-      return false;
+    if (recipeData.image != image ||
+      recipeData.name != name ||
+      recipeData.description != description ||
+      Math.floor(recipeData.cooktime/60).toString() != cookHrs ||
+      Math.floor(recipeData.cooktime % 60).toString() != cookMin ||
+      Math.floor(recipeData.preptime/60).toString() != prepHrs ||
+      Math.floor(recipeData.preptime % 60).toString() != prepMin || instructions.length != recipeData.instructions.length || ingredients.length != recipeData.ingredients.length) {
+        return true;
     }
+    for (let i = 0; i < instructions.length; i++) {
+      if (instructions[i].value != recipeData.instructions[i]) {
+        return true;
+      }
+    }
+    for (let i = 0; i < ingredients.length; i++) {
+      if (ingredients[i].value != recipeData.ingredients[i]) {
+        return true;
+      }
+    }
+    return false;
   };
 
   return (
@@ -330,17 +308,17 @@ export default function Edit({ navigation }) {
         />
         <Text style={global.topbarTitle}>Edit Recipe</Text>
         <TouchableOpacity
-            disabled={publishing || !(name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value)}
+            disabled={publishing || !(name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value && changed)}
             onPress={() => {
               setPublishing(true);
               publish();
             }}
             style={styles.button}
           >
-            <Text style={[styles.buttonText, {color: (name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value) ? "white" : "gray"}]}>Save</Text>
+            <Text style={[styles.buttonText, {color: (name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value && changed) ? "white" : "gray"}]}>Save</Text>
           </TouchableOpacity>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.items}>
           {!image && (
             <View style={styles.photoSelect}>
@@ -368,7 +346,7 @@ export default function Edit({ navigation }) {
                 source={{ uri: (image.uri ? image.uri : image) }}
                 style={{ width: 333, height: 250, marginTop: 20 }}
               />
-              <TouchableOpacity onPress={() => setImage(null)}>
+              <TouchableOpacity onPress={() => {setImage(null); if (!changed) setChanged(true);}}>
                 <Text
                   style={{
                     ...styles.addText,
@@ -391,7 +369,7 @@ export default function Edit({ navigation }) {
               maxLength={50}
               value={name}
               editable={!publishing}
-              onChangeText={(title) => setName(title)}
+              onChangeText={(title) => {setName(title); if (!changed) setChanged(true);}}
             ></TextInput>
           </View>
           <View style={styles.section}>
@@ -406,7 +384,7 @@ export default function Edit({ navigation }) {
               textAlignVertical="top"
               value={description}
               editable={!publishing}
-              onChangeText={(desc) => setDescription(desc)}
+              onChangeText={(desc) => {setDescription(desc); if (!changed) setChanged(true);}}
             ></TextInput>
             <Text
               style={{
@@ -423,7 +401,7 @@ export default function Edit({ navigation }) {
             <Text style={styles.title}>DIFFICULTY</Text>
             <SelectList
               data={data}
-              setSelected={(diff) => setDifficulty(diff)}
+              setSelected={(diff) => {setDifficulty(diff); if (!changed && recipeData && diff != recipeData.difficulty) setChanged(true);}}
               defaultOption={{key: difficulty, value: difficulty}}
               search={false}
               disabled={publishing}
@@ -468,7 +446,7 @@ export default function Edit({ navigation }) {
                   numberOfLines={1}
                   value={prepHrs}
                   editable={!publishing}
-                  onChangeText={(text) => setPrepHrs(convertNumber(text))}
+                  onChangeText={(text) => {setPrepHrs(convertNumber(text)); if (!changed) setChanged(true);}}
                 />
                 <View style={{ justifyContent: "center" }}>
                   <Text style={styles.timeText}>hrs</Text>
@@ -483,7 +461,7 @@ export default function Edit({ navigation }) {
                   numberOfLines={1}
                   value={prepMin}
                   editable={!publishing}
-                  onChangeText={(text) => setPrepMin(convertNumber(text))}
+                  onChangeText={(text) => {setPrepMin(convertNumber(text)); if (!changed) setChanged(true);}}
                 />
                 <View style={{ justifyContent: "center" }}>
                   <Text style={styles.timeText}>min</Text>
@@ -510,7 +488,7 @@ export default function Edit({ navigation }) {
                     numberOfLines={1}
                     value={cookHrs}
                     editable={!publishing}
-                    onChangeText={(text) => setCookHrs(convertNumber(text))}
+                    onChangeText={(text) => {setCookHrs(convertNumber(text)); if (!changed) setChanged(true);}}
                   />
                   <View style={{ justifyContent: "center" }}>
                     <Text style={styles.timeText}>hrs</Text>
@@ -525,7 +503,7 @@ export default function Edit({ navigation }) {
                     numberOfLines={1}
                     value={cookMin}
                     editable={!publishing}
-                    onChangeText={(text) => setCookMin(convertNumber(text))}
+                    onChangeText={(text) => {setCookMin(convertNumber(text)); if (!changed) setChanged(true);}}
                   />
                   <View style={{ justifyContent: "center" }}>
                     <Text style={styles.timeText}>min</Text>
@@ -545,7 +523,7 @@ export default function Edit({ navigation }) {
                 value={ingredients[0].value}
                 style={styles.input}
                 editable={!publishing}
-                onChangeText={(text) => inputHandler(text, 0, "ingredients")}
+                onChangeText={(text) => {inputHandler(text, 0, "ingredients"); if (!changed) setChanged(true);}}
               />
             </View>
             {ingredients.slice(1).map((input, key) => (
@@ -561,7 +539,7 @@ export default function Edit({ navigation }) {
                   style={styles.input}
                   editable={!publishing}
                   onChangeText={(text) =>
-                    inputHandler(text, key + 1, "ingredients")
+                    {inputHandler(text, key + 1, "ingredients"); if (!changed) setChanged(true);}
                   }
                 />
                 <TouchableOpacity
@@ -591,7 +569,7 @@ export default function Edit({ navigation }) {
                 style={[styles.input, { paddingLeft: 30 }]}
                 value={instructions[0].value}
                 editable={!publishing}
-                onChangeText={(text) => inputHandler(text, 0, "instructions")}
+                onChangeText={(text) => {inputHandler(text, 0, "instructions"); if (!changed) setChanged(true);}}
               />
               <Text
                 style={{
@@ -617,7 +595,7 @@ export default function Edit({ navigation }) {
                   editable={!publishing}
                   style={[styles.input, { paddingLeft: 30 }]}
                   onChangeText={(text) =>
-                    inputHandler(text, key + 1, "instructions")
+                    {inputHandler(text, key + 1, "instructions"); if (!changed) setChanged(true);}
                   }
                 />
                 <Text
@@ -648,7 +626,7 @@ export default function Edit({ navigation }) {
           </View>
           
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 }
@@ -684,6 +662,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 30,
+    marginBottom: 30,
   },
   title: {
     color: "#518BFF",

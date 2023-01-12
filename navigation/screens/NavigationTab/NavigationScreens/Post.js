@@ -16,6 +16,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
 import { SelectList } from "react-native-dropdown-select-list";
 import Dialog from "react-native-dialog";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default function Post({ navigation }) {
   const [initializing, setInitializing] = useState(true);
@@ -326,7 +327,7 @@ export default function Post({ navigation }) {
               <Text style={[styles.buttonText, {color: (name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value) ? "white" : "gray"}]}>Post</Text>
             </TouchableOpacity>
         </View>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.items}>
             {!image && (
               <View style={styles.photoSelect}>
@@ -633,7 +634,7 @@ export default function Post({ navigation }) {
               </TouchableOpacity>
             </View>
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </View>
     );
   }

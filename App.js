@@ -9,7 +9,7 @@ export default function App() {
         <NavigationContainer>
           <MainStack />
         </NavigationContainer>
-        <FlashMessage position="top" floating={true} icon={"success"} titleStyle={{fontSize: 15}}/>
+        <FlashMessage position={{top: '7.5%'}} floating={true} icon={"success"} titleStyle={{fontSize: 15}} animationDuration={400}/>
     </MenuProvider>
   );
 }

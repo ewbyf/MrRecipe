@@ -6,6 +6,7 @@ import BackArrow from '../../../../../components/BackArrow';
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import Dialog from 'react-native-dialog';
+import { showMessage } from "react-native-flash-message";
 
 export default function Settings({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -95,10 +96,10 @@ export default function Settings({ navigation }) {
           {name, username, bio, username_lowercase: username.toLowerCase(), pfp: imgUrl}
         )
         .then(() => {
-          Alert.alert(
-            "Settings Saved",
-            "Settings have been successfully saved."
-          );
+          showMessage({
+            message: "Settings successfully saved!",
+            type: "success",
+          });
           navigation.navigate('DashboardScreen');
         })
         .catch((error) => {
@@ -567,7 +568,10 @@ export default function Settings({ navigation }) {
           </View>
 
           <View style={styles.footer}>
-              <TouchableOpacity disabled={inProgress} onPress={() => firebase.auth().signOut()}>
+              <TouchableOpacity disabled={inProgress} onPress={() => {firebase.auth().signOut(); showMessage({
+            message: "Successfully signed out!",
+            type: "success",
+          });}}>
                 <Text style={styles.signOutText}>Sign Out</Text>
               </TouchableOpacity>
               <TouchableOpacity disabled={inProgress} onPress={async() => {if (await verify()) setDeleteVisible(true)}}>

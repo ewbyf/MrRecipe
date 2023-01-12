@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useState, useEffect } from "react";
 import { firebase } from '../../../../../config';
 import Dialog from 'react-native-dialog';
+import { showMessage } from "react-native-flash-message";
 
 export default function Login({ navigation }){
   const [email, setEmail] = useState('');
@@ -65,7 +66,10 @@ export default function Login({ navigation }){
   const resetPassword = async() => {
     try {
         await firebase.auth().sendPasswordResetEmail(resetEmail);
-        alert("Your password reset email has been sent!");
+        showMessage({
+            message: "Password reset email sent!",
+            type: "success",
+          });
         setResetEmail('');
         setForgotVisible(false);
     }

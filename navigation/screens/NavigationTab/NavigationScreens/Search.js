@@ -85,8 +85,19 @@ export default function Search({ navigation }) {
     navigation.addListener("focus", () => {setLoading(!loading)});
   }, [navigation, loading]);
 
-  if (initializing)
-    return null;
+  if (initializing) {
+    return (
+      <View style={global.appContainer}>
+        <View style={global.searchTopbar}>
+            <Text style={global.topbarTitle}>Search</Text>
+            <View>
+              <TextInput placeholder='Search for Recipes and Users' style={global.searchbar}></TextInput>
+              <Icon name="search-outline" style={{position: 'absolute', bottom: 10, left: 10}} size={16} color="lightgray"/>
+            </View>
+        </View>
+    </View>
+    );
+  }
 
   return (
     <View style={global.appContainer}>
@@ -104,17 +115,6 @@ export default function Search({ navigation }) {
           style={{ zIndex: 3}}
         >
           <View style={styles.postsContainer}>
-            {favorites.length == 0 && (
-              <Text
-                style={{
-                  color: "lightgrey",
-                  fontSize: 16,
-                  textAlign: "center",
-                }}
-              >
-                You have no favorites
-              </Text>
-            )}
             {user && favorites.length > 0 && (
               <FlashList
                 data={favorites}

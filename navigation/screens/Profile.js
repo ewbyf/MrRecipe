@@ -226,6 +226,22 @@ export default function Profile({ navigation }) {
     )
   }
 
+  if (!userData) {
+    return (
+      <View style={global.appContainer}>
+        <View style={global.topbar}>     
+          <Text style={global.topbarTitle}>Profile</Text>
+        </View>
+
+        <View style={styles.dashboard}>
+          <View style={styles.postTitleContainer}>
+            <Text style={styles.postsTitle}>POSTS</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={global.appContainer}>
       {/* Header pop up */}
@@ -286,7 +302,7 @@ export default function Profile({ navigation }) {
               ],
             }}
           >
-            <Text style={[styles.name, { fontSize: 22 }]}>{userData.name}</Text>
+            <Text style={[styles.name, { fontSize: 22 }]} numberOfLines={2}>{userData.name}</Text>
           </Animated.View>
           <Animated.View
             style={{
@@ -305,7 +321,7 @@ export default function Profile({ navigation }) {
               ],
             }}
           >
-            <Text style={[styles.username, { fontSize: 13 }]}>
+            <Text style={[styles.username, { fontSize: 13 }]} numberOfLines={1}>
               @{userData.username}
             </Text>
           </Animated.View>

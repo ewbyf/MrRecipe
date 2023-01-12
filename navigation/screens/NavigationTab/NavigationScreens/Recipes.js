@@ -140,13 +140,8 @@ export default function Recipes({ navigation }) {
   const Featured = ({ item }) => {
     const favorite = async (doc) => {
       if (user) {
-        let fav = [];
-        let temp = [];
-        let color = "gray";
-        let index = -1;
-
-        temp = dataList;
-        index = dataList.findIndex((item) => item.key == doc);
+        let temp = dataList;
+        let index = dataList.findIndex((item) => item.key == doc);
 
         await firebase
           .firestore()
@@ -154,7 +149,7 @@ export default function Recipes({ navigation }) {
           .doc(firebase.auth().currentUser.uid)
           .get()
           .then((snap) => {
-            fav = snap.data().favorites;
+            let fav = snap.data().favorites;
             if (fav.indexOf(doc) != -1) {
               fav.splice(snap.data().favorites.indexOf(doc), 1);
               firebase
@@ -163,6 +158,7 @@ export default function Recipes({ navigation }) {
                 .doc(firebase.auth().currentUser.uid)
                 .update({ favorites: fav });
               temp[index].favorite = "gray";
+              setLiked("gray");
             } else {
               fav.push(doc);
               firebase
@@ -171,7 +167,7 @@ export default function Recipes({ navigation }) {
                 .doc(firebase.auth().currentUser.uid)
                 .update({ favorites: fav });
               temp[index].favorite = "#FF4343";
-              color = "#FF4343";
+              setLiked("#FF4343");
             }
           })
           .catch((error) => {
@@ -179,11 +175,10 @@ export default function Recipes({ navigation }) {
           });
 
         setDataList(temp);
-        setLiked(color);
       } else {
         Alert.alert(
           "Not Signed In",
-          "You msut be signed in to favorite a recipe.",
+          "You must be signed in to favorite a recipe.",
         );
       }
     };
@@ -229,7 +224,7 @@ export default function Recipes({ navigation }) {
       } else {
         Alert.alert(
           "Not Signed In",
-          "You msut be signed in to favorite a recipe.",
+          "You must be signed in to favorite a recipe.",
         );
       }
     }, []);
@@ -375,7 +370,7 @@ export default function Recipes({ navigation }) {
       } else {
         Alert.alert(
           "Not Signed In",
-          "You msut be signed in to favorite a recipe.",
+          "You must be signed in to favorite a recipe.",
         );
       }
     };
@@ -432,7 +427,7 @@ export default function Recipes({ navigation }) {
       } else {
         Alert.alert(
           "Not Signed In",
-          "You msut be signed in to favorite a recipe.",
+          "You must be signed in to favorite a recipe.",
         );
       }
     }, []);
@@ -482,9 +477,9 @@ export default function Recipes({ navigation }) {
               />
               <Image
                 source={{
-                  uri: item.value.image
+                  uri: (item.value.image
                     ? item.value.image
-                    : "https://imgur.com/hNwMcZQ.png",
+                    : "https://imgur.com/hNwMcZQ.png"),
                 }}
                 style={styles.smallImage}
               />
@@ -544,6 +539,7 @@ export default function Recipes({ navigation }) {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        showsVerticalScrollIndicator={false}
       >
         <View
           style={{

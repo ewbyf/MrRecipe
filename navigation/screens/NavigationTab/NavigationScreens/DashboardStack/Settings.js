@@ -86,7 +86,7 @@ export default function Settings({ navigation }) {
         if (imgUrl == null && userData.pfp) {
           imgUrl = userData.pfp;
         }
-        else {
+        else if (userData.pfp) {
           let imageRef = firebase.storage().refFromURL(userData.pfp);
           imageRef.delete();
         }

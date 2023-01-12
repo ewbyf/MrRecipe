@@ -20,9 +20,9 @@ import Animated, {useAnimatedStyle, useSharedValue, withDelay, withSpring} from 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-export default function Dashboard({ navigation, props }) {
+export default function Dashboard({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
-  const [userData, setUserData] = useState("");
+  const [userData, setUserData] = useState();
   const [loading, setLoading] = useState(false);
   const [dataList, setDataList] = useState([]);
 
@@ -32,7 +32,7 @@ export default function Dashboard({ navigation, props }) {
     return new Promise((resolve) => setTimeout(resolve, timeout));
   };
 
-  const fetchData = async () => {
+  const fetchData = async() => {
     var tempList = [];
     let fav = [];
     let ref = "";
@@ -216,6 +216,8 @@ export default function Dashboard({ navigation, props }) {
       </TouchableOpacity>
     )
   }
+
+  if (!userData) return null;
 
   return (
     <GestureHandlerRootView style={global.appContainer}>

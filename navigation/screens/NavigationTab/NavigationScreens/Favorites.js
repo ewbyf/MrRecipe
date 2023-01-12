@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, TextInput, Image, Dimensions, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
+import { StyleSheet, View, Text, TextInput, Image, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
 import global from "../../../../Styles";
 import { useState, useEffect, useRef } from "react";
 import { firebase } from '../../../../config';
@@ -101,7 +101,19 @@ export default function Favorites({ navigation }) {
     setFavorites([...temp]);
   }
   
-  if (initializing) return null;
+  if (initializing) {
+    return (
+      <View style={global.appContainer}>
+        <View style={global.searchTopbar}>
+            <Text style={global.topbarTitle}>Favorites</Text>
+            <View>
+              <TextInput placeholder='Search for Recipes and Users' style={global.searchbar}></TextInput>
+              <Icon name="search-outline" style={{position: 'absolute', bottom: 10, left: 10}} size={16} color="lightgray"/>
+          </View>
+        </View>
+      </View>
+    );
+  }
 
   if (user) {
     return (
@@ -120,17 +132,6 @@ export default function Favorites({ navigation }) {
           style={{ zIndex: 3}}
         >
           <View style={styles.postsContainer}>
-            {favorites.length == 0 && (
-              <Text
-                style={{
-                  color: "lightgrey",
-                  fontSize: 16,
-                  textAlign: "center",
-                }}
-              >
-                You have no favorites
-              </Text>
-            )}
             {user && favorites.length > 0 && (
               <FlashList
                 data={favorites}
@@ -183,10 +184,6 @@ export default function Favorites({ navigation }) {
                 <TextInput placeholder='Search for Favorites' style={global.searchbar}></TextInput>
                 <Icon name="search-outline" style={{position: 'absolute', bottom: 10, left: 10}} size={16} color="lightgray"/>
               </View>
-          </View>
-          <View style={{height: Dimensions.get('window').height - 284, alignItems: 'center', justifyContent: 'center'}}>
-            <Text style={{fontSize: 18, fontWeight: 'bold', color: 'white'}}>You are currently logged out.</Text>
-            <Text style={{fontSize: 18, marginTop: 15, color: 'white'}}><Text onPress={() => navigation.navigate('Login')} style={{fontSize: 18, color: '#518BFF'}}>Sign in</Text> to view favorites</Text>
           </View>
       </View>
   );

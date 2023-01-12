@@ -26,18 +26,19 @@ import {
 } from "react-native-popup-menu";
 import Dialog from 'react-native-dialog';
 import { showMessage } from "react-native-flash-message";
+import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
 
 export default function Dish({ navigation }) {
   const route = useRoute();
-  const [posting, setPosting] = useState(false);
   const [recipeData, setRecipeData] = useState("");
   const [initializing, setInitializing] = useState(true);
   const [rating, setRating] = useState(0);
   const [authorData, setAuthorData] = useState();
   const [userData, setUserData] = useState();
   const [deleteVisible, setDeleteVisible] = useState(false);
-  const [comment, setComment] = useState('');
   const [pressed, setPressed] = useState(false);
+
 
   function onAuthStateChanged(userParam) {
     if (userParam) fetchUser();
@@ -73,6 +74,7 @@ export default function Dish({ navigation }) {
   }
 
   useEffect(() => {
+    dayjs.extend(relativeTime);
     firebase
       .firestore()
       .collection("recipes")
@@ -96,54 +98,7 @@ export default function Dish({ navigation }) {
       });
   }, []);
 
-  const rate = (rating) => {
-    if (userData) {
-      let newRating = 0;
-      let numRatings = recipeData.numratings;
-      let rated = recipeData.rated;
 
-      if (Object.keys(rated).includes(userData.uid)) {
-        newRating =
-          (recipeData.rating * recipeData.numratings -
-            recipeData.rated[userData.uid] +
-            rating) /
-          recipeData.numratings;
-        rated[userData.uid] = rating;
-      } else {
-        newRating =
-          (recipeData.rating * recipeData.numratings + rating) /
-            (recipeData.numratings + 1);
-        numRatings++;
-        rated[userData.uid] = rating;
-
-        firebase.firestore().collection("users").doc(userData.uid).get()
-        .then((snap) => {
-          let temp = snap.data().ratings;
-          temp.push(route.params.doc);
-          firebase.firestore().collection("users").doc(userData.uid).update({ratings: temp});
-        })
-      }
-
-      let weight = newRating + (5 * (1 - Math.E ** (-numRatings / 50)));
-
-      firebase
-        .firestore()
-        .collection("recipes")
-        .doc(route.params.doc)
-        .update({ rating: newRating, numratings: numRatings, rated, weight });
-
-      fetchRecipe();
-    } else {
-      Alert.alert("Not Logged In", "You must be logged in to leave a rating.");
-    }
-  };
-
-  const optionsStyles = {
-    optionsContainer: {
-      width: 150,
-      borderRadius: 15,
-    },
-  };
 
   const deleteRecipe = async() => {
     let recipes = authorData.recipes;
@@ -164,76 +119,416 @@ export default function Dish({ navigation }) {
         recipes
       });
       setDeleteVisible(false);
-      navigation.goBack(null);
+      if (navigation.canGoBack())
+        navigation.goBack(null);
     })
     .catch((error) => alert(error.message));
   }
 
-  const submitComment = async() => {
-    if (userData) {
-      if (comment.replace(/\s/g, "")) {
-        let timestamp = firebase.firestore.Timestamp.fromDate(new Date());
-        let tempComments = recipeData.comments;
+  const Heart = () => {
+    const [liked, setLiked] = useState('gray');
 
-        await firebase
+    useEffect(() => {
+      if (userData) {
+        firebase
         .firestore()
         .collection("users")
-        .doc(firebase.auth().currentUser.uid)
+        .doc(userData.uid)
         .get()
         .then((snap) => {
-          let key = timestamp + snap.data().username;
-          let temp = snap.data().comments;
-          temp.push({key, recipe: route.params.doc});
+          if (snap.data().favorites.indexOf(route.params.doc) != -1) {
+            setLiked("#FF4343");
+          }
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
+      }
+    }, [])
 
-          firebase
+    const favorite = async() => {
+      if (userData) {
+        await firebase
           .firestore()
           .collection("users")
-          .doc(firebase.auth().currentUser.uid)
-          .update({
-            comments: temp
+          .doc(userData.uid)
+          .get()
+          .then((snap) => {
+            let fav = snap.data().favorites;
+            if (fav.indexOf(route.params.doc) != -1) {
+              fav.splice(snap.data().favorites.indexOf(route.params.doc), 1);
+              firebase
+                .firestore()
+                .collection("users")
+                .doc(userData.uid)
+                .update({ favorites: fav });
+              setLiked("gray");
+            } else {
+              fav.push(route.params.doc);
+              firebase
+                .firestore()
+                .collection("users")
+                .doc(userData.uid)
+                .update({ favorites: fav });
+              setLiked("#FF4343");
+            }
+          })
+          .catch((error) => {
+            alert(error.message);
           });
+      } else {
+        Alert.alert(
+          "Not Signed In",
+          "You must be signed in to favorite a recipe.",
+        );
+      }
+    };
 
-          tempComments.push({key, uid: snap.data().uid, comment, timestamp})
-        });
+    return (
+      <TouchableOpacity onPress={() => favorite()}>
+        <Icon name="heart" color={liked} size={30} />
+      </TouchableOpacity>
+    );
+  }
 
+  const Body = () => {
+    const [recipeRating, setRecipeRating] = useState();
+    const [recipeNumRatings, setRecipeNumRatings] = useState();
+    const [currentRated, setCurrentRated] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-        await firebase
+    useEffect(() => {
+      firebase
         .firestore()
         .collection("recipes")
         .doc(route.params.doc)
-        .update({ 
-          comments: tempComments
-         })
-         .then(() => {
-          showMessage({
-            message: "Comment successfully posted!",
-            type: "success",
-          });
-          fetchRecipe();
-          setComment('');
-         });
+        .get()
+        .then((snapshot) => {
+          if (snapshot.exists) {
+            setRecipeRating(snapshot.data().rating);
+            setRecipeNumRatings(snapshot.data().numratings);
+            setLoading(false);
+          }
+        });
+    }, []);
+
+    if (loading) return null;
+
+    const rate = async(rating) => {
+      if (userData) {
+        let newRating = 0;
+        let numRatings = 0;
+        let rated = {};
+  
+        await firebase.firestore().collection('recipes').doc(route.params.doc).get()
+        .then((snap) => {
+          numRatings = snap.data().numratings;
+          rated = snap.data().rated;
+        })
+  
+        if (Object.keys(rated).includes(userData.uid) || currentRated) {
+          newRating =
+            (recipeData.rating * recipeData.numratings -
+              recipeData.rated[userData.uid] +
+              rating) /
+            recipeData.numratings;
+          setRecipeRating((recipeRating * recipeNumRatings - rated[userData.uid] + rating) / recipeNumRatings)
+        } else {
+          newRating = (recipeData.rating * recipeData.numratings + rating) / (recipeData.numratings + 1);
+          numRatings++;
+          setRecipeRating((recipeRating * recipeNumRatings + rating) / (recipeNumRatings + 1));
+          setRecipeNumRatings(recipeNumRatings + 1);
+          setCurrentRated(true);
+  
+          firebase.firestore().collection("users").doc(userData.uid).get()
+          .then((snap) => {
+            let temp = snap.data().ratings;
+            temp.push(route.params.doc);
+            firebase.firestore().collection("users").doc(userData.uid).update({ratings: temp});
+          })
+        }
+
+        rated[userData.uid] = rating;
+
+        let weight = newRating + (5 * (1 - Math.E ** (-numRatings / 50)));
+  
+        firebase
+        .firestore()
+        .collection("recipes")
+        .doc(route.params.doc)
+        .update({ rating: newRating, numratings: numRatings, rated, weight });
+      
+      } else {
+        Alert.alert("Not Logged In", "You must be logged in to leave a rating.");
       }
-    }
-    else {
-      Alert.alert("Not Signed In", "You must be signed in to post a comment.");
-    }
-    setPosting(false);
+    };
+  
+    return (
+      <View>
+      <View style={styles.details}>
+          {recipeData.description && (
+            <Text style={styles.desc}>{recipeData.description}</Text>
+          )}
+          {!recipeData.description && (
+            <Text style={[styles.desc, {fontStyle: "italic"}]}>No description provided</Text>
+          )}
+          <View style={styles.timeContainer}>
+            <View style={{justifyContent: 'space-between'}}>
+              <Text style={styles.timeText}>
+                <Text style={{ color: "#518BFF", fontWeight: "bold" }}>
+                  Prep Time:
+                </Text>{" "}
+                {Math.floor(recipeData.preptime / 60)} hrs{" "}
+                {recipeData.preptime % 60} min
+              </Text>
+              <Text style={styles.timeText}>
+                <Text style={{ color: "#518BFF", fontWeight: "bold" }}>
+                  Cook Time:
+                </Text>{" "}
+                {Math.floor(recipeData.cooktime / 60)} hrs{" "}
+                {recipeData.cooktime % 60} min
+              </Text>
+            </View>
+            <View>
+              <Text style={styles.difficulty}>
+                <Text style={{ color: "#518BFF" }}>Difficulty:</Text>{" "}
+                {recipeData.difficulty}
+              </Text>
+              <View style={styles.ratingContainer}>
+                <Rating
+                  ratingCount={5}
+                  imageSize={20}
+                  readonly={true}
+                  type={"custom"}
+                  ratingBackgroundColor={"gray"}
+                  tintColor={"#222222"}
+                  startingValue={recipeRating}
+                />
+                <Text style={[global.rating, { marginRight: 0 }]}>
+                  {parseFloat(recipeRating.toFixed(2))} ({recipeNumRatings})
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.profileRow}>
+            <View style={{ flexDirection: "row", flex: 4}}>
+              <TouchableOpacity
+                style={{ flexDirection: "row", alignItems: "center" }}
+                disabled={pressed}
+                onPress={() => {
+                  if (authorData.uid == route.params.id) {
+                    if (navigation.canGoBack()) {
+                      setPressed(true);
+                      navigation.goBack(null);
+                    }
+                  }
+                  else {
+                    navigation.push("ProfileScreen", {doc: route.params.doc, id: authorData.uid});
+                  }
+                }}
+              >
+                <Image
+                  source={{ uri: (authorData.pfp ? authorData.pfp : 'https://imgur.com/hNwMcZQ.png') }}
+                  style={styles.authorPfp}
+                />
+                <View style={{ marginLeft: 10 }}>
+                  <Text style={styles.username} numberOfLines={1}>{authorData.username}</Text>
+                  <Text style={{ color: "gray" }}>
+                    {authorData.recipes.length} Posts
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+            <View style={{flex: 1, alignItems: 'center'}}>
+              <Heart/>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.recipeContainer}>
+          <Text style={styles.title}>Ingredients</Text>
+          {recipeData.ingredients.map((data, key) => (
+            <View key={key} style={styles.listContainer}>
+              <Text style={[styles.listText, { fontWeight: "bold" }]}>• </Text>
+              <Text style={[styles.listText, { paddingRight: 15 }]}>
+                {data}
+              </Text>
+            </View>
+          ))}
+
+          <Text style={[styles.title, { marginTop: 8 }]}>Instructions</Text>
+          {recipeData.instructions.map((data, key) => (
+            <View key={key} style={styles.listContainer}>
+              <Text style={styles.listText}>{key + 1}. </Text>
+              <Text style={[styles.listText, { paddingRight: 15 }]}>
+                {data}
+              </Text>
+            </View>
+          ))}
+        </View>
+          
+        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+          <View>
+            <Text style={styles.title}>Leave a Rating</Text>
+            <View>
+              <AirbnbRating
+                showRating={false}
+                size={25}
+                unSelectedColor={"gray"}
+                defaultRating={rating}
+                onFinishRating={(val) => rate(val)}
+                ratingContainerStyle={{
+                  alignSelf: "flex-start",
+                  marginVertical: 5,
+                }}
+              />
+            </View>
+          </View>
+        </View>
+      </View>
+    );
   }
 
   const Comments = () => {
-    if (recipeData.comments.length == 0) {
-      return null;
+    const [posting, setPosting] = useState(false);
+    const [comment, setComment] = useState('');
+    const [commentsData, setCommentsData] = useState();
+    const [loading, setLoading] = useState(true);
+    const [numComments, setNumComments] = useState();
+
+    useEffect(() => {
+      firebase
+        .firestore()
+        .collection("recipes")
+        .doc(route.params.doc)
+        .get()
+        .then((snapshot) => {
+          if (snapshot.exists) {
+            setCommentsData(snapshot.data().comments);
+            setNumComments(snapshot.data().comments.length);
+            setLoading(false);
+          }
+        });
+    }, []);
+
+    const submitComment = async() => {
+      if (userData) {
+        if (comment.replace(/\s/g, "")) {
+          let timestamp = firebase.firestore.Timestamp.fromDate(new Date());
+          let tempComments = [];
+  
+          firebase
+          .firestore()
+          .collection("recipes")
+          .doc(route.params.doc)
+          .get()
+          .then((snap) => {
+            tempComments = snap.data().comments;
+          })
+  
+          await firebase
+          .firestore()
+          .collection("users")
+          .doc(userData.uid)
+          .get()
+          .then((snap) => {
+            let key = timestamp + snap.data().username;
+            let temp = snap.data().comments;
+            temp.push({key, recipe: route.params.doc});
+  
+            firebase
+            .firestore()
+            .collection("users")
+            .doc(userData.uid)
+            .update({
+              comments: temp
+            });
+  
+            tempComments.push({key, uid: snap.data().uid, comment, timestamp});
+            setCommentsData([...commentsData, {key, uid: snap.data().uid, comment, timestamp}])
+          });
+  
+  
+          await firebase
+          .firestore()
+          .collection("recipes")
+          .doc(route.params.doc)
+          .update({ 
+            comments: tempComments
+           })
+           .then(() => {
+            showMessage({
+              message: "Comment successfully posted!",
+              type: "success",
+            });
+            setNumComments(numComments + 1);
+            setComment('');
+           });
+        }
+      }
+      else {
+        Alert.alert("Not Signed In", "You must be signed in to post a comment.");
+      }
+      setPosting(false);
     }
 
+    const CommentList = () => {
+      if (commentsData.length == 0) {
+        return null;
+      }
+  
+      return (
+        <View style={{height: '100%', marginBottom: 40}}>
+          <FlashList
+            data={commentsData.reverse()}
+            renderItem={({ item }) => (
+              <CommentRender item={item}/>
+            )}
+            estimatedItemSize={10}
+          /> 
+        </View>
+      );
+    }
+
+    if (loading) return null;
+
     return (
-      <View style={{height: '100%', marginBottom: 40}}>
-        <FlashList
-          data={recipeData.comments}
-          renderItem={({ item }) => (
-            <CommentRender item={item}/>
-          )}
-          estimatedItemSize={10}
-        /> 
+      <View>
+        <Text style={styles.commentsTitle}>
+          {numComments} Comments
+        </Text>
+        <View style={styles.commentContainer}>
+          <Image
+            source={{
+              uri:
+                userData && userData.pfp
+                  ? userData.pfp
+                  : "https://imgur.com/hNwMcZQ.png",
+            }}
+            style={styles.smallPfp}
+          />
+          <TextInput
+            style={{ ...styles.input }}
+            placeholder="Add a comment..."
+            placeholderTextColor="#494949"
+            maxLength={150}
+            blurOnSubmit={true}
+            value={comment}
+            onChangeText={(comment) => setComment(comment)}
+          ></TextInput>
+          <Icon
+            name="send"
+            disabled={posting}
+            size={20}
+            color={comment.replace(/\s/g, "") ? "#518BFF" : 'gray'}
+            style={{ marginLeft: "auto" }}
+            onPress={() => {
+              setPosting(true);
+              submitComment();
+            }}
+          />
+        </View>
+        <CommentList/>
       </View>
     );
   }
@@ -252,43 +547,43 @@ export default function Dish({ navigation }) {
       });
     }, []);
 
-    if (loading) return null;
+    if (loading || !commenterData) return null;
     
     return (
       <View style={{minHeight: 40, marginTop: 15}}>
         <View style={{flexDirection: 'row'}}>
-            <TouchableOpacity 
-              disabled={pressed}
-              onPress={() => {
-                if (item.uid == route.params.id) {
-                  setPressed(true);
-                  navigation.goBack(null);
-                }
-                else {
-                  navigation.push("ProfileScreen", {doc: route.params.doc, id: item.uid});
-                }
-              }}>
-              <Image source={{uri: (commenterData.pfp ? commenterData.pfp : "https://imgur.com/hNwMcZQ.png")}} style={styles.smallPfp} />
-            </TouchableOpacity>
-            <View style={{maxWidth: '85%'}}>
-              <View style={{flexDirection: 'row'}}>
-                <TouchableOpacity 
-                  disabled={pressed}
-                  onPress={() => {
-                    if (item.uid == route.params.id) {
-                      setPressed(true);
-                      navigation.goBack(null);
-                    }
-                    else {
-                      navigation.push("ProfileScreen", {doc: route.params.doc, id: item.uid});
-                    }
-                  }}>
-                  <Text style={[styles.username, {fontSize: 15, marginBottom: 3}]}>{commenterData.username}</Text>
-                </TouchableOpacity>
-                <Text style={{color: 'gray'}}> • {item.timestamp.toDate().toDateString()}</Text>
-              </View>
-            
-            <Text style={{color: 'white', fontSize: 15}}>{item.comment}</Text>
+          <TouchableOpacity 
+            disabled={pressed}
+            onPress={() => {
+              if (item.uid == route.params.id) {
+                setPressed(true);
+                navigation.goBack(null);
+              }
+              else {
+                navigation.push("ProfileScreen", {doc: route.params.doc, id: item.uid});
+              }
+            }}>
+            <Image source={{uri: (commenterData.pfp ? commenterData.pfp : "https://imgur.com/hNwMcZQ.png")}} style={styles.smallPfp} />
+          </TouchableOpacity>
+          <View>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <TouchableOpacity 
+                disabled={pressed}
+                onPress={() => {
+                  if (item.uid == route.params.id) {
+                    setPressed(true);
+                    navigation.goBack(null);
+                  }
+                  else {
+                    navigation.push("ProfileScreen", {doc: route.params.doc, id: item.uid});
+                  }
+                }}
+              >
+                <Text style={[styles.username, {fontSize: 15}]} numberOfLines={1}>{commenterData.name}<Text style={{color: 'gray', fontSize: 12.5, fontWeight: 'normal'}}> @{commenterData.username}</Text></Text>
+              </TouchableOpacity>
+              <Text style={{color: 'gray', fontSize: 12.5, fontWeight: 'normal'}}> • {dayjs(item.timestamp.toDate()).fromNow()}</Text>
+            </View>
+            <Text style={{color: 'white', fontSize: 15, marginTop: 3}}>{item.comment}</Text>
           </View>
         </View>
       </View>
@@ -296,7 +591,12 @@ export default function Dish({ navigation }) {
   }
 
   if (initializing) {
-    return null;
+    return (
+      <View style={global.appContainer}>
+        <View style={global.topbar}>
+        </View>
+      </View>
+    );
   }
 
   return (
@@ -313,14 +613,14 @@ export default function Dish({ navigation }) {
 
       <View style={global.topbar}>
         <BackArrow navigation={navigation}/>
-        <Text style={global.topbarTitle}>{recipeData.name}</Text>
-        {userData && recipeData.username == userData.username && (
+        <Text style={[global.topbarTitle, {maxWidth: '70%'}]} numberOfLines={2}>{recipeData.name}</Text>
+        {userData && authorData.username == userData.username && (
           <Menu style={styles.dotsContainer}>
             <MenuTrigger
               text="..."
               customStyles={{ triggerText: styles.dots }}
             />
-            <MenuOptions customStyles={optionsStyles}>
+            <MenuOptions customStyles={{optionsContainer: {width: 150, borderRadius: 15}}}>
               <MenuOption
                 disabled={true}
                 children={
@@ -379,152 +679,9 @@ export default function Dish({ navigation }) {
           }}
           style={styles.image}
         />
-        <View style={styles.details}>
-          <Text style={styles.desc}>
-            <Text style={{ color: "#518BFF", fontWeight: "bold" }}>
-              Description:{" "}
-            </Text>
-            {recipeData.description ? recipeData.description : "No description provided"}
-          </Text>
-          <View style={styles.timeContainer}>
-            <Text style={styles.timeText}>
-              <Text style={{ color: "#518BFF", fontWeight: "bold" }}>
-                Cook Time:
-              </Text>{" "}
-              {Math.floor(recipeData.cooktime / 60)} hrs{" "}
-              {recipeData.cooktime % 60} min
-            </Text>
-            <Text style={styles.timeText}>
-              <Text style={{ color: "#518BFF", fontWeight: "bold" }}>
-                Prep Time:
-              </Text>{" "}
-              {Math.floor(recipeData.preptime / 60)} hrs{" "}
-              {recipeData.preptime % 60} min
-            </Text>
-          </View>
-          <View style={styles.profileRow}>
-            <View style={{ flexDirection: "row" }}>
-              <TouchableOpacity
-                style={{ flexDirection: "row", alignItems: "center" }}
-                disabled={pressed}
-                onPress={() => {
-                  if (authorData.uid == route.params.id) {
-                    if (navigation.canGoBack()) {
-                      setPressed(true);
-                      navigation.goBack(null);
-                    }
-                  }
-                  else {
-                    navigation.push("ProfileScreen", {doc: route.params.doc, id: authorData.uid});
-                  }
-                }}
-              >
-                <Image
-                  source={{ uri: (authorData.pfp ? authorData.pfp : 'https://imgur.com/hNwMcZQ.png') }}
-                  style={styles.authorPfp}
-                />
-                <View style={{ marginLeft: 10 }}>
-                  <Text style={styles.username}>{authorData.username}</Text>
-                  <Text style={{ color: "gray" }}>
-                    {authorData.recipes.length} Posts
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-            <View>
-              <Text style={styles.difficulty}>
-                <Text style={{ color: "#518BFF" }}>Difficulty:</Text>{" "}
-                {recipeData.difficulty}
-              </Text>
-              <View style={styles.ratingContainer}>
-                <Rating
-                  ratingCount={5}
-                  imageSize={20}
-                  readonly={true}
-                  type={"custom"}
-                  ratingBackgroundColor={"gray"}
-                  tintColor={"#222222"}
-                  startingValue={recipeData.rating}
-                />
-                <Text style={[global.rating, { marginRight: 0 }]}>
-                  {parseFloat(recipeData.rating.toFixed(2))} ({recipeData.numratings})
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
 
-        <View style={styles.recipeContainer}>
-          <Text style={styles.title}>Ingredients</Text>
-          {recipeData.ingredients.map((data, key) => (
-            <View key={key} style={styles.listContainer}>
-              <Text style={[styles.listText, { fontWeight: "bold" }]}>• </Text>
-              <Text style={[styles.listText, { paddingRight: 15 }]}>
-                {data}
-              </Text>
-            </View>
-          ))}
+        <Body/>
 
-          <Text style={[styles.title, { marginTop: 8 }]}>Instructions</Text>
-          {recipeData.instructions.map((data, key) => (
-            <View key={key} style={styles.listContainer}>
-              <Text style={styles.listText}>{key + 1}. </Text>
-              <Text style={[styles.listText, { paddingRight: 15 }]}>
-                {data}
-              </Text>
-            </View>
-          ))}
-        </View>
-
-        <Text style={styles.title}>Leave a Rating</Text>
-        <View>
-          <AirbnbRating
-            showRating={false}
-            size={25}
-            unSelectedColor={"gray"}
-            defaultRating={rating}
-            onFinishRating={(val) => rate(val)}
-            ratingContainerStyle={{
-              alignSelf: "flex-start",
-              marginVertical: 5,
-            }}
-          />
-        </View>
-
-        <Text style={styles.commentsTitle}>
-          {recipeData.comments.length} Comments
-        </Text>
-        <View style={styles.commentContainer}>
-          <Image
-            source={{
-              uri:
-                userData && userData.pfp
-                  ? userData.pfp
-                  : "https://imgur.com/hNwMcZQ.png",
-            }}
-            style={styles.smallPfp}
-          />
-          <TextInput
-            style={{ ...styles.input }}
-            placeholder="Add a comment..."
-            placeholderTextColor="#494949"
-            maxLength={150}
-            blurOnSubmit={true}
-            value={comment}
-            onChangeText={(comment) => setComment(comment)}
-          ></TextInput>
-          <Icon
-            name="send"
-            disabled={posting}
-            size={20}
-            color={comment.replace(/\s/g, "") ? "#518BFF" : 'gray'}
-            style={{ marginLeft: "auto" }}
-            onPress={() => {
-              setPosting(true);
-              submitComment();
-            }}
-          />
-        </View>
         <Comments/>
       </KeyboardAwareScrollView>
     </View>
@@ -567,6 +724,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginBottom: 5,
     fontWeight: "bold",
+    textAlign: 'center',
   },
   timeContainer: {
     flexDirection: "row",
@@ -592,6 +750,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
+    maxWidth: Dimensions.get('window').width / 2 + 30,
   },
   ratingContainer: {
     flexDirection: "row",

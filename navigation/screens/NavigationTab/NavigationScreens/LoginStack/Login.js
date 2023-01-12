@@ -122,9 +122,9 @@ export default function Login({ navigation }){
               style={styles.logo}
               source={{uri: 'https://imgur.com/Fg7Vv0f.png'}} 
             /> 
+            <Text style={styles.title}>Mr. Recipe</Text>
           </View>
           <View style={styles.loginContainer}>
-              <Text style={styles.title}>Mr. Recipe</Text>
               <View style={{flexDirection: 'row'}}>
                 <Icon name='mail-outline' size={20} color={'white'} style={styles.icon}/>
                 <TextInput 
@@ -156,9 +156,9 @@ export default function Login({ navigation }){
 
               <View style={{flexDirection: 'row', marginTop: 20}}>
                 <Text style={{color: 'white'}}>Don't have an account? </Text>
-                <Text onPress={() => navigation.navigate('RegisterScreen')} style={{color: '#518BFF'}}>Sign up</Text>
+                <Text onPress={() => navigation.navigate('RegisterScreen')} style={{color: '#518BFF', textDecorationLine: 'underline'}}>Sign up</Text>
               </View>
-              <Text onPress={() => setForgotVisible(true)} style={{color: '#518BFF', marginTop: 20}}>Forgot Password?</Text>
+              <Text onPress={() => setForgotVisible(true)} style={{color: '#518BFF', marginTop: 20, textDecorationLine: 'underline'}}>Forgot password?</Text>
           </View>
         </View>
       </View>

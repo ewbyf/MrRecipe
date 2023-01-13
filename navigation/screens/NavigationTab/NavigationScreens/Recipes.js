@@ -72,11 +72,13 @@ export default function Recipes({ navigation }) {
       .firestore()
       .collection("recipes")
       .orderBy("weight", "desc")
+      .limit(50)
       .get();
     const snapshot2 = await firebase
       .firestore()
       .collection("recipes")
       .orderBy("timestamp", "desc")
+      .limit(50)
       .get();
     if (userParam) {
       await firebase
@@ -91,6 +93,7 @@ export default function Recipes({ navigation }) {
           alert(error.message);
         });
     }
+
 
     await Promise.all(
       snapshot.docs.map((doc) => {
@@ -623,7 +626,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   featuredImage: {
-    height: undefined,
     width: "100%",
     aspectRatio: 5/3,
     borderRadius: 20,
@@ -640,7 +642,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   smallImage: {
-    height: undefined,
     width: "100%",
     aspectRatio: 5/3,
     borderRadius: 20,

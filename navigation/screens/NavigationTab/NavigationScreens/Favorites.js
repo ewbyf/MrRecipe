@@ -5,6 +5,7 @@ import { firebase } from '../../../../config';
 import { FlashList } from "@shopify/flash-list";
 import { Rating } from "react-native-ratings";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SearchBar } from "@rneui/themed";
 
 export default function Favorites({ navigation }) {
   const [initializing, setInitializing] = useState(true);
@@ -105,11 +106,8 @@ export default function Favorites({ navigation }) {
     return (
       <View style={global.appContainer}>
         <View style={global.searchTopbar}>
-            <Text style={global.topbarTitle}>Favorites</Text>
-            <View>
-              <TextInput placeholder='Search for Recipes and Users' style={global.searchbar}></TextInput>
-              <Icon name="search-outline" style={{position: 'absolute', bottom: 10, left: 10}} size={16} color="lightgray"/>
-          </View>
+          <SearchBar lightTheme round containerStyle={global.searchbar} inputContainerStyle={{backgroundColor: 'white'}} placeholder="Search for favorites" inputStyle={{fontSize: 15}}
+            />
         </View>
       </View>
     );
@@ -120,11 +118,7 @@ export default function Favorites({ navigation }) {
       <View style={global.appContainer}>
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
           <View style={global.searchTopbar}>
-              <Text style={global.topbarTitle}>Favorites</Text>
-              <View>
-                <TextInput placeholder='Search for Recipes and Users' style={global.searchbar}></TextInput>
-                <Icon name="search-outline" style={{position: 'absolute', bottom: 10, left: 10}} size={16} color="lightgray"/>
-            </View>
+            <SearchBar lightTheme round showCancel platform={Platform.OS == "ios" ? "ios" : "android"} cancelButtonProps={{color: 'white'}}containerStyle={global.searchbar} inputContainerStyle={{backgroundColor: 'white'}} placeholder="Search for favorites" inputStyle={{fontSize: 15}}/>
           </View>
         </TouchableWithoutFeedback>
         <ScrollView
@@ -179,11 +173,7 @@ export default function Favorites({ navigation }) {
   return (
       <View style={global.appContainer}>
           <View style={global.searchTopbar}>
-              <Text style={global.topbarTitle}>Favorites</Text>
-              <View>
-                <TextInput placeholder='Search for Favorites' style={global.searchbar}></TextInput>
-                <Icon name="search-outline" style={{position: 'absolute', bottom: 10, left: 10}} size={16} color="lightgray"/>
-              </View>
+            <SearchBar lightTheme round showCancel platform={Platform.OS == "ios" ? "ios" : "android"} cancelButtonProps={{color: 'white'}}containerStyle={global.searchbar} inputContainerStyle={{backgroundColor: 'white'}} placeholder="Search for favorites" inputStyle={{fontSize: 15}} />
           </View>
       </View>
   );

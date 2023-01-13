@@ -711,8 +711,9 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   image: {
-    height: 200,
+    width: '100%',
     borderRadius: 20,
+    aspectRatio: 5/3,
   },
   details: {
     width: "100%",

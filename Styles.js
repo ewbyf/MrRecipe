@@ -16,11 +16,10 @@ export default StyleSheet.create({
         backgroundColor: '#518BFF',
     },
     searchTopbar: {
-        paddingTop: 30,
-        height: 174,
+        paddingTop: 50,
+        height: 130,
         width: '100%',
         alignItems: 'center',
-        justifyContent: 'center',
         backgroundColor: '#518BFF',
     },
     topbarTitle: {
@@ -31,14 +30,10 @@ export default StyleSheet.create({
         textAlign: 'center',
     },
     searchbar: {
-        width: 300,
-        height: 40,
-        marginTop: 15,
-        borderRadius: 8,
-        padding: 7,
-        paddingLeft: 30,
-        backgroundColor: 'white',
-        color: 'black',
+        width: '90%', 
+        backgroundColor: '#518BFF', 
+        borderBottomWidth: 0, 
+        borderTopWidth: 0,
     },
     itemContainer: {
         width: Dimensions.get('window').width/2 - 9,
@@ -55,7 +50,6 @@ export default StyleSheet.create({
         borderRadius: 15,
     },
     listImage: {
-        height: undefined,
         width: (Dimensions.get('window').width/2 - 40),
         aspectRatio: 5/3,
         borderRadius: 15,

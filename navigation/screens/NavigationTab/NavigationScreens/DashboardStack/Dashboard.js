@@ -33,7 +33,7 @@ export default function Dashboard({ navigation }) {
   };
 
   const fetchData = async() => {
-    var tempList = [];
+    let tempList = [];
     let fav = [];
     let ref = "";
 
@@ -89,17 +89,14 @@ export default function Dashboard({ navigation }) {
 
   const Posts = ({ item }) => {
     const favorite = async(doc) => {
-      let fav = [];
-      let temp = [];
       let color = 'gray';
-      let index = -1;
 
-      temp = dataList;
-      index = dataList.findIndex(item => item.key == doc);
+      let temp = dataList;
+      let index = dataList.findIndex(item => item.key == doc);
 
       await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
       .then((snap) => {
-        fav = snap.data().favorites;
+        let fav = snap.data().favorites;
         if (fav.indexOf(doc) != -1) {
           fav.splice(snap.data().favorites.indexOf(doc), 1);
           firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: fav});
@@ -160,7 +157,6 @@ export default function Dashboard({ navigation }) {
     const doubleTapRef = useRef();
     const lastItemId = useRef(item.key);
     const [liked, setLiked] = useState(item.favorite);
-    const [opened, setOpened] = useState(false);
 
     if (item.key !== lastItemId.current) {
       lastItemId.current = item.key;

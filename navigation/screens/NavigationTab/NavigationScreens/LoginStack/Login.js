@@ -28,7 +28,7 @@ export default function Login({ navigation }){
     }
     else {
       try {
-        await firebase.auth().signInWithEmailAndPassword(email, password);
+        firebase.auth().signInWithEmailAndPassword(email, password);
       }
       catch (error) {
         switch(error.code) {
@@ -186,9 +186,9 @@ const styles = StyleSheet.create({
         marginBottom: 115,
     },
     title: {
-      marginBottom: 20,
+      marginBottom: 10,
       fontFamily: 'Pacifico',
-      fontSize: 36,
+      fontSize: 40,
       color: '#518BFF',
     },
     icon: {

@@ -47,7 +47,7 @@ export default function Recipes({ navigation }) {
   const windowWidth = Dimensions.get("window").width;
   const windowHeight = Dimensions.get("window").height;
 
-  function onAuthStateChanged(userParam) {
+  onAuthStateChanged = (userParam) => {
     fetchData(userParam);
     setUser(userParam);
     if (initializing) setInitializing(false);
@@ -93,7 +93,6 @@ export default function Recipes({ navigation }) {
           alert(error.message);
         });
     }
-
 
     await Promise.all(
       snapshot.docs.map((doc) => {

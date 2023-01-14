@@ -5,11 +5,16 @@ import { useState, useEffect } from "react";
 import { NavigationContainer } from '@react-navigation/native';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
+import { firebase } from "./config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getReactNativePersistence } from "firebase/auth/react-native"
+import { initializeAuth } from "firebase/auth"
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const [loaded, setLoaded] = useState(false);
+
   const fetchFonts = async() => {
     await Font.loadAsync({
       'Proxima': require('./assets/fonts/ProximaNova-Regular.otf'),
@@ -17,6 +22,7 @@ export default function App() {
     }); 
     setLoaded(true);
   };
+
   useEffect(() => {
     fetchFonts(); 
   },[]);
@@ -30,7 +36,7 @@ export default function App() {
         <NavigationContainer>
           <MainStack />
         </NavigationContainer>
-        <FlashMessage position={{top: '7.5%'}} floating={true} icon={"success"} titleStyle={{fontSize: 15}} animationDuration={400}/>
+        <FlashMessage position={{top: '7%'}} floating={true} icon={"success"} titleStyle={{fontSize: 15}} animationDuration={400}/>
     </MenuProvider>
   );
 }

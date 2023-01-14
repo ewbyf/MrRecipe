@@ -14,13 +14,13 @@ import { useState } from "react";
 import { firebase } from "../../../../../config";
 import Icon from "react-native-vector-icons/Ionicons";
 import BackArrow from "../../../../../components/BackArrow";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default function Register({ navigation }) {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState();
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const usersDB = firebase.firestore().collection("users");
 
@@ -33,15 +33,10 @@ export default function Register({ navigation }) {
         "User Already Exists",
         "An account with that username has already been created. Please login or retry using a different username."
       );
-    else if (!password || !confirmPassword)
+    else if (!password)
       Alert.alert(
         "Missing Password",
-        "Please enter and confirm your password in the input fields."
-      );
-    else if (confirmPassword != password)
-      Alert.alert(
-        "Passwords Don't Match",
-        "Passwords do not match. Please retry entering your password."
+        "Please enter your password in the input fields."
       );
     else if (!name)
       Alert.alert(
@@ -144,131 +139,111 @@ export default function Register({ navigation }) {
           <Text style={global.topbarTitle}>Register</Text>
         </View>
         <View style={styles.register}>
-          <View style={styles.logoContainer}>
-          </View>
-          <Text style={styles.title}>Mr. Recipe</Text>
-          <View style={{ flexDirection: "row" }}>
-            <Icon
-              name="person-circle-outline"
-              size={20}
-              color={"white"}
-              style={styles.icon}
-            />
-            <TextInput
-              placeholder="Name"
-              placeholderTextColor="lightgrey"
-              editable={!loading}
-              style={styles.inputField}
-              value={name}
-              onChangeText={(name) => {
-                setName(convertName(name));
-              }}
-              maxLength={18}
-              onSubmitEditing={() => {
-                registerUser();
-              }}
-            ></TextInput>
-          </View>
-          <View style={{ flexDirection: "row" }}>
-            <Icon
-              name="person-outline"
-              size={20}
-              color={"white"}
-              style={styles.icon}
-            />
-            <TextInput
-              placeholder="Username"
-              placeholderTextColor="lightgrey"
-              editable={!loading}
-              autoCorrect={false}
-              style={styles.inputField}
-              value={username}
-              onChangeText={(username) => {
-                setUsername(convertUsername(username));
-              }}
-              maxLength={12}
-              onSubmitEditing={() => {
-                registerUser();
-              }}
-            ></TextInput>
-          </View>
-          <View style={{ flexDirection: "row" }}>
-            <Icon
-              name="mail-outline"
-              size={20}
-              color={"white"}
-              style={styles.icon}
-            />
-            <TextInput
-              placeholder="Email Address"
-              placeholderTextColor="lightgrey"
-              editable={!loading}
-              style={styles.inputField}
-              keyboardType="email-address"
-              onChangeText={(email) => {
-                setEmail(email);
-              }}
-              autoCapitalize={false}
-              maxLength={320}
-              onSubmitEditing={() => {
-                registerUser();
-              }}
-            ></TextInput>
-          </View>
+            <View style={styles.logoContainer}>
+            </View>
+            <Text style={styles.title}>Mr. Recipe</Text>
+            <View style={{ flexDirection: "row" }}>
+              <Icon
+                name="person-circle-outline"
+                size={20}
+                color={"white"}
+                style={styles.icon}
+              />
+              <TextInput
+                placeholder="Name"
+                placeholderTextColor="lightgrey"
+                editable={!loading}
+                style={styles.inputField}
+                value={name}
+                onChangeText={(name) => {
+                  setName(convertName(name));
+                }}
+                maxLength={18}
+                onSubmitEditing={() => {
+                  registerUser();
+                }}
+              ></TextInput>
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <Icon
+                name="person-outline"
+                size={20}
+                color={"white"}
+                style={styles.icon}
+              />
+              <TextInput
+                placeholder="Username"
+                placeholderTextColor="lightgrey"
+                editable={!loading}
+                autoCorrect={false}
+                style={styles.inputField}
+                value={username}
+                onChangeText={(username) => {
+                  setUsername(convertUsername(username));
+                }}
+                maxLength={12}
+                onSubmitEditing={() => {
+                  registerUser();
+                }}
+              ></TextInput>
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <Icon
+                name="mail-outline"
+                size={20}
+                color={"white"}
+                style={styles.icon}
+              />
+              <TextInput
+                placeholder="Email Address"
+                placeholderTextColor="lightgrey"
+                editable={!loading}
+                style={styles.inputField}
+                keyboardType="email-address"
+                onChangeText={(email) => {
+                  setEmail(email);
+                }}
+                autoCapitalize={false}
+                maxLength={320}
+                onSubmitEditing={() => {
+                  registerUser();
+                }}
+              ></TextInput>
+            </View>
 
-          <View style={{ flexDirection: "row" }}>
-            <Icon
-              name="lock-closed-outline"
-              size={20}
-              color={"white"}
-              style={styles.icon}
-            />
-            <TextInput
-              placeholder="Password"
-              placeholderTextColor={"lightgrey"}
-              editable={!loading}
-              style={styles.inputField}
-              onChangeText={(password) => {
-                setPassword(password);
-              }}
-              secureTextEntry={true}
-              onSubmitEditing={() => {
+            <View style={{ flexDirection: "row" }}>
+              <Icon
+                name="lock-closed-outline"
+                size={20}
+                color={"white"}
+                style={styles.icon}
+              />
+              <TextInput
+                placeholder="Password"
+                placeholderTextColor={"lightgrey"}
+                editable={!loading}
+                style={styles.inputField}
+                onChangeText={(password) => {
+                  setPassword(password);
+                }}
+                secureTextEntry={true}
+                onSubmitEditing={() => {
+                  registerUser();
+                }}
+              ></TextInput>
+            </View>
+
+
+            <TouchableOpacity
+              disabled={loading}
+              style={styles.button}
+              onPress={() => {
+                setLoading(true);
                 registerUser();
               }}
-            ></TextInput>
-          </View>
-          <View style={{ flexDirection: "row" }}>
-            <Icon
-              name="lock-closed"
-              size={20}
-              color={"white"}
-              style={styles.icon}
-            />
-            <TextInput
-              placeholder="Confirm Password"
-              placeholderTextColor="lightgrey"
-              editable={!loading}
-              style={styles.inputField}
-              onChangeText={(confirmPassword) => {
-                setConfirmPassword(confirmPassword);
-              }}
-              secureTextEntry={true}
-              onSubmitEditing={() => {
-                registerUser(email, password, name, username);
-              }}
-            ></TextInput>
-          </View>
-
-          <TouchableOpacity
-            disabled={loading}
-            style={styles.button}
-            onPress={() => {
-              setLoading(true);
-              registerUser();
-            }}
-          >
-            <Text style={styles.buttonText}>Sign up</Text>
-          </TouchableOpacity>
+            >
+              <Text style={styles.buttonText}>Sign up</Text>
+            </TouchableOpacity>
         </View>
       </View>
     </TouchableWithoutFeedback>
@@ -290,9 +265,9 @@ const styles = StyleSheet.create({
     width: 100,
   },
   title: {
-    marginBottom: 20,
+    marginBottom: 10,
     fontFamily: 'Pacifico',
-    fontSize: 36,
+    fontSize: 40,
     color: '#518BFF',
   },
   inputField: {

@@ -1,9 +1,30 @@
 import { MenuProvider } from "react-native-popup-menu";
 import FlashMessage from "react-native-flash-message";
-import MainStack from "./navigation/routes/MainStack"
+import MainStack from "./navigation/routes/MainStack";
+import { useState, useEffect } from "react";
 import { NavigationContainer } from '@react-navigation/native';
+import * as SplashScreen from 'expo-splash-screen';
+import * as Font from 'expo-font';
+
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+  const [loaded, setLoaded] = useState(false);
+  const fetchFonts = async() => {
+    await Font.loadAsync({
+      'Proxima': require('./assets/fonts/ProximaNova-Regular.otf'),
+      'Pacifico': require('./assets/fonts/Pacifico-Regular.ttf'),
+    }); 
+    setLoaded(true);
+  };
+  useEffect(() => {
+    fetchFonts(); 
+  },[]);
+
+  if(loaded){
+    SplashScreen.hideAsync();
+  }
+
   return (
     <MenuProvider>
         <NavigationContainer>

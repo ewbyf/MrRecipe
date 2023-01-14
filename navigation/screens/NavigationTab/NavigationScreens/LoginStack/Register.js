@@ -145,10 +145,6 @@ export default function Register({ navigation }) {
         </View>
         <View style={styles.register}>
           <View style={styles.logoContainer}>
-            <Image
-              style={styles.logo}
-              source={{ uri: "https://imgur.com/Fg7Vv0f.png" }}
-            />
           </View>
           <Text style={styles.title}>Mr. Recipe</Text>
           <View style={{ flexDirection: "row" }}>
@@ -295,9 +291,9 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 20,
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#518BFF",
+    fontFamily: 'Pacifico',
+    fontSize: 36,
+    color: '#518BFF',
   },
   inputField: {
     width: 200,

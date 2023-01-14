@@ -122,10 +122,6 @@ export default function Login({ navigation }){
         </View>
         <View style={styles.login}>
           <View style={styles.logoContainer}>
-            <Image 
-              style={styles.logo}
-              source={{uri: 'https://imgur.com/Fg7Vv0f.png'}} 
-            /> 
             <Text style={styles.title}>Mr. Recipe</Text>
           </View>
           <View style={styles.loginContainer}>
@@ -191,8 +187,8 @@ const styles = StyleSheet.create({
     },
     title: {
       marginBottom: 20,
-      fontSize: 24,
-      fontWeight: 'bold',
+      fontFamily: 'Pacifico',
+      fontSize: 36,
       color: '#518BFF',
     },
     icon: {

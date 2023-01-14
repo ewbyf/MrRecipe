@@ -158,6 +158,14 @@ export default function Post({ navigation }) {
     return text.replace(/[^0-9]/g, "");
   };
 
+  const convertName = (text) => {
+    return text.replace(/[^0-9a-zA-Z!:&$,\/()#%+-]/g, "");
+  }
+
+  const convertText = (text) => {
+    return text.replace(/[^0-9a-zA-Z.?:!&$,\/()#%+-]/g, "");
+  }
+
   const publish = async () => {
     if (name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value) {
       const preptime = Number(prepMin) + Number(prepHrs) * 60;
@@ -195,6 +203,8 @@ export default function Post({ navigation }) {
             .collection("recipes")
             .add({
               name,
+              name_lowercase: name.toLowerCase(),
+              name_array: name.toLowerCase().match(/\b(\w+)\b/g),
               description,
               weight: 0,
               rating: 0,
@@ -378,7 +388,7 @@ export default function Post({ navigation }) {
                 maxLength={50}
                 value={name}
                 editable={!publishing}
-                onChangeText={(title) => setName(title)}
+                onChangeText={(title) => setName(convertName(title))}
               ></TextInput>
             </View>
             <View style={styles.section}>
@@ -532,7 +542,7 @@ export default function Post({ navigation }) {
                   value={ingredients[0].value}
                   style={styles.input}
                   editable={!publishing}
-                  onChangeText={(text) => inputHandler(text, 0, "ingredients")}
+                  onChangeText={(text) => inputHandler(convertText(text), 0, "ingredients")}
                 />
               </View>
               {ingredients.slice(1).map((input, key) => (
@@ -548,7 +558,7 @@ export default function Post({ navigation }) {
                     style={styles.input}
                     editable={!publishing}
                     onChangeText={(text) =>
-                      inputHandler(text, key + 1, "ingredients")
+                      inputHandler(convertText(text), key + 1, "ingredients")
                     }
                   />
                   <TouchableOpacity
@@ -578,7 +588,7 @@ export default function Post({ navigation }) {
                   style={[styles.input, { paddingLeft: 30 }]}
                   value={instructions[0].value}
                   editable={!publishing}
-                  onChangeText={(text) => inputHandler(text, 0, "instructions")}
+                  onChangeText={(text) => inputHandler(convertText(text), 0, "instructions")}
                 />
                 <Text
                   style={{
@@ -604,7 +614,7 @@ export default function Post({ navigation }) {
                     editable={!publishing}
                     style={[styles.input, { paddingLeft: 30 }]}
                     onChangeText={(text) =>
-                      inputHandler(text, key + 1, "instructions")
+                      inputHandler(convertText(text), key + 1, "instructions")
                     }
                   />
                   <Text

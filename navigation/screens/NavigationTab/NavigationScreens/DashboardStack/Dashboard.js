@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
     color: "white",
   },
   username: {
-    color: "#C9C9C9",
+    color: "gray",
     fontSize: 16,
     textAlign: "center",
     marginBottom: 3,

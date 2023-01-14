@@ -93,7 +93,7 @@ export default function Settings({ navigation }) {
         }
 
         await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update(
-          {name, username, bio, username_lowercase: username.toLowerCase(), pfp: imgUrl}
+          {name, name_lowercase: name.toLowerCase(), name_array: name.toLowerCase().match(/\b(\w+)\b/g), username, bio, username_lowercase: username.toLowerCase(), pfp: imgUrl}
         )
         .then(() => {
           showMessage({
@@ -400,6 +400,14 @@ export default function Settings({ navigation }) {
     }
   }
 
+  const convertName = (text) => {
+    return text.replace(/[\[\]]/g, "");
+  }
+
+  const convertUsername = (text) => {
+    return text.replace(/[^0-9a-zA-Z_.-]/g, "");
+  }
+
   return (
     <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}}>
       <View style={global.appContainer}>
@@ -503,7 +511,7 @@ export default function Settings({ navigation }) {
                   maxLength={18}
                   editable={!inProgress}
                   value={name}
-                  onChangeText={(newName) => updateSettings('name', newName)}
+                  onChangeText={(newName) => updateSettings('name', convertName(newName))}
                   style={styles.input}
                 ></TextInput>
               </View>
@@ -515,7 +523,7 @@ export default function Settings({ navigation }) {
                   maxLength={12}
                   editable={!inProgress}
                   value={username}
-                  onChangeText={(newUsername) => updateSettings('username', newUsername)}
+                  onChangeText={(newUsername) => updateSettings('username', convertUsername(newUsername))}
                   style={styles.input}
                 ></TextInput>
               </View>
@@ -525,7 +533,7 @@ export default function Settings({ navigation }) {
                   placeholder='Add a bio to your profile'
                   placeholderTextColor='#818181'
                   multiline={true}
-                  maxLength={150}
+                  maxLength={80}
                   blurOnSubmit={true}
                   editable={!inProgress}
                   value={bio}
@@ -534,7 +542,7 @@ export default function Settings({ navigation }) {
                   onChangeText={(newBio) => updateSettings('bio', newBio)}
                   style={{...styles.input, paddingTop: 0, width: 200}}
                 ></TextInput>
-                <Text style={{color: '#494949', position: 'absolute', right: 10, bottom: 5}}>{bio.length}/150</Text>
+                <Text style={{color: '#494949', position: 'absolute', right: 10, bottom: 5}}>{bio.length}/80</Text>
               </View>
             </View>
 

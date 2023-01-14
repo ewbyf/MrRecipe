@@ -65,6 +65,8 @@ export default function Register({ navigation }) {
             .doc(firebase.auth().currentUser.uid)
             .set({
               name,
+              name_lowercase: name.toLowerCase(),
+              name_array: name.toLowerCase().match(/\b(\w+)\b/g),
               username,
               username_lowercase,
               email,
@@ -117,7 +119,6 @@ export default function Register({ navigation }) {
                 "Email Already Exists",
                 "The email address you entered is already in use by another account. Please login or retry with a different email address."
               );
-              console.debug("a");
               break;
             default:
               alert(error.message);
@@ -126,6 +127,14 @@ export default function Register({ navigation }) {
     }
     setLoading(false);
   };
+
+  const convertName = (text) => {
+    return text.replace(/[\[\]]/g, "");
+  }
+
+  const convertUsername = (text) => {
+    return text.replace(/[^0-9a-zA-Z_.-]/g, "");
+  }
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -154,8 +163,9 @@ export default function Register({ navigation }) {
               placeholderTextColor="lightgrey"
               editable={!loading}
               style={styles.inputField}
+              value={name}
               onChangeText={(name) => {
-                setName(name);
+                setName(convertName(name));
               }}
               maxLength={18}
               onSubmitEditing={() => {
@@ -176,8 +186,9 @@ export default function Register({ navigation }) {
               editable={!loading}
               autoCorrect={false}
               style={styles.inputField}
+              value={username}
               onChangeText={(username) => {
-                setUsername(username);
+                setUsername(convertUsername(username));
               }}
               maxLength={12}
               onSubmitEditing={() => {

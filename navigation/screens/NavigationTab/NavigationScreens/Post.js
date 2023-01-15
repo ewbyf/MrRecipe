@@ -40,7 +40,7 @@ export default function Post({ navigation }) {
     { key: "Hard", value: "Hard" },
   ];
 
-  // Check if users signed in
+  // Check if users signed in (fallback)
   function onAuthStateChanged(user) {
     setUser(user);
     if (initializing) setInitializing(false);

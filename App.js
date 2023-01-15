@@ -15,6 +15,7 @@ export default function App() {
     await Font.loadAsync({
       Proxima: require("./assets/fonts/ProximaNova-Regular.otf"),
       Pacifico: require("./assets/fonts/Pacifico-Regular.ttf"),
+      Sora: require("./assets/fonts/Sora-Medium.ttf"),
     });
     setLoaded(true);
   };

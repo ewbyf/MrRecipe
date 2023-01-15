@@ -91,7 +91,7 @@ export default function NavigationBar() {
                   size={25}
                 />
                 <Text
-                  style={{ fontSize: 13, color: focused ? "#FFDDA1" : "white" }}
+                  style={{ fontSize: 11, color: focused ? "#FFDDA1" : "white" , fontFamily: 'Sora'}}
                 >
                   Recipes
                 </Text>
@@ -117,7 +117,7 @@ export default function NavigationBar() {
                   size={25}
                 />
                 <Text
-                  style={{ fontSize: 13, color: focused ? "#FFDDA1" : "white" }}
+                  style={{ fontSize: 11, color: focused ? "#FFDDA1" : "white" , fontFamily: 'Sora'}}
                 >
                   Search
                 </Text>
@@ -160,7 +160,7 @@ export default function NavigationBar() {
                   size={25}
                 />
                 <Text
-                  style={{ fontSize: 13, color: focused ? "#FFDDA1" : "white" }}
+                  style={{ fontSize: 11, color: focused ? "#FFDDA1" : "white" , fontFamily: 'Sora'}}
                 >
                   Favorites
                 </Text>
@@ -186,7 +186,7 @@ export default function NavigationBar() {
                   size={25}
                 />
                 <Text
-                  style={{ fontSize: 13, color: focused ? "#FFDDA1" : "white" }}
+                  style={{ fontSize: 11, color: focused ? "#FFDDA1" : "white" , fontFamily: 'Sora'}}
                 >
                   {buttonName}
                 </Text>

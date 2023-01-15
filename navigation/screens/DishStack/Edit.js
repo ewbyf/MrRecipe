@@ -4,7 +4,6 @@ import {
   TouchableOpacity,
   Text,
   TextInput,
-  Alert,
   Image,
 } from "react-native";
 import global from "../../../Styles";
@@ -43,30 +42,34 @@ export default function Edit({ navigation }) {
   ];
 
   useEffect(() => {
-    firebase.firestore().collection('recipes').doc(route.params.doc).get()
-    .then((snap) => {
-      setRecipeData(snap.data());
-      setImage(snap.data().image);
-      setName(snap.data().name);
-      setDescription(snap.data().description);
-      setDifficulty(snap.data().difficulty);
-      setCookHrs(Math.floor(snap.data().cooktime / 60).toString());
-      setCookMin((snap.data().cooktime % 60).toString());
-      setPrepMin((snap.data().preptime % 60).toString());
-      setPrepHrs(Math.floor(snap.data().preptime / 60).toString());
-      
-      let tempIns = [];
-      for(let i = 0; i < snap.data().instructions.length; i++){
-        tempIns.push({key: i, value: snap.data().instructions[i]});
-      }
-      setInstructions(tempIns);
-      
-      let tempIng = [];
-      for(let i = 0; i < snap.data().ingredients.length; i++){
-        tempIng.push({key: i, value: snap.data().ingredients[i]});
-      }
-      setIngredients(tempIng);
-    })
+    firebase
+      .firestore()
+      .collection("recipes")
+      .doc(route.params.doc)
+      .get()
+      .then((snap) => {
+        setRecipeData(snap.data());
+        setImage(snap.data().image);
+        setName(snap.data().name);
+        setDescription(snap.data().description);
+        setDifficulty(snap.data().difficulty);
+        setCookHrs(Math.floor(snap.data().cooktime / 60).toString());
+        setCookMin((snap.data().cooktime % 60).toString());
+        setPrepMin((snap.data().preptime % 60).toString());
+        setPrepHrs(Math.floor(snap.data().preptime / 60).toString());
+
+        let tempIns = [];
+        for (let i = 0; i < snap.data().instructions.length; i++) {
+          tempIns.push({ key: i, value: snap.data().instructions[i] });
+        }
+        setInstructions(tempIns);
+
+        let tempIng = [];
+        for (let i = 0; i < snap.data().ingredients.length; i++) {
+          tempIng.push({ key: i, value: snap.data().ingredients[i] });
+        }
+        setIngredients(tempIng);
+      });
   }, []);
 
   const takePhoto = async () => {
@@ -101,7 +104,7 @@ export default function Edit({ navigation }) {
 
   const uploadPhoto = async () => {
     if (image == null) return null;
-  
+
     if (image == recipeData.image) return image;
 
     let imageRef = firebase.storage().refFromURL(recipeData.image);
@@ -120,7 +123,11 @@ export default function Edit({ navigation }) {
         .getDownloadURL();
       return url;
     } catch (error) {
-      alert(error.code);
+      showMessage({
+        message: error.message,
+        icon: "danger",
+        type: "danger",
+      });
     }
   };
 
@@ -128,10 +135,11 @@ export default function Edit({ navigation }) {
     if (type == "ingredients") {
       const _inputs = [...ingredients];
       if (ingredients[_inputs.length - 1].value == "") {
-        Alert.alert(
-          "Blank Ingredient",
-          "Please enter an ingredient and amount for the blank field before creating a new one."
-        );
+        showMessage({
+          message: "Please enter an ingredient before creating another",
+          icon: "danger",
+          type: "danger",
+        });
         return;
       }
       _inputs.push({ key: "", value: "" });
@@ -139,10 +147,11 @@ export default function Edit({ navigation }) {
     } else {
       const _inputs = [...instructions];
       if (instructions[_inputs.length - 1].value == "") {
-        Alert.alert(
-          "Blank Step",
-          "Please enter a step before creating a new one."
-        );
+        showMessage({
+          message: "Please enter an ingredient before creating another",
+          icon: "danger",
+          type: "danger",
+        });
         return;
       }
       _inputs.push({ key: "", value: "" });
@@ -181,12 +190,18 @@ export default function Edit({ navigation }) {
   };
 
   const publish = async () => {
-    if (name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value) {
+    if (
+      name &&
+      difficulty &&
+      (cookHrs || cookMin) &&
+      ingredients[0].value &&
+      instructions[0].value
+    ) {
       const preptime = Number(prepMin) + Number(prepHrs) * 60;
       const cooktime = Number(cookMin) + Number(cookHrs) * 60;
       const ingredientsArray = [];
       const instructionsArray = [];
-      
+
       for (let i = 0; i < ingredients.length; i++) {
         if (ingredients[i].value) {
           ingredientsArray.push(ingredients[i].value);
@@ -232,26 +247,37 @@ export default function Edit({ navigation }) {
                 setChanged(false);
               })
               .catch((error) => {
-                alert(error.message);
+                showMessage({
+                  message: error.message,
+                  icon: "danger",
+                  type: "danger",
+                });
               });
-          } else
-            Alert.alert("Unknown Error Occured", "Contact support with error.");
+          }
         })
         .catch((error) => {
-          alert(error.message);
+          showMessage({
+            message: error.message,
+            icon: "danger",
+            type: "danger",
+          });
         });
     }
   };
 
   const checkFieldChanged = () => {
-    if (recipeData.image != image ||
+    if (
+      recipeData.image != image ||
       recipeData.name != name ||
       recipeData.description != description ||
-      Math.floor(recipeData.cooktime/60).toString() != cookHrs ||
+      Math.floor(recipeData.cooktime / 60).toString() != cookHrs ||
       Math.floor(recipeData.cooktime % 60).toString() != cookMin ||
-      Math.floor(recipeData.preptime/60).toString() != prepHrs ||
-      Math.floor(recipeData.preptime % 60).toString() != prepMin || instructions.length != recipeData.instructions.length || ingredients.length != recipeData.ingredients.length) {
-        return true;
+      Math.floor(recipeData.preptime / 60).toString() != prepHrs ||
+      Math.floor(recipeData.preptime % 60).toString() != prepMin ||
+      instructions.length != recipeData.instructions.length ||
+      ingredients.length != recipeData.ingredients.length
+    ) {
+      return true;
     }
     for (let i = 0; i < instructions.length; i++) {
       if (instructions[i].value != recipeData.instructions[i]) {
@@ -308,15 +334,42 @@ export default function Edit({ navigation }) {
         />
         <Text style={global.topbarTitle}>Edit Recipe</Text>
         <TouchableOpacity
-            disabled={publishing || !(name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value && changed)}
-            onPress={() => {
-              setPublishing(true);
-              publish();
-            }}
-            style={styles.button}
+          disabled={
+            publishing ||
+            !(
+              name &&
+              difficulty &&
+              (cookHrs || cookMin) &&
+              ingredients[0].value &&
+              instructions[0].value &&
+              changed
+            )
+          }
+          onPress={() => {
+            setPublishing(true);
+            publish();
+          }}
+          style={styles.button}
+        >
+          <Text
+            style={[
+              styles.buttonText,
+              {
+                color:
+                  name &&
+                  difficulty &&
+                  (cookHrs || cookMin) &&
+                  ingredients[0].value &&
+                  instructions[0].value &&
+                  changed
+                    ? "white"
+                    : "gray",
+              },
+            ]}
           >
-            <Text style={[styles.buttonText, {color: (name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value && changed) ? "white" : "gray"}]}>Save</Text>
-          </TouchableOpacity>
+            Save
+          </Text>
+        </TouchableOpacity>
       </View>
       <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.items}>
@@ -343,10 +396,20 @@ export default function Edit({ navigation }) {
           {image && (
             <View style={{ alignItems: "center" }}>
               <Image
-                source={{ uri: (image.uri ? image.uri : image) }}
-                style={{ width: 350, height: undefined, marginTop: 20, aspectRatio: 5/3 }}
+                source={{ uri: image.uri ? image.uri : image }}
+                style={{
+                  width: 350,
+                  height: undefined,
+                  marginTop: 20,
+                  aspectRatio: 5 / 3,
+                }}
               />
-              <TouchableOpacity onPress={() => {setImage(null); if (!changed) setChanged(true);}}>
+              <TouchableOpacity
+                onPress={() => {
+                  setImage(null);
+                  if (!changed) setChanged(true);
+                }}
+              >
                 <Text
                   style={{
                     ...styles.addText,
@@ -369,7 +432,10 @@ export default function Edit({ navigation }) {
               maxLength={50}
               value={name}
               editable={!publishing}
-              onChangeText={(title) => {setName(title); if (!changed) setChanged(true);}}
+              onChangeText={(title) => {
+                setName(title);
+                if (!changed) setChanged(true);
+              }}
             ></TextInput>
           </View>
           <View style={styles.section}>
@@ -384,7 +450,10 @@ export default function Edit({ navigation }) {
               textAlignVertical="top"
               value={description}
               editable={!publishing}
-              onChangeText={(desc) => {setDescription(desc); if (!changed) setChanged(true);}}
+              onChangeText={(desc) => {
+                setDescription(desc);
+                if (!changed) setChanged(true);
+              }}
             ></TextInput>
             <Text
               style={{
@@ -401,8 +470,12 @@ export default function Edit({ navigation }) {
             <Text style={styles.title}>DIFFICULTY</Text>
             <SelectList
               data={data}
-              setSelected={(diff) => {setDifficulty(diff); if (!changed && recipeData && diff != recipeData.difficulty) setChanged(true);}}
-              defaultOption={{key: difficulty, value: difficulty}}
+              setSelected={(diff) => {
+                setDifficulty(diff);
+                if (!changed && recipeData && diff != recipeData.difficulty)
+                  setChanged(true);
+              }}
+              defaultOption={{ key: difficulty, value: difficulty }}
               search={false}
               disabled={publishing}
               inputStyles={{ color: "white" }}
@@ -446,7 +519,10 @@ export default function Edit({ navigation }) {
                   numberOfLines={1}
                   value={prepHrs}
                   editable={!publishing}
-                  onChangeText={(text) => {setPrepHrs(convertNumber(text)); if (!changed) setChanged(true);}}
+                  onChangeText={(text) => {
+                    setPrepHrs(convertNumber(text));
+                    if (!changed) setChanged(true);
+                  }}
                 />
                 <View style={{ justifyContent: "center" }}>
                   <Text style={styles.timeText}>hrs</Text>
@@ -461,7 +537,10 @@ export default function Edit({ navigation }) {
                   numberOfLines={1}
                   value={prepMin}
                   editable={!publishing}
-                  onChangeText={(text) => {setPrepMin(convertNumber(text)); if (!changed) setChanged(true);}}
+                  onChangeText={(text) => {
+                    setPrepMin(convertNumber(text));
+                    if (!changed) setChanged(true);
+                  }}
                 />
                 <View style={{ justifyContent: "center" }}>
                   <Text style={styles.timeText}>min</Text>
@@ -488,7 +567,10 @@ export default function Edit({ navigation }) {
                     numberOfLines={1}
                     value={cookHrs}
                     editable={!publishing}
-                    onChangeText={(text) => {setCookHrs(convertNumber(text)); if (!changed) setChanged(true);}}
+                    onChangeText={(text) => {
+                      setCookHrs(convertNumber(text));
+                      if (!changed) setChanged(true);
+                    }}
                   />
                   <View style={{ justifyContent: "center" }}>
                     <Text style={styles.timeText}>hrs</Text>
@@ -503,7 +585,10 @@ export default function Edit({ navigation }) {
                     numberOfLines={1}
                     value={cookMin}
                     editable={!publishing}
-                    onChangeText={(text) => {setCookMin(convertNumber(text)); if (!changed) setChanged(true);}}
+                    onChangeText={(text) => {
+                      setCookMin(convertNumber(text));
+                      if (!changed) setChanged(true);
+                    }}
                   />
                   <View style={{ justifyContent: "center" }}>
                     <Text style={styles.timeText}>min</Text>
@@ -523,7 +608,10 @@ export default function Edit({ navigation }) {
                 value={ingredients[0].value}
                 style={styles.input}
                 editable={!publishing}
-                onChangeText={(text) => {inputHandler(text, 0, "ingredients"); if (!changed) setChanged(true);}}
+                onChangeText={(text) => {
+                  inputHandler(text, 0, "ingredients");
+                  if (!changed) setChanged(true);
+                }}
               />
             </View>
             {ingredients.slice(1).map((input, key) => (
@@ -538,9 +626,10 @@ export default function Edit({ navigation }) {
                   value={input.value}
                   style={styles.input}
                   editable={!publishing}
-                  onChangeText={(text) =>
-                    {inputHandler(text, key + 1, "ingredients"); if (!changed) setChanged(true);}
-                  }
+                  onChangeText={(text) => {
+                    inputHandler(text, key + 1, "ingredients");
+                    if (!changed) setChanged(true);
+                  }}
                 />
                 <TouchableOpacity
                   onPress={() => deleteHandler(key + 1, "ingredients")}
@@ -569,7 +658,10 @@ export default function Edit({ navigation }) {
                 style={[styles.input, { paddingLeft: 30 }]}
                 value={instructions[0].value}
                 editable={!publishing}
-                onChangeText={(text) => {inputHandler(text, 0, "instructions"); if (!changed) setChanged(true);}}
+                onChangeText={(text) => {
+                  inputHandler(text, 0, "instructions");
+                  if (!changed) setChanged(true);
+                }}
               />
               <Text
                 style={{
@@ -594,9 +686,10 @@ export default function Edit({ navigation }) {
                   value={input.value}
                   editable={!publishing}
                   style={[styles.input, { paddingLeft: 30 }]}
-                  onChangeText={(text) =>
-                    {inputHandler(text, key + 1, "instructions"); if (!changed) setChanged(true);}
-                  }
+                  onChangeText={(text) => {
+                    inputHandler(text, key + 1, "instructions");
+                    if (!changed) setChanged(true);
+                  }}
                 />
                 <Text
                   style={{
@@ -624,7 +717,6 @@ export default function Edit({ navigation }) {
               <Text style={styles.addText}>Add Step</Text>
             </TouchableOpacity>
           </View>
-          
         </View>
       </KeyboardAwareScrollView>
     </View>
@@ -640,7 +732,7 @@ const styles = StyleSheet.create({
   },
   button: {
     position: "absolute",
-    top: '50%',
+    top: "50%",
     marginTop: 21,
     right: 20,
   },

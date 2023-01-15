@@ -2,10 +2,8 @@ import {
   StyleSheet,
   View,
   Text,
-  TextInput,
   RefreshControl,
   TouchableOpacity,
-  Alert,
   ScrollView,
   Dimensions,
   Image,
@@ -51,7 +49,7 @@ export default function Recipes({ navigation }) {
     fetchData(userParam);
     setUser(userParam);
     if (initializing) setInitializing(false);
-  }
+  };
 
   useEffect(() => {
     const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
@@ -90,7 +88,11 @@ export default function Recipes({ navigation }) {
           fav = snap.data().favorites;
         })
         .catch((error) => {
-          alert(error.message);
+          showMessage({
+            message: error.message,
+            icon: "danger",
+            type: "danger",
+          });
         });
     }
 
@@ -105,7 +107,7 @@ export default function Recipes({ navigation }) {
         } else {
           tempList.push({ key: doc.id, value: doc.data(), favorite: "gray" });
         }
-      }),
+      })
     );
 
     await Promise.all(
@@ -119,7 +121,7 @@ export default function Recipes({ navigation }) {
         } else {
           tempList2.push({ key: doc.id, value: doc.data(), favorite: "gray" });
         }
-      }),
+      })
     );
 
     setDataList(tempList);
@@ -173,15 +175,20 @@ export default function Recipes({ navigation }) {
             }
           })
           .catch((error) => {
-            alert(error.message);
+            showMessage({
+              message: error.message,
+              icon: "danger",
+              type: "danger",
+            });
           });
 
         setDataList(temp);
       } else {
-        Alert.alert(
-          "Not Signed In",
-          "You must be signed in to favorite a recipe.",
-        );
+        showMessage({
+          message: "Must be signed in to favorite a recipe",
+          icon: "danger",
+          type: "danger",
+        });
       }
     };
     const scale = useSharedValue(0);
@@ -219,15 +226,20 @@ export default function Recipes({ navigation }) {
             }
           })
           .catch((error) => {
-            alert(error.message);
+            showMessage({
+              message: error.message,
+              icon: "danger",
+              type: "danger",
+            });
           });
 
         setDataList(temp);
       } else {
-        Alert.alert(
-          "Not Signed In",
-          "You must be signed in to favorite a recipe.",
-        );
+        showMessage({
+          message: "Must be signed in to favorite a recipe",
+          icon: "danger",
+          type: "danger",
+        });
       }
     }, []);
 
@@ -284,9 +296,12 @@ export default function Recipes({ navigation }) {
                   </Text>
                   <Text style={{ color: "gray" }}>{item.value.difficulty}</Text>
                   <Text style={{ color: "gray" }}>
-                    {parseFloat(((item.value.cooktime + item.value.preptime) / 60).toFixed(
-                      2
-                    ))}
+                    {parseFloat(
+                      (
+                        (item.value.cooktime + item.value.preptime) /
+                        60
+                      ).toFixed(2)
+                    )}
                     + hrs
                   </Text>
                 </View>
@@ -305,7 +320,10 @@ export default function Recipes({ navigation }) {
             startingValue={item.value.rating}
           />
           <Text style={[global.rating, { marginHorizontal: 8 }]}>
-            {item.value.rating >= 0 ? parseFloat(item.value.rating.toFixed(2)) : 0} ({item.value.numratings})
+            {item.value.rating >= 0
+              ? parseFloat(item.value.rating.toFixed(2))
+              : 0}{" "}
+            ({item.value.numratings})
           </Text>
           <TouchableOpacity
             style={{ marginLeft: 8 }}
@@ -360,7 +378,11 @@ export default function Recipes({ navigation }) {
             }
           })
           .catch((error) => {
-            alert(error.message);
+            showMessage({
+              message: error.message,
+              icon: "danger",
+              type: "danger",
+            });
           });
 
         if (list == "trending") {
@@ -370,10 +392,11 @@ export default function Recipes({ navigation }) {
         }
         setLiked(color);
       } else {
-        Alert.alert(
-          "Not Signed In",
-          "You must be signed in to favorite a recipe.",
-        );
+        showMessage({
+          message: "Must be signed in to favorite a recipe",
+          icon: "danger",
+          type: "danger",
+        });
       }
     };
     const scale = useSharedValue(0);
@@ -418,7 +441,11 @@ export default function Recipes({ navigation }) {
             }
           })
           .catch((error) => {
-            alert(error.message);
+            showMessage({
+              message: error.message,
+              icon: "danger",
+              type: "danger",
+            });
           });
 
         if (list == "trending") {
@@ -427,10 +454,11 @@ export default function Recipes({ navigation }) {
           setRecentList(temp);
         }
       } else {
-        Alert.alert(
-          "Not Signed In",
-          "You must be signed in to favorite a recipe.",
-        );
+        showMessage({
+          message: "Must be signed in to favorite a recipe",
+          icon: "danger",
+          type: "danger",
+        });
       }
     }, []);
 
@@ -439,7 +467,7 @@ export default function Recipes({ navigation }) {
     }));
 
     const doubleTapRef = useRef();
-    
+
     const lastItemId = useRef(item.key);
     const [liked, setLiked] = useState(item.favorite);
     if (item.key !== lastItemId.current) {
@@ -479,9 +507,9 @@ export default function Recipes({ navigation }) {
               />
               <Image
                 source={{
-                  uri: (item.value.image
+                  uri: item.value.image
                     ? item.value.image
-                    : "https://imgur.com/hNwMcZQ.png"),
+                    : "https://imgur.com/hNwMcZQ.png",
                 }}
                 style={styles.smallImage}
               />
@@ -494,9 +522,12 @@ export default function Recipes({ navigation }) {
                   </Text>
                   <Text style={{ color: "gray" }}>{item.value.difficulty}</Text>
                   <Text style={{ color: "gray" }}>
-                    {parseFloat(((item.value.cooktime + item.value.preptime) / 60).toFixed(
-                      2
-                    ))}
+                    {parseFloat(
+                      (
+                        (item.value.cooktime + item.value.preptime) /
+                        60
+                      ).toFixed(2)
+                    )}
                     + hrs
                   </Text>
                 </View>
@@ -516,7 +547,10 @@ export default function Recipes({ navigation }) {
               startingValue={item.value.rating}
             />
             <Text style={[global.rating, { marginHorizontal: 8 }]}>
-              {item.value.rating >= 0 ? parseFloat(item.value.rating.toFixed(2)) : 0} ({item.value.numratings})
+              {item.value.rating >= 0
+                ? parseFloat(item.value.rating.toFixed(2))
+                : 0}{" "}
+              ({item.value.numratings})
             </Text>
           </View>
           <TouchableOpacity onPress={() => favorite(item.key, list)}>
@@ -534,7 +568,7 @@ export default function Recipes({ navigation }) {
   return (
     <GestureHandlerRootView style={global.appContainer}>
       <View style={global.topbar}>
-          <Text style={global.topbarTitle}>Mr. Recipe</Text>
+        <Text style={global.topbarTitle}>Mr. Recipe</Text>
       </View>
       <ScrollView
         style={{ height: windowHeight, width: windowWidth }}
@@ -626,7 +660,7 @@ const styles = StyleSheet.create({
   },
   featuredImage: {
     width: "100%",
-    aspectRatio: 5/3,
+    aspectRatio: 5 / 3,
     borderRadius: 20,
     marginBottom: 10,
   },
@@ -642,7 +676,7 @@ const styles = StyleSheet.create({
   },
   smallImage: {
     width: "100%",
-    aspectRatio: 5/3,
+    aspectRatio: 5 / 3,
     borderRadius: 20,
     marginBottom: 10,
   },

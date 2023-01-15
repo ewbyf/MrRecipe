@@ -6,15 +6,12 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  Alert,
-  Image,
 } from "react-native";
 import global from "../../../../../Styles";
 import { useState } from "react";
 import { firebase } from "../../../../../config";
 import Icon from "react-native-vector-icons/Ionicons";
 import BackArrow from "../../../../../components/BackArrow";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default function Register({ navigation }) {
   const [name, setName] = useState("");
@@ -29,30 +26,34 @@ export default function Register({ navigation }) {
       .where("username_lowercase", "==", username.toLowerCase())
       .get();
     if (!snapshot.empty)
-      Alert.alert(
-        "User Already Exists",
-        "An account with that username has already been created. Please login or retry using a different username."
-      );
-    else if (!password)
-      Alert.alert(
-        "Missing Password",
-        "Please enter your password in the input fields."
-      );
+      showMessage({
+        message: "Username already exists",
+        icon: "danger",
+        type: "danger",
+      });
     else if (!name)
-      Alert.alert(
-        "Missing Name",
-        "Please enter your name into the input field."
-      );
+      showMessage({
+        message: "Name not entered",
+        icon: "danger",
+        type: "danger",
+      });
     else if (!username)
-      Alert.alert(
-        "Missing Username",
-        "Please enter your username into the input field."
-      );
+      showMessage({
+        message: "Username not entered",
+        icon: "danger",
+        type: "danger",
+      });
+    else if (!password)
+      showMessage({
+        message: "Password not entered",
+        icon: "danger",
+        type: "danger",
+      });
     else {
       await firebase
         .auth()
         .createUserWithEmailAndPassword(email, password)
-        .then(async() => {
+        .then(async () => {
           let username_lowercase = username.toLowerCase();
           await firebase
             .firestore()
@@ -80,10 +81,11 @@ export default function Register({ navigation }) {
               url: "https://mr-recipe-799e9.firebaseapp.com",
             })
             .then(() => {
-              Alert.alert(
-                "Verification Sent",
-                "A verification email has been sent to your email. Please check your junk mail."
-              );
+              showMessage({
+                message:
+                  "Account succesfully created! A verification email has been sent.",
+                type: "success",
+              });
             })
             .catch((error) => {
               alert(error.code);
@@ -92,31 +94,39 @@ export default function Register({ navigation }) {
         .catch((error) => {
           switch (error.code) {
             case "auth/weak-password":
-              Alert.alert(
-                "Weak Password",
-                "Password should be at least 6 characters long."
-              );
+              showMessage({
+                message: "Password needs to be at least 6 characters long",
+                icon: "danger",
+                type: "danger",
+              });
               break;
             case "auth/invalid-email":
-              Alert.alert(
-                "Invalid Email",
-                "Please enter a valid email address into the input field."
-              );
+              showMessage({
+                message: "Email not valid",
+                icon: "danger",
+                type: "danger",
+              });
               break;
             case "auth/missing-email":
-              Alert.alert(
-                "Missing Email",
-                "Please enter your email address into the input field."
-              );
+              showMessage({
+                message: "Email not entered",
+                icon: "danger",
+                type: "danger",
+              });
               break;
             case "auth/email-already-in-use":
-              Alert.alert(
-                "Email Already Exists",
-                "The email address you entered is already in use by another account. Please login or retry with a different email address."
-              );
+              showMessage({
+                message: "Email already exists",
+                icon: "danger",
+                type: "danger",
+              });
               break;
             default:
-              alert(error.message);
+              showMessage({
+                message: error.message,
+                icon: "danger",
+                type: "danger",
+              });
           }
         });
     }
@@ -125,11 +135,11 @@ export default function Register({ navigation }) {
 
   const convertName = (text) => {
     return text.replace(/[\[\]]/g, "");
-  }
+  };
 
   const convertUsername = (text) => {
     return text.replace(/[^0-9a-zA-Z_.-]/g, "");
-  }
+  };
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -139,111 +149,109 @@ export default function Register({ navigation }) {
           <Text style={global.topbarTitle}>Register</Text>
         </View>
         <View style={styles.register}>
-            <View style={styles.logoContainer}>
-            </View>
-            <Text style={styles.title}>Mr. Recipe</Text>
-            <View style={{ flexDirection: "row" }}>
-              <Icon
-                name="person-circle-outline"
-                size={20}
-                color={"white"}
-                style={styles.icon}
-              />
-              <TextInput
-                placeholder="Name"
-                placeholderTextColor="lightgrey"
-                editable={!loading}
-                style={styles.inputField}
-                value={name}
-                onChangeText={(name) => {
-                  setName(convertName(name));
-                }}
-                maxLength={18}
-                onSubmitEditing={() => {
-                  registerUser();
-                }}
-              ></TextInput>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <Icon
-                name="person-outline"
-                size={20}
-                color={"white"}
-                style={styles.icon}
-              />
-              <TextInput
-                placeholder="Username"
-                placeholderTextColor="lightgrey"
-                editable={!loading}
-                autoCorrect={false}
-                style={styles.inputField}
-                value={username}
-                onChangeText={(username) => {
-                  setUsername(convertUsername(username));
-                }}
-                maxLength={12}
-                onSubmitEditing={() => {
-                  registerUser();
-                }}
-              ></TextInput>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <Icon
-                name="mail-outline"
-                size={20}
-                color={"white"}
-                style={styles.icon}
-              />
-              <TextInput
-                placeholder="Email Address"
-                placeholderTextColor="lightgrey"
-                editable={!loading}
-                style={styles.inputField}
-                keyboardType="email-address"
-                onChangeText={(email) => {
-                  setEmail(email);
-                }}
-                autoCapitalize={false}
-                maxLength={320}
-                onSubmitEditing={() => {
-                  registerUser();
-                }}
-              ></TextInput>
-            </View>
-
-            <View style={{ flexDirection: "row" }}>
-              <Icon
-                name="lock-closed-outline"
-                size={20}
-                color={"white"}
-                style={styles.icon}
-              />
-              <TextInput
-                placeholder="Password"
-                placeholderTextColor={"lightgrey"}
-                editable={!loading}
-                style={styles.inputField}
-                onChangeText={(password) => {
-                  setPassword(password);
-                }}
-                secureTextEntry={true}
-                onSubmitEditing={() => {
-                  registerUser();
-                }}
-              ></TextInput>
-            </View>
-
-
-            <TouchableOpacity
-              disabled={loading}
-              style={styles.button}
-              onPress={() => {
-                setLoading(true);
+          <View style={styles.logoContainer}></View>
+          <Text style={styles.title}>Mr. Recipe</Text>
+          <View style={{ flexDirection: "row" }}>
+            <Icon
+              name="person-circle-outline"
+              size={20}
+              color={"white"}
+              style={styles.icon}
+            />
+            <TextInput
+              placeholder="Name"
+              placeholderTextColor="lightgrey"
+              editable={!loading}
+              style={styles.inputField}
+              value={name}
+              onChangeText={(name) => {
+                setName(convertName(name));
+              }}
+              maxLength={18}
+              onSubmitEditing={() => {
                 registerUser();
               }}
-            >
-              <Text style={styles.buttonText}>Sign up</Text>
-            </TouchableOpacity>
+            ></TextInput>
+          </View>
+          <View style={{ flexDirection: "row" }}>
+            <Icon
+              name="person-outline"
+              size={20}
+              color={"white"}
+              style={styles.icon}
+            />
+            <TextInput
+              placeholder="Username"
+              placeholderTextColor="lightgrey"
+              editable={!loading}
+              autoCorrect={false}
+              style={styles.inputField}
+              value={username}
+              onChangeText={(username) => {
+                setUsername(convertUsername(username));
+              }}
+              maxLength={12}
+              onSubmitEditing={() => {
+                registerUser();
+              }}
+            ></TextInput>
+          </View>
+          <View style={{ flexDirection: "row" }}>
+            <Icon
+              name="mail-outline"
+              size={20}
+              color={"white"}
+              style={styles.icon}
+            />
+            <TextInput
+              placeholder="Email Address"
+              placeholderTextColor="lightgrey"
+              editable={!loading}
+              style={styles.inputField}
+              keyboardType="email-address"
+              onChangeText={(email) => {
+                setEmail(email);
+              }}
+              autoCapitalize={false}
+              maxLength={320}
+              onSubmitEditing={() => {
+                registerUser();
+              }}
+            ></TextInput>
+          </View>
+
+          <View style={{ flexDirection: "row" }}>
+            <Icon
+              name="lock-closed-outline"
+              size={20}
+              color={"white"}
+              style={styles.icon}
+            />
+            <TextInput
+              placeholder="Password"
+              placeholderTextColor={"lightgrey"}
+              editable={!loading}
+              style={styles.inputField}
+              onChangeText={(password) => {
+                setPassword(password);
+              }}
+              secureTextEntry={true}
+              onSubmitEditing={() => {
+                registerUser();
+              }}
+            ></TextInput>
+          </View>
+
+          <TouchableOpacity
+            disabled={loading}
+            style={styles.button}
+            onPress={() => {
+              setLoading(true);
+              registerUser();
+            }}
+          >
+            <Text style={styles.buttonText}>Sign up</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </TouchableWithoutFeedback>
@@ -254,7 +262,8 @@ const styles = StyleSheet.create({
   register: {
     justifyContent: "center",
     alignItems: "center",
-    height: "87%",
+    height: "100%",
+    paddingBottom: 110,
   },
   logoContainer: {
     alignItems: "center",
@@ -266,9 +275,9 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 10,
-    fontFamily: 'Pacifico',
+    fontFamily: "Pacifico",
     fontSize: 40,
-    color: '#518BFF',
+    color: "#518BFF",
   },
   inputField: {
     width: 200,

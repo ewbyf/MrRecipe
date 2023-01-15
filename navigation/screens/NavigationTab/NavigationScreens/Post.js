@@ -4,9 +4,7 @@ import {
   TouchableOpacity,
   Text,
   TextInput,
-  Alert,
   Image,
-  ScrollView
 } from "react-native";
 import global from "../../../../Styles";
 import { useState, useEffect } from "react";
@@ -25,10 +23,10 @@ export default function Post({ navigation }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [difficulty, setDifficulty] = useState("Easy");
-  const [cookHrs, setCookHrs] = useState('');
-  const [cookMin, setCookMin] = useState('');
-  const [prepHrs, setPrepHrs] = useState('');
-  const [prepMin, setPrepMin] = useState('');
+  const [cookHrs, setCookHrs] = useState("");
+  const [cookMin, setCookMin] = useState("");
+  const [prepHrs, setPrepHrs] = useState("");
+  const [prepMin, setPrepMin] = useState("");
   const [ingredients, setIngredients] = useState([{ key: 0, value: "" }]);
   const [instructions, setInstructions] = useState([{ key: 0, value: "" }]);
 
@@ -98,7 +96,11 @@ export default function Post({ navigation }) {
         .getDownloadURL();
       return url;
     } catch (error) {
-      alert(error.code);
+      showMessage({
+        message: error.message,
+        icon: "danger",
+        type: "danger",
+      });
     }
   };
 
@@ -106,10 +108,11 @@ export default function Post({ navigation }) {
     if (type == "ingredients") {
       const _inputs = [...ingredients];
       if (ingredients[_inputs.length - 1].value == "") {
-        Alert.alert(
-          "Blank Ingredient",
-          "Please enter an ingredient and amount for the blank field before creating a new one."
-        );
+        showMessage({
+          message: "Please enter an ingredient before creating another",
+          icon: "danger",
+          type: "danger",
+        });
         return;
       }
       _inputs.push({ key: "", value: "" });
@@ -117,10 +120,11 @@ export default function Post({ navigation }) {
     } else {
       const _inputs = [...instructions];
       if (instructions[_inputs.length - 1].value == "") {
-        Alert.alert(
-          "Blank Step",
-          "Please enter a step before creating a new one."
-        );
+        showMessage({
+          message: "Please enter an ingredient before creating another",
+          icon: "danger",
+          type: "danger",
+        });
         return;
       }
       _inputs.push({ key: "", value: "" });
@@ -160,21 +164,27 @@ export default function Post({ navigation }) {
 
   const convertName = (text) => {
     return text.replace(/[^0-9a-zA-Z!:&$,\/()#%+-]/g, "");
-  }
+  };
 
   const convertText = (text) => {
     return text.replace(/[^0-9a-zA-Z.?:!&$,\/()#%+-]/g, "");
-  }
+  };
 
   const publish = async () => {
-    if (name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value) {
+    if (
+      name &&
+      difficulty &&
+      (cookHrs || cookMin) &&
+      ingredients[0].value &&
+      instructions[0].value
+    ) {
       const preptime = Number(prepMin) + Number(prepHrs) * 60;
       const cooktime = Number(cookMin) + Number(cookHrs) * 60;
       const ingredientsArray = [];
       const instructionsArray = [];
       const rated = {};
       const comments = [];
-      
+
       for (let i = 0; i < ingredients.length; i++) {
         if (ingredients[i].value) {
           ingredientsArray.push(ingredients[i].value);
@@ -199,46 +209,52 @@ export default function Post({ navigation }) {
         .then((snapshot) => {
           if (snapshot.exists) {
             firebase
-            .firestore()
-            .collection("recipes")
-            .add({
-              name,
-              name_lowercase: name.toLowerCase(),
-              name_array: name.toLowerCase().match(/\b(\w+)\b/g),
-              description,
-              weight: 0,
-              rating: 0,
-              numratings: 0,
-              difficulty,
-              cooktime,
-              preptime,
-              ingredients: ingredientsArray,
-              instructions: instructionsArray,
-              image: imgUrl,
-              rated,
-              comments,
-              uid: snapshot.data().uid,
-              timestamp,
-            })
-            .then((doc) => {
-              const recipes = snapshot.data().recipes;
-              recipes.push(doc.id);
-              ref.update({ recipes });
-              reset();
-              navigation.goBack(null);
-              setPublishing(false);
-            })
-            .catch((error) => {
-              alert(error.message);
-            });
-          } else
-            Alert.alert("Unknown Error Occured", "Contact support with error.");
+              .firestore()
+              .collection("recipes")
+              .add({
+                name,
+                name_lowercase: name.toLowerCase(),
+                name_array: name.toLowerCase().match(/\b(\w+)\b/g),
+                description,
+                weight: 0,
+                rating: 0,
+                numratings: 0,
+                difficulty,
+                cooktime,
+                preptime,
+                ingredients: ingredientsArray,
+                instructions: instructionsArray,
+                image: imgUrl,
+                rated,
+                comments,
+                uid: snapshot.data().uid,
+                timestamp,
+              })
+              .then((doc) => {
+                const recipes = snapshot.data().recipes;
+                recipes.push(doc.id);
+                ref.update({ recipes });
+                reset();
+                navigation.goBack(null);
+                setPublishing(false);
+              })
+              .catch((error) => {
+                showMessage({
+                  message: error.message,
+                  icon: "danger",
+                  type: "danger",
+                });
+              });
+          }
         })
         .catch((error) => {
-          alert(error.message);
+          showMessage({
+            message: error.message,
+            icon: "danger",
+            type: "danger",
+          });
         });
-    }
-    else {
+    } else {
       setPublishing(false);
     }
   };
@@ -247,10 +263,10 @@ export default function Post({ navigation }) {
     setImage(null);
     setName("");
     setDescription("");
-    setCookHrs('');
-    setCookMin('');
-    setPrepHrs('');
-    setPrepMin('');
+    setCookHrs("");
+    setCookMin("");
+    setPrepHrs("");
+    setPrepMin("");
     setInstructions([{ key: 0, value: "" }]);
     setIngredients([{ key: 0, value: "" }]);
   };
@@ -327,15 +343,40 @@ export default function Post({ navigation }) {
           />
           <Text style={global.topbarTitle}>Add a Recipe</Text>
           <TouchableOpacity
-              disabled={publishing || !(name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value)}
-              onPress={() => {
-                setPublishing(true);
-                publish();
-              }}
-              style={styles.button}
+            disabled={
+              publishing ||
+              !(
+                name &&
+                difficulty &&
+                (cookHrs || cookMin) &&
+                ingredients[0].value &&
+                instructions[0].value
+              )
+            }
+            onPress={() => {
+              setPublishing(true);
+              publish();
+            }}
+            style={styles.button}
+          >
+            <Text
+              style={[
+                styles.buttonText,
+                {
+                  color:
+                    name &&
+                    difficulty &&
+                    (cookHrs || cookMin) &&
+                    ingredients[0].value &&
+                    instructions[0].value
+                      ? "white"
+                      : "gray",
+                },
+              ]}
             >
-              <Text style={[styles.buttonText, {color: (name && difficulty && (cookHrs || cookMin) && ingredients[0].value && instructions[0].value) ? "white" : "gray"}]}>Post</Text>
-            </TouchableOpacity>
+              Post
+            </Text>
+          </TouchableOpacity>
         </View>
         <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.items}>
@@ -363,7 +404,12 @@ export default function Post({ navigation }) {
               <View style={{ alignItems: "center" }}>
                 <Image
                   source={{ uri: image.uri }}
-                  style={{ width: 350, height: undefined, marginTop: 20, aspectRatio: 5/3 }}
+                  style={{
+                    width: 350,
+                    height: undefined,
+                    marginTop: 20,
+                    aspectRatio: 5 / 3,
+                  }}
                 />
                 <TouchableOpacity onPress={() => setImage(null)}>
                   <Text
@@ -421,7 +467,7 @@ export default function Post({ navigation }) {
               <SelectList
                 data={data}
                 setSelected={(diff) => setDifficulty(diff)}
-                defaultOption={{key: "Easy", value: "Easy"}}
+                defaultOption={{ key: "Easy", value: "Easy" }}
                 search={false}
                 disabled={publishing}
                 inputStyles={{ color: "white" }}
@@ -542,7 +588,9 @@ export default function Post({ navigation }) {
                   value={ingredients[0].value}
                   style={styles.input}
                   editable={!publishing}
-                  onChangeText={(text) => inputHandler(convertText(text), 0, "ingredients")}
+                  onChangeText={(text) =>
+                    inputHandler(convertText(text), 0, "ingredients")
+                  }
                 />
               </View>
               {ingredients.slice(1).map((input, key) => (
@@ -588,7 +636,9 @@ export default function Post({ navigation }) {
                   style={[styles.input, { paddingLeft: 30 }]}
                   value={instructions[0].value}
                   editable={!publishing}
-                  onChangeText={(text) => inputHandler(convertText(text), 0, "instructions")}
+                  onChangeText={(text) =>
+                    inputHandler(convertText(text), 0, "instructions")
+                  }
                 />
                 <Text
                   style={{
@@ -688,7 +738,7 @@ const styles = StyleSheet.create({
   },
   button: {
     position: "absolute",
-    top: '50%',
+    top: "50%",
     marginTop: 21,
     right: 20,
   },

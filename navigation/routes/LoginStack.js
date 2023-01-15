@@ -5,12 +5,15 @@ import Register from "../screens/NavigationTab/NavigationScreens/LoginStack/Regi
 const Stack = createStackNavigator();
 
 export default function LoginStack() {
-    return (
-        <Stack.Navigator initialRouteName="LoginScreen" screenOptions={({route}) => ({
-            headerShown: false,
-        })}>
-            <Stack.Screen name="LoginScreen" component={Login} />
-            <Stack.Screen name="RegisterScreen" component={Register} />
-        </Stack.Navigator>
-      );
+  return (
+    <Stack.Navigator
+      initialRouteName="LoginScreen"
+      screenOptions={() => ({
+        headerShown: false,
+      })}
+    >
+      <Stack.Screen name="LoginScreen" component={Login} />
+      <Stack.Screen name="RegisterScreen" component={Register} />
+    </Stack.Navigator>
+  );
 }

@@ -2,7 +2,6 @@ import {
   StyleSheet,
   View,
   Text,
-  TextInput,
   ScrollView,
   TouchableOpacity,
   Image,
@@ -10,7 +9,6 @@ import {
   Platform,
   TouchableWithoutFeedback,
   RefreshControl,
-  Alert
 } from "react-native";
 import { SearchBar } from "@rneui/themed";
 import global from "../../../../Styles";
@@ -22,7 +20,6 @@ import { Rating } from "react-native-ratings";
 import {
   TapGestureHandler,
   GestureHandlerRootView,
-  Gesture,
 } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedStyle,
@@ -49,7 +46,6 @@ export default function Search({ navigation }) {
   const wait = (timeout) => {
     return new Promise((resolve) => setTimeout(resolve, timeout));
   };
-
 
   function onAuthStateChanged(userParam) {
     fetchData(userParam);
@@ -87,8 +83,7 @@ export default function Search({ navigation }) {
           if (snapshot.exists) {
             setUser(snapshot.data());
             fav = snapshot.data().favorites;
-          } else
-            Alert.alert("Unknown Error Occured", "Contact support with error.");
+          }
         });
     }
 
@@ -98,7 +93,7 @@ export default function Search({ navigation }) {
       .orderBy("weight", "desc")
       .limit(50)
       .get();
-    
+
     recipes = shuffle(recipes.docs);
 
     await Promise.all(
@@ -109,8 +104,7 @@ export default function Search({ navigation }) {
             value: doc.data(),
             favorite: "#FF4343",
           });
-        }
-        else {
+        } else {
           tempList.push({ key: doc.id, value: doc.data(), favorite: "gray" });
         }
       })
@@ -160,22 +154,26 @@ export default function Search({ navigation }) {
             }
           })
           .catch((error) => {
-            alert(error.message);
+            showMessage({
+              message: error.message,
+              icon: "danger",
+              type: "danger",
+            });
           });
 
         if (set == "dataList") {
           setDataList(temp);
+        } else {
+          setRecipesList(temp);
         }
-        else {
-          setRecipesList(temp)
-        }
-      
+
         setLiked(color);
       } else {
-        Alert.alert(
-          "Not Signed In",
-          "You must be signed in to favorite a recipe.",
-        );
+        showMessage({
+          message: "Must be signed in to favorite a recipe",
+          icon: "danger",
+          type: "danger",
+        });
       }
     };
     const scale = useSharedValue(0);
@@ -213,21 +211,24 @@ export default function Search({ navigation }) {
             }
           })
           .catch((error) => {
-            alert(error.message);
+            showMessage({
+              message: error.message,
+              icon: "danger",
+              type: "danger",
+            });
           });
 
-        
         if (set == "dataList") {
           setDataList(temp);
-        }
-        else {
+        } else {
           setRecipesList(temp);
         }
       } else {
-        Alert.alert(
-          "Not Signed In",
-          "You must be signed in to favorite a recipe.",
-        );
+        showMessage({
+          message: "Must be signed in to favorite a recipe",
+          icon: "danger",
+          type: "danger",
+        });
       }
     }, []);
 
@@ -321,8 +322,11 @@ export default function Search({ navigation }) {
 
   const Users = ({ item }) => {
     return (
-      <TouchableOpacity style={global.itemContainer} onPress={() => navigation.navigate("ProfileScreen", {id: item.key})}>
-        <View style={[global.list, {paddingTop: 10}]}>
+      <TouchableOpacity
+        style={global.itemContainer}
+        onPress={() => navigation.navigate("ProfileScreen", { id: item.key })}
+      >
+        <View style={[global.list, { paddingTop: 10 }]}>
           <Image
             source={{
               uri: item.value.pfp
@@ -332,16 +336,29 @@ export default function Search({ navigation }) {
             style={styles.profileImage}
           />
           <View style={{ width: "100%", height: 85, marginTop: 10 }}>
-            <Text style={{ color: "white", fontWeight: "bold", fontSize: 16, textAlign: 'center' }}>{item.value.name}</Text>
-            <Text style={{ color: "gray", textAlign: 'center' }}>@{item.value.username}</Text>
-            <Text style={{ color: "white" }} numberOfLines={3 }>{item.value.bio}</Text>
+            <Text
+              style={{
+                color: "white",
+                fontWeight: "bold",
+                fontSize: 16,
+                textAlign: "center",
+              }}
+            >
+              {item.value.name}
+            </Text>
+            <Text style={{ color: "gray", textAlign: "center" }}>
+              @{item.value.username}
+            </Text>
+            <Text style={{ color: "white" }} numberOfLines={3}>
+              {item.value.bio}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>
     );
-  }
+  };
 
-  const searchRecipe = async(val) => {
+  const searchRecipe = async (val) => {
     if (val) {
       let users = [];
       let tempUsers = [];
@@ -351,31 +368,31 @@ export default function Search({ navigation }) {
       let fav = [];
 
       val = val.toLowerCase();
-      
+
       // Searched recipes
 
-      await firebase.firestore().collection("recipes")
-      .where("name_lowercase", ">=", val)
-      .where("name_lowercase", "<=", val + "\uF7FF")
-      .get()
-      .then((snap) => {
-        if (!snap.empty)
-          tempRecipes = snap.docs;
-      })
+      await firebase
+        .firestore()
+        .collection("recipes")
+        .where("name_lowercase", ">=", val)
+        .where("name_lowercase", "<=", val + "\uF7FF")
+        .get()
+        .then((snap) => {
+          if (!snap.empty) tempRecipes = snap.docs;
+        });
 
       if (tempRecipes.length) {
         if (user) {
           await firebase
-          .firestore()
-          .collection("users")
-          .doc(firebase.auth().currentUser.uid)
-          .get()
-          .then((snapshot) => {
-            if (snapshot.exists) {
-              fav = snapshot.data().favorites;
-            } else
-              Alert.alert("Unknown Error Occured", "Contact support with error.");
-          });
+            .firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .get()
+            .then((snapshot) => {
+              if (snapshot.exists) {
+                fav = snapshot.data().favorites;
+              }
+            });
         }
 
         await Promise.all(
@@ -386,35 +403,42 @@ export default function Search({ navigation }) {
                 value: doc.data(),
                 favorite: "#FF4343",
               });
-            }
-            else {
-              recipes.push({ key: doc.id, value: doc.data(), favorite: "gray" });
+            } else {
+              recipes.push({
+                key: doc.id,
+                value: doc.data(),
+                favorite: "gray",
+              });
             }
           })
         );
       }
 
-      await firebase.firestore().collection("recipes")
-      .where("name_array", "array-contains", val)
-      .get()
-      .then((snap) => {
-        if (!snap.empty)
-          tempRecipes = snap.docs;
-      })
+      await firebase
+        .firestore()
+        .collection("recipes")
+        .where("name_array", "array-contains", val)
+        .get()
+        .then((snap) => {
+          if (!snap.empty) tempRecipes = snap.docs;
+        });
 
       if (tempRecipes.length) {
         await Promise.all(
           tempRecipes.map(async (doc) => {
-            if (recipes.findIndex(item => item.key == doc.id) < 0) {
+            if (recipes.findIndex((item) => item.key == doc.id) < 0) {
               if (fav.indexOf(doc.id) >= 0) {
                 recipes.push({
                   key: doc.id,
                   value: doc.data(),
                   favorite: "#FF4343",
                 });
-              }
-              else {
-                recipes.push({ key: doc.id, value: doc.data(), favorite: "gray" });
+              } else {
+                recipes.push({
+                  key: doc.id,
+                  value: doc.data(),
+                  favorite: "gray",
+                });
               }
             }
           })
@@ -424,14 +448,15 @@ export default function Search({ navigation }) {
       setRecipesList(recipes);
 
       // Searched users
-      await firebase.firestore().collection("users")
-      .where("username_lowercase", ">=", val)
-      .where("username_lowercase", "<=", val + "\uF7FF")
-      .get()
-      .then((snap) => {
-        if (!snap.empty)
-          tempUsers = snap.docs;
-      });
+      await firebase
+        .firestore()
+        .collection("users")
+        .where("username_lowercase", ">=", val)
+        .where("username_lowercase", "<=", val + "\uF7FF")
+        .get()
+        .then((snap) => {
+          if (!snap.empty) tempUsers = snap.docs;
+        });
 
       if (tempUsers.length) {
         await Promise.all(
@@ -444,19 +469,20 @@ export default function Search({ navigation }) {
         );
       }
 
-      await firebase.firestore().collection("users")
-      .where("name_lowercase", ">=", val)
-      .where("name_lowercase", "<=", val + "\uF7FF")
-      .get()
-      .then((snap) => {
-        if (!snap.empty)
-          tempUsers = snap.docs;
-      });
+      await firebase
+        .firestore()
+        .collection("users")
+        .where("name_lowercase", ">=", val)
+        .where("name_lowercase", "<=", val + "\uF7FF")
+        .get()
+        .then((snap) => {
+          if (!snap.empty) tempUsers = snap.docs;
+        });
 
       if (tempUsers.length) {
         await Promise.all(
           tempUsers.map(async (doc) => {
-            if (users.findIndex(item => item.key == doc.id) < 0) {
+            if (users.findIndex((item) => item.key == doc.id) < 0) {
               users.push({
                 key: doc.id,
                 value: doc.data(),
@@ -466,18 +492,19 @@ export default function Search({ navigation }) {
         );
       }
 
-      await firebase.firestore().collection("users")
-      .where("name_array", "array-contains", val)
-      .get()
-      .then((snap) => {
-        if (!snap.empty)
-          tempUsers = snap.docs;
-      });
+      await firebase
+        .firestore()
+        .collection("users")
+        .where("name_array", "array-contains", val)
+        .get()
+        .then((snap) => {
+          if (!snap.empty) tempUsers = snap.docs;
+        });
 
       if (tempUsers.length) {
         await Promise.all(
           tempUsers.map(async (doc) => {
-            if (users.findIndex(item => item.key == doc.id) < 0) {
+            if (users.findIndex((item) => item.key == doc.id) < 0) {
               users.push({
                 key: doc.id,
                 value: doc.data(),
@@ -487,9 +514,9 @@ export default function Search({ navigation }) {
         );
       }
 
-      setUserList(users)
+      setUserList(users);
     }
-  }
+  };
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -518,7 +545,7 @@ export default function Search({ navigation }) {
   return (
     <GestureHandlerRootView style={global.appContainer}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View style={[global.searchTopbar, {height: (press ? 160 : 130)}]}>
+        <View style={[global.searchTopbar, { height: press ? 160 : 130 }]}>
           <SearchBar
             lightTheme
             round
@@ -530,42 +557,67 @@ export default function Search({ navigation }) {
             placeholder="Search for users and recipes"
             inputStyle={{ fontSize: 15 }}
             onFocus={() => setPress(true)}
-            onChangeText={(val) => {setSearchValue(val); searchRecipe(val)}}
+            onChangeText={(val) => {
+              setSearchValue(val);
+              searchRecipe(val);
+            }}
             value={searchValue}
-            onCancel={() => {setPress(false)}}
+            onCancel={() => {
+              setPress(false);
+            }}
           />
           {press && (
-            <View style={{flexDirection: 'row', position: 'absolute', bottom: 0}}>
-              <TouchableOpacity onPress={() => setRecipesSelected(true)} style={[styles.tab, {borderBottomWidth: (recipesSelected ? 1 : 0)}]}>
+            <View
+              style={{ flexDirection: "row", position: "absolute", bottom: 0 }}
+            >
+              <TouchableOpacity
+                onPress={() => setRecipesSelected(true)}
+                style={[
+                  styles.tab,
+                  { borderBottomWidth: recipesSelected ? 1 : 0 },
+                ]}
+              >
                 <View>
-                  <Text style={styles.tabTitle}>
-                    Recipes
-                  </Text>
+                  <Text style={styles.tabTitle}>Recipes</Text>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setRecipesSelected(false)} style={[styles.tab, {borderBottomWidth: (!recipesSelected ? 1 : 0)}]}>
+              <TouchableOpacity
+                onPress={() => setRecipesSelected(false)}
+                style={[
+                  styles.tab,
+                  { borderBottomWidth: !recipesSelected ? 1 : 0 },
+                ]}
+              >
                 <View>
-                  <Text style={styles.tabTitle}>
-                    Users
-                  </Text>
+                  <Text style={styles.tabTitle}>Users</Text>
                 </View>
               </TouchableOpacity>
             </View>
           )}
         </View>
       </TouchableWithoutFeedback>
-      <ScrollView showsVerticalScrollIndicator={false} style={{ zIndex: 3 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{ zIndex: 3 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View style={styles.postsContainer}>
-          {searchValue && ((recipesList.length == 0 && recipesSelected) || (userList.length == 0 && !recipesSelected)) && (
-            <View>
-              <Text style={styles.noResults}>No results found</Text>
-            </View>
-          )}
+          {searchValue &&
+            ((recipesList.length == 0 && recipesSelected) ||
+              (userList.length == 0 && !recipesSelected)) && (
+              <View>
+                <Text style={styles.noResults}>No results found</Text>
+              </View>
+            )}
 
           {!press && !searchValue && (
             <FlashList
               data={dataList}
-              renderItem={({ item }) => <Recipes item={item} data={dataList} set={"dataList"} />}
+              renderItem={({ item }) => (
+                <Recipes item={item} data={dataList} set={"dataList"} />
+              )}
               estimatedItemSize={10}
               numColumns={2}
             />
@@ -574,7 +626,9 @@ export default function Search({ navigation }) {
           {searchValue && recipesSelected && (
             <FlashList
               data={recipesList}
-              renderItem={({ item }) => <Recipes item={item} data={recipesList} set={"recipesList"} />}
+              renderItem={({ item }) => (
+                <Recipes item={item} data={recipesList} set={"recipesList"} />
+              )}
               estimatedItemSize={10}
               numColumns={2}
             />
@@ -588,7 +642,6 @@ export default function Search({ navigation }) {
               numColumns={2}
             />
           )}
-          
         </View>
       </ScrollView>
     </GestureHandlerRootView>
@@ -618,23 +671,23 @@ const styles = StyleSheet.create({
   heart: {
     height: 75,
     width: 75,
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
     marginTop: -35,
     marginLeft: -22,
     zIndex: 10,
   },
   tabTitle: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center'
+    fontWeight: "bold",
+    textAlign: "center",
   },
   tab: {
     flex: 1,
     paddingVertical: 15,
-    borderBottomColor: "white"
+    borderBottomColor: "white",
   },
   profileImage: {
     height: 100,
@@ -642,10 +695,10 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   noResults: {
-    color: 'gray',
-    textAlign: 'center',
+    color: "gray",
+    textAlign: "center",
     fontSize: 16,
-    fontStyle: 'italic',
+    fontStyle: "italic",
     marginTop: 10,
-  }
+  },
 });

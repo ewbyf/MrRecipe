@@ -6,12 +6,11 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
-  Alert,
 } from "react-native";
 import global from "../../../Styles";
 import { AirbnbRating, Rating } from "react-native-ratings";
 import BackArrow from "../../../components/BackArrow";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { firebase } from "../../../config";
 import { useRoute } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -23,10 +22,10 @@ import {
   MenuOption,
   MenuTrigger,
 } from "react-native-popup-menu";
-import Dialog from 'react-native-dialog';
+import Dialog from "react-native-dialog";
 import { showMessage } from "react-native-flash-message";
-import dayjs from "dayjs"
-import relativeTime from "dayjs/plugin/relativeTime"
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 export default function Dish({ navigation }) {
   const route = useRoute();
@@ -39,7 +38,6 @@ export default function Dish({ navigation }) {
   const [pressed, setPressed] = useState(false);
   const [reload, setReload] = useState(false);
 
-
   function onAuthStateChanged(userParam) {
     if (userParam) fetchUser();
   }
@@ -49,7 +47,7 @@ export default function Dish({ navigation }) {
     return subscriber;
   }, []);
 
-  const fetchUser = async() => {
+  const fetchUser = async () => {
     await firebase
       .firestore()
       .collection("users")
@@ -62,94 +60,101 @@ export default function Dish({ navigation }) {
       });
   };
 
-  const fetchRecipe = async() => {
+  const fetchRecipe = async () => {
     firebase
-    .firestore()
-    .collection("recipes")
-    .doc(route.params.doc)
-    .get()
-    .then((snapshot) => {
-      setRecipeData(snapshot.data());
-    });
-  }
+      .firestore()
+      .collection("recipes")
+      .doc(route.params.doc)
+      .get()
+      .then((snapshot) => {
+        setRecipeData(snapshot.data());
+      });
+  };
 
   useEffect(() => {
     dayjs.extend(relativeTime);
     firebase
-    .firestore()
-    .collection("recipes")
-    .doc(route.params.doc)
-    .get()
-    .then((snapshot) => {
-      setRecipeData(snapshot.data());
-      let user = firebase.auth().currentUser;
-      if (user && Object.keys(snapshot.data().rated).includes(user.uid)) {
-        setRating(snapshot.data().rated[user.uid]);
-      }
-      firebase
-        .firestore()
-        .collection("users")
-        .doc(snapshot.data().uid)
-        .get()
-        .then((snap) => {
-          setAuthorData(snap.data());
-          setInitializing(false);
-        });
-    });
+      .firestore()
+      .collection("recipes")
+      .doc(route.params.doc)
+      .get()
+      .then((snapshot) => {
+        setRecipeData(snapshot.data());
+        let user = firebase.auth().currentUser;
+        if (user && Object.keys(snapshot.data().rated).includes(user.uid)) {
+          setRating(snapshot.data().rated[user.uid]);
+        }
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(snapshot.data().uid)
+          .get()
+          .then((snap) => {
+            setAuthorData(snap.data());
+            setInitializing(false);
+          });
+      });
     navigation.addListener("focus", () => {
       setReload(!reload);
     });
   }, [navigation, reload]);
 
-
-
-  const deleteRecipe = async() => {
+  const deleteRecipe = async () => {
     let recipes = authorData.recipes;
     recipes.splice(recipes.indexOf(route.params.doc), 1);
 
-    await firebase.firestore().collection('recipes').doc(route.params.doc).delete()
-    .then(() => {
-      if (recipeData.image) {
-        let imageRef = firebase.storage().refFromURL(recipeData.image);
-        imageRef.delete();
-      }
-
-      firebase
+    await firebase
       .firestore()
-      .collection("users")
-      .doc(authorData.uid)
-      .update({
-        recipes
-      });
-      setDeleteVisible(false);
-      if (navigation.canGoBack())
-        navigation.goBack(null);
-    })
-    .catch((error) => alert(error.message));
-  }
+      .collection("recipes")
+      .doc(route.params.doc)
+      .delete()
+      .then(() => {
+        if (recipeData.image) {
+          let imageRef = firebase.storage().refFromURL(recipeData.image);
+          imageRef.delete();
+        }
+
+        firebase.firestore().collection("users").doc(authorData.uid).update({
+          recipes,
+        });
+        setDeleteVisible(false);
+        if (navigation.canGoBack()) navigation.goBack(null);
+      })
+      .catch((error) =>
+        showMessage({
+          message: error.message,
+          icon: "danger",
+          type: "danger",
+        })
+      );
+  };
 
   const Heart = () => {
-    const [liked, setLiked] = useState('gray');
+    const [liked, setLiked] = useState("gray");
 
     useEffect(() => {
       if (userData) {
         firebase
-        .firestore()
-        .collection("users")
-        .doc(userData.uid)
-        .get()
-        .then((snap) => {
-          if (snap.data().favorites.indexOf(route.params.doc) != -1) {
-            setLiked("#FF4343");
-          }
-        })
-        .catch((error) => {
-          alert(error.message);
-        });
+          .firestore()
+          .collection("users")
+          .doc(userData.uid)
+          .get()
+          .then((snap) => {
+            if (snap.data().favorites.indexOf(route.params.doc) != -1) {
+              setLiked("#FF4343");
+            }
+          })
+          .catch((error) => {
+            showMessage({
+              message: error.message,
+              icon: "danger",
+              type: "danger",
+            });
+          });
       }
-    }, [])
+    }, []);
 
-    const favorite = async() => {
+    const favorite = async () => {
       if (userData) {
         await firebase
           .firestore()
@@ -177,13 +182,18 @@ export default function Dish({ navigation }) {
             }
           })
           .catch((error) => {
-            alert(error.message);
+            showMessage({
+              message: error.message,
+              icon: "danger",
+              type: "danger",
+            });
           });
       } else {
-        Alert.alert(
-          "Not Signed In",
-          "You must be signed in to favorite a recipe.",
-        );
+        showMessage({
+          message: "Must be signed in to favorite a recipe",
+          icon: "danger",
+          type: "danger",
+        });
       }
     };
 
@@ -192,7 +202,7 @@ export default function Dish({ navigation }) {
         <Icon name="heart" color={liked} size={30} />
       </TouchableOpacity>
     );
-  }
+  };
 
   const Body = () => {
     const [recipeRating, setRecipeRating] = useState();
@@ -217,66 +227,90 @@ export default function Dish({ navigation }) {
 
     if (loading) return null;
 
-    const rate = async(rating) => {
+    const rate = async (rating) => {
       if (userData) {
         let newRating = 0;
         let numRatings = 0;
         let rated = {};
-  
-        await firebase.firestore().collection('recipes').doc(route.params.doc).get()
-        .then((snap) => {
-          numRatings = snap.data().numratings;
-          rated = snap.data().rated;
-        })
-  
+
+        await firebase
+          .firestore()
+          .collection("recipes")
+          .doc(route.params.doc)
+          .get()
+          .then((snap) => {
+            numRatings = snap.data().numratings;
+            rated = snap.data().rated;
+          });
+
         if (Object.keys(rated).includes(userData.uid) || currentRated) {
           newRating =
             (recipeData.rating * recipeData.numratings -
               recipeData.rated[userData.uid] +
               rating) /
             recipeData.numratings;
-          setRecipeRating((recipeRating * recipeNumRatings - rated[userData.uid] + rating) / recipeNumRatings)
+          setRecipeRating(
+            (recipeRating * recipeNumRatings - rated[userData.uid] + rating) /
+              recipeNumRatings
+          );
         } else {
-          newRating = (recipeData.rating * recipeData.numratings + rating) / (recipeData.numratings + 1);
+          newRating =
+            (recipeData.rating * recipeData.numratings + rating) /
+            (recipeData.numratings + 1);
           numRatings++;
-          setRecipeRating((recipeRating * recipeNumRatings + rating) / (recipeNumRatings + 1));
+          setRecipeRating(
+            (recipeRating * recipeNumRatings + rating) / (recipeNumRatings + 1)
+          );
           setRecipeNumRatings(recipeNumRatings + 1);
           setCurrentRated(true);
-  
-          firebase.firestore().collection("users").doc(userData.uid).get()
-          .then((snap) => {
-            let temp = snap.data().ratings;
-            temp.push(route.params.doc);
-            firebase.firestore().collection("users").doc(userData.uid).update({ratings: temp});
-          })
+
+          firebase
+            .firestore()
+            .collection("users")
+            .doc(userData.uid)
+            .get()
+            .then((snap) => {
+              let temp = snap.data().ratings;
+              temp.push(route.params.doc);
+              firebase
+                .firestore()
+                .collection("users")
+                .doc(userData.uid)
+                .update({ ratings: temp });
+            });
         }
 
         rated[userData.uid] = rating;
 
-        let weight = newRating + (5 * (1 - Math.E ** (-numRatings / 50)));
-  
+        let weight = newRating + 5 * (1 - Math.E ** (-numRatings / 50));
+
         firebase
-        .firestore()
-        .collection("recipes")
-        .doc(route.params.doc)
-        .update({ rating: newRating, numratings: numRatings, rated, weight });
-      
+          .firestore()
+          .collection("recipes")
+          .doc(route.params.doc)
+          .update({ rating: newRating, numratings: numRatings, rated, weight });
       } else {
-        Alert.alert("Not Logged In", "You must be logged in to leave a rating.");
+        showMessage({
+          message: "Must be signed in to leave a rating",
+          icon: "danger",
+          type: "danger",
+        });
       }
     };
-  
+
     return (
       <View>
-      <View style={styles.details}>
+        <View style={styles.details}>
           {recipeData.description && (
             <Text style={styles.desc}>{recipeData.description}</Text>
           )}
           {!recipeData.description && (
-            <Text style={[styles.desc, {fontStyle: "italic"}]}>No description provided</Text>
+            <Text style={[styles.desc, { fontStyle: "italic" }]}>
+              No description provided
+            </Text>
           )}
           <View style={styles.timeContainer}>
-            <View style={{justifyContent: 'space-between'}}>
+            <View style={{ justifyContent: "space-between" }}>
               <Text style={styles.timeText}>
                 <Text style={{ color: "#518BFF", fontWeight: "bold" }}>
                   Prep Time:
@@ -314,7 +348,7 @@ export default function Dish({ navigation }) {
             </View>
           </View>
           <View style={styles.profileRow}>
-            <View style={{ flexDirection: "row", flex: 4}}>
+            <View style={{ flexDirection: "row", flex: 4 }}>
               <TouchableOpacity
                 style={{ flexDirection: "row", alignItems: "center" }}
                 disabled={pressed}
@@ -324,26 +358,35 @@ export default function Dish({ navigation }) {
                       setPressed(true);
                       navigation.goBack(null);
                     }
-                  }
-                  else {
-                    navigation.push("ProfileScreen", {doc: route.params.doc, id: authorData.uid});
+                  } else {
+                    navigation.push("ProfileScreen", {
+                      doc: route.params.doc,
+                      id: authorData.uid,
+                    });
                   }
                 }}
               >
                 <Image
-                  source={{ uri: (authorData.pfp ? authorData.pfp : 'https://imgur.com/hNwMcZQ.png') }}
+                  source={{
+                    uri: authorData.pfp
+                      ? authorData.pfp
+                      : "https://imgur.com/hNwMcZQ.png",
+                  }}
                   style={styles.authorPfp}
                 />
                 <View style={{ marginLeft: 10 }}>
-                  <Text style={styles.username} numberOfLines={1}>{authorData.username}</Text>
+                  <Text style={styles.username} numberOfLines={1}>
+                    {authorData.username}
+                  </Text>
                   <Text style={{ color: "gray" }}>
-                    {authorData.recipes.length} {(authorData.recipes.length == 1 ? "Post" : "Posts")}
+                    {authorData.recipes.length}{" "}
+                    {authorData.recipes.length == 1 ? "Post" : "Posts"}
                   </Text>
                 </View>
               </TouchableOpacity>
             </View>
-            <View style={{flex: 1, alignItems: 'center'}}>
-              <Heart/>
+            <View style={{ flex: 1, alignItems: "center" }}>
+              <Heart />
             </View>
           </View>
         </View>
@@ -369,8 +412,14 @@ export default function Dish({ navigation }) {
             </View>
           ))}
         </View>
-          
-        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <View>
             <Text style={styles.title}>Leave a Rating</Text>
             <View>
@@ -390,11 +439,11 @@ export default function Dish({ navigation }) {
         </View>
       </View>
     );
-  }
+  };
 
   const Comments = () => {
     const [posting, setPosting] = useState(false);
-    const [comment, setComment] = useState('');
+    const [comment, setComment] = useState("");
     const [commentsData, setCommentsData] = useState();
     const [loading, setLoading] = useState(true);
     const [numComments, setNumComments] = useState();
@@ -414,92 +463,98 @@ export default function Dish({ navigation }) {
         });
     }, []);
 
-    const submitComment = async() => {
+    const submitComment = async () => {
       if (userData) {
         if (comment.replace(/\s/g, "")) {
           let timestamp = firebase.firestore.Timestamp.fromDate(new Date());
           let tempComments = [];
-  
+
           firebase
-          .firestore()
-          .collection("recipes")
-          .doc(route.params.doc)
-          .get()
-          .then((snap) => {
-            tempComments = snap.data().comments;
-          })
-  
+            .firestore()
+            .collection("recipes")
+            .doc(route.params.doc)
+            .get()
+            .then((snap) => {
+              tempComments = snap.data().comments;
+            });
+
           await firebase
-          .firestore()
-          .collection("users")
-          .doc(userData.uid)
-          .get()
-          .then((snap) => {
-            let key = timestamp + snap.data().username;
-            let temp = snap.data().comments;
-            temp.push({key, recipe: route.params.doc});
-  
-            firebase
             .firestore()
             .collection("users")
             .doc(userData.uid)
-            .update({
-              comments: temp
+            .get()
+            .then((snap) => {
+              let key = timestamp + snap.data().username;
+              let temp = snap.data().comments;
+              temp.push({ key, recipe: route.params.doc });
+
+              firebase
+                .firestore()
+                .collection("users")
+                .doc(userData.uid)
+                .update({
+                  comments: temp,
+                });
+
+              tempComments.push({
+                key,
+                uid: snap.data().uid,
+                comment,
+                timestamp,
+              });
+              setCommentsData([
+                ...commentsData,
+                { key, uid: snap.data().uid, comment, timestamp },
+              ]);
             });
-  
-            tempComments.push({key, uid: snap.data().uid, comment, timestamp});
-            setCommentsData([...commentsData, {key, uid: snap.data().uid, comment, timestamp}])
-          });
-  
-  
+
           await firebase
-          .firestore()
-          .collection("recipes")
-          .doc(route.params.doc)
-          .update({ 
-            comments: tempComments
-           })
-           .then(() => {
-            showMessage({
-              message: "Comment successfully posted!",
-              type: "success",
+            .firestore()
+            .collection("recipes")
+            .doc(route.params.doc)
+            .update({
+              comments: tempComments,
+            })
+            .then(() => {
+              showMessage({
+                message: "Comment successfully posted!",
+                type: "success",
+              });
+              setNumComments(numComments + 1);
+              setComment("");
             });
-            setNumComments(numComments + 1);
-            setComment('');
-           });
         }
-      }
-      else {
-        Alert.alert("Not Signed In", "You must be signed in to post a comment.");
+      } else {
+        showMessage({
+          message: "Must be signed in to post a comment",
+          icon: "danger",
+          type: "danger",
+        });
       }
       setPosting(false);
-    }
+    };
 
     const CommentList = () => {
       if (commentsData.length == 0) {
         return null;
       }
-  
+
       return (
-        <View style={{height: '100%', marginBottom: 40}}>
+        <View style={{ height: "100%", marginBottom: 40 }}>
           <FlashList
             data={commentsData.slice().reverse()}
-            renderItem={({ item }) => (
-              <CommentRender item={item}/>
-            )}
+            renderItem={({ item }) => <CommentRender item={item} />}
             estimatedItemSize={10}
-          /> 
+          />
         </View>
       );
-    }
+    };
 
     if (loading) return null;
 
     return (
       <View>
-        <Text style={styles.commentsTitle}>
-          {numComments} Comments
-        </Text>
+        <Text style={styles.commentsTitle}>{numComments} Comments</Text>
         <View style={styles.commentContainer}>
           <Image
             source={{
@@ -523,7 +578,7 @@ export default function Dish({ navigation }) {
             name="send"
             disabled={posting}
             size={20}
-            color={comment.replace(/\s/g, "") ? "#518BFF" : 'gray'}
+            color={comment.replace(/\s/g, "") ? "#518BFF" : "gray"}
             style={{ marginLeft: "auto" }}
             onPress={() => {
               setPosting(true);
@@ -531,99 +586,153 @@ export default function Dish({ navigation }) {
             }}
           />
         </View>
-        <CommentList/>
+        <CommentList />
       </View>
     );
-  }
+  };
 
-  const CommentRender = ({item}) => {
+  const CommentRender = ({ item }) => {
     const [commenterData, setCommenterData] = useState();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-      firebase.firestore().collection('users').doc(item.uid).get()
-      .then((snap) => {
-        if (snap.exists) {
-          setCommenterData(snap.data());
-        }
-        setLoading(false);
-      });
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(item.uid)
+        .get()
+        .then((snap) => {
+          if (snap.exists) {
+            setCommenterData(snap.data());
+          }
+          setLoading(false);
+        });
     }, []);
 
     if (loading || !commenterData) return null;
-    
+
     return (
-      <View style={{minHeight: 40, marginTop: 15}}>
-        <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity 
+      <View style={{ minHeight: 40, marginTop: 15 }}>
+        <View style={{ flexDirection: "row" }}>
+          <TouchableOpacity
             disabled={pressed}
             onPress={() => {
               if (item.uid == route.params.id) {
                 setPressed(true);
                 navigation.goBack(null);
+              } else {
+                navigation.push("ProfileScreen", {
+                  doc: route.params.doc,
+                  id: item.uid,
+                });
               }
-              else {
-                navigation.push("ProfileScreen", {doc: route.params.doc, id: item.uid});
-              }
-            }}>
-            <Image source={{uri: (commenterData.pfp ? commenterData.pfp : "https://imgur.com/hNwMcZQ.png")}} style={styles.smallPfp} />
+            }}
+          >
+            <Image
+              source={{
+                uri: commenterData.pfp
+                  ? commenterData.pfp
+                  : "https://imgur.com/hNwMcZQ.png",
+              }}
+              style={styles.smallPfp}
+            />
           </TouchableOpacity>
           <View>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <TouchableOpacity 
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <TouchableOpacity
                 disabled={pressed}
                 onPress={() => {
                   if (item.uid == route.params.id) {
                     setPressed(true);
                     navigation.goBack(null);
-                  }
-                  else {
-                    navigation.push("ProfileScreen", {doc: route.params.doc, id: item.uid});
+                  } else {
+                    navigation.push("ProfileScreen", {
+                      doc: route.params.doc,
+                      id: item.uid,
+                    });
                   }
                 }}
               >
-                <Text style={[styles.username, {fontSize: 15}]} numberOfLines={1}>{commenterData.name}<Text style={{color: 'gray', fontSize: 12.5, fontWeight: 'normal'}}> @{commenterData.username}</Text></Text>
+                <Text
+                  style={[styles.username, { fontSize: 15 }]}
+                  numberOfLines={1}
+                >
+                  {commenterData.name}
+                  <Text
+                    style={{
+                      color: "gray",
+                      fontSize: 12.5,
+                      fontWeight: "normal",
+                    }}
+                  >
+                    {" "}
+                    @{commenterData.username}
+                  </Text>
+                </Text>
               </TouchableOpacity>
-              <Text style={{color: 'gray', fontSize: 12.5, marginTop: 2.5}}> • {dayjs(item.timestamp.toDate()).fromNow()}</Text>
+              <Text style={{ color: "gray", fontSize: 12.5, marginTop: 2.5 }}>
+                {" "}
+                • {dayjs(item.timestamp.toDate()).fromNow()}
+              </Text>
             </View>
-            <Text style={{color: 'white', fontSize: 15, marginTop: 3}}>{item.comment}</Text>
+            <Text style={{ color: "white", fontSize: 15, marginTop: 3 }}>
+              {item.comment}
+            </Text>
           </View>
         </View>
       </View>
     );
-  }
+  };
 
   if (initializing) {
     return (
       <View style={global.appContainer}>
-        <View style={global.topbar}>
-        </View>
+        <View style={global.topbar}></View>
       </View>
     );
   }
 
   return (
     <View style={global.appContainer}>
-      {/* Delete recipe pop up */} 
+      {/* Delete recipe pop up */}
       <Dialog.Container visible={deleteVisible}>
         <Dialog.Title>Delete Recipe</Dialog.Title>
         <Dialog.Description>
-          Are you sure you want to delete this recipe? You cannot undo this action.
+          Are you sure you want to delete this recipe? You cannot undo this
+          action.
         </Dialog.Description>
-        <Dialog.Button label="Cancel" onPress={() => {setDeleteVisible(false)}}/>
-        <Dialog.Button label="Delete" style={{color: 'red'}} onPress={() => deleteRecipe()}/>
+        <Dialog.Button
+          label="Cancel"
+          onPress={() => {
+            setDeleteVisible(false);
+          }}
+        />
+        <Dialog.Button
+          label="Delete"
+          style={{ color: "red" }}
+          onPress={() => deleteRecipe()}
+        />
       </Dialog.Container>
 
       <View style={global.topbar}>
-        <BackArrow navigation={navigation}/>
-        <Text style={[global.topbarTitle, {maxWidth: '70%'}]} numberOfLines={2}>{recipeData.name}</Text>
+        <BackArrow navigation={navigation} />
+        <Text
+          style={[global.topbarTitle, { maxWidth: "70%" }]}
+          numberOfLines={2}
+        >
+          {recipeData.name}
+        </Text>
         {userData && authorData.username == userData.username && (
           <Menu style={styles.dotsContainer}>
             <MenuTrigger
               text="..."
               customStyles={{ triggerText: styles.dots }}
             />
-            <MenuOptions customStyles={{optionsContainer: {width: 150, borderRadius: 15}}}>
+            <MenuOptions
+              customStyles={{
+                optionsContainer: { width: 150, borderRadius: 15 },
+              }}
+            >
               <MenuOption
                 disabled={true}
                 children={
@@ -634,36 +743,40 @@ export default function Dish({ navigation }) {
                       justifyContent: "center",
                     }}
                   >
-                    <Text style={{color: 'gray', fontSize: 12}}>Options</Text>
+                    <Text style={{ color: "gray", fontSize: 12 }}>Options</Text>
                   </View>
                 }
               />
               <MenuOption
-                onSelect={() => navigation.navigate("EditScreen", {doc: route.params.doc})}
+                onSelect={() =>
+                  navigation.navigate("EditScreen", { doc: route.params.doc })
+                }
                 children={
-                  <View
-                    style={styles.popup}
-                  >
+                  <View style={styles.popup}>
                     <Text>Edit</Text>
                     <Icon name="pencil-outline" size={18} />
                   </View>
                 }
                 customStyles={{
-                  optionWrapper: { borderTopWidth: 1, borderTopColor: "lightgrey" },
+                  optionWrapper: {
+                    borderTopWidth: 1,
+                    borderTopColor: "lightgrey",
+                  },
                 }}
               />
               <MenuOption
                 onSelect={() => setDeleteVisible(true)}
                 children={
-                  <View
-                    style={styles.popup}
-                  >
-                    <Text style={{color: '#FF4343'}}>Delete</Text>
-                    <Icon name="trash-outline" color={'#FF4343'} size={18} />
+                  <View style={styles.popup}>
+                    <Text style={{ color: "#FF4343" }}>Delete</Text>
+                    <Icon name="trash-outline" color={"#FF4343"} size={18} />
                   </View>
                 }
                 customStyles={{
-                  optionWrapper: { borderTopWidth: 1, borderTopColor: "lightgrey" },
+                  optionWrapper: {
+                    borderTopWidth: 1,
+                    borderTopColor: "lightgrey",
+                  },
                 }}
               />
             </MenuOptions>
@@ -683,9 +796,9 @@ export default function Dish({ navigation }) {
           style={styles.image}
         />
 
-        <Body/>
+        <Body />
 
-        <Comments/>
+        <Comments />
       </KeyboardAwareScrollView>
     </View>
   );
@@ -711,9 +824,9 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   image: {
-    width: '100%',
+    width: "100%",
     borderRadius: 20,
-    aspectRatio: 5/3,
+    aspectRatio: 5 / 3,
   },
   details: {
     width: "100%",
@@ -728,7 +841,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginBottom: 5,
     fontWeight: "bold",
-    textAlign: 'center',
+    textAlign: "center",
   },
   timeContainer: {
     flexDirection: "row",
@@ -754,7 +867,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
-    maxWidth: Dimensions.get('window').width / 2 + 30,
+    maxWidth: Dimensions.get("window").width / 2 + 30,
   },
   ratingContainer: {
     flexDirection: "row",

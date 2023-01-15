@@ -2,11 +2,9 @@ import {
   StyleSheet,
   View,
   Text,
-  Alert,
   Image,
   TouchableOpacity,
   RefreshControl,
-  Dimensions
 } from "react-native";
 import global from "../../../../../Styles";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -14,8 +12,17 @@ import { firebase } from "../../../../../config";
 import { FlashList } from "@shopify/flash-list";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Rating } from "react-native-ratings";
-import { TapGestureHandler, GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
-import Animated, {useAnimatedStyle, useSharedValue, withDelay, withSpring} from 'react-native-reanimated';
+import {
+  TapGestureHandler,
+  GestureHandlerRootView,
+  ScrollView,
+} from "react-native-gesture-handler";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withSpring,
+} from "react-native-reanimated";
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
@@ -32,7 +39,7 @@ export default function Dashboard({ navigation }) {
     return new Promise((resolve) => setTimeout(resolve, timeout));
   };
 
-  const fetchData = async() => {
+  const fetchData = async () => {
     let tempList = [];
     let fav = [];
     let ref = "";
@@ -47,12 +54,11 @@ export default function Dashboard({ navigation }) {
           setUserData(snapshot.data());
           ref = snapshot.data();
           fav = snapshot.data().favorites;
-        } else
-          Alert.alert("Unknown Error Occured", "Contact support with error.");
+        }
       });
 
     await Promise.all(
-      ref.recipes.reverse().map(async(doc) => {
+      ref.recipes.reverse().map(async (doc) => {
         return firebase
           .firestore()
           .collection("recipes")
@@ -60,16 +66,23 @@ export default function Dashboard({ navigation }) {
           .get()
           .then((snap) => {
             if (fav.indexOf(doc) >= 0) {
-              tempList.push({key: doc, value: snap.data(), favorite: '#FF4343'});
-            }
-            else {
-              tempList.push({key: doc, value: snap.data(), favorite: 'gray'});
+              tempList.push({
+                key: doc,
+                value: snap.data(),
+                favorite: "#FF4343",
+              });
+            } else {
+              tempList.push({ key: doc, value: snap.data(), favorite: "gray" });
             }
           })
           .catch((error) => {
-            alert(error.message);
+            showMessage({
+              message: error.message,
+              icon: "danger",
+              type: "danger",
+            });
           });
-      }),
+      })
     );
     setDataList(tempList);
   };
@@ -88,38 +101,53 @@ export default function Dashboard({ navigation }) {
   }, []);
 
   const Posts = ({ item }) => {
-    const favorite = async(doc) => {
-      let color = 'gray';
+    const favorite = async (doc) => {
+      let color = "gray";
 
       let temp = dataList;
-      let index = dataList.findIndex(item => item.key == doc);
+      let index = dataList.findIndex((item) => item.key == doc);
 
-      await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
-      .then((snap) => {
-        let fav = snap.data().favorites;
-        if (fav.indexOf(doc) != -1) {
-          fav.splice(snap.data().favorites.indexOf(doc), 1);
-          firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: fav});
-          temp[index].favorite = 'gray';
-        }
-        else {
-          fav.push(doc);
-          firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: fav});
-          temp[index].favorite = '#FF4343';
-          color = '#FF4343';
-        }
-      })
-      .catch((error) => {
-        alert(error.message);
-      })
+      await firebase
+        .firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .get()
+        .then((snap) => {
+          let fav = snap.data().favorites;
+          if (fav.indexOf(doc) != -1) {
+            fav.splice(snap.data().favorites.indexOf(doc), 1);
+            firebase
+              .firestore()
+              .collection("users")
+              .doc(firebase.auth().currentUser.uid)
+              .update({ favorites: fav });
+            temp[index].favorite = "gray";
+          } else {
+            fav.push(doc);
+            firebase
+              .firestore()
+              .collection("users")
+              .doc(firebase.auth().currentUser.uid)
+              .update({ favorites: fav });
+            temp[index].favorite = "#FF4343";
+            color = "#FF4343";
+          }
+        })
+        .catch((error) => {
+          showMessage({
+            message: error.message,
+            icon: "danger",
+            type: "danger",
+          });
+        });
 
-        setDataList(temp);
-        setLiked(color);
-    }
+      setDataList(temp);
+      setLiked(color);
+    };
     const scale = useSharedValue(0);
 
-    const onDoubleTap = useCallback(async() => {
-      setLiked('#FF4343');
+    const onDoubleTap = useCallback(async () => {
+      setLiked("#FF4343");
       scale.value = withSpring(1, undefined, (isFinished) => {
         if (isFinished) {
           scale.value = withDelay(500, withSpring(0));
@@ -128,23 +156,34 @@ export default function Dashboard({ navigation }) {
       let fav = [];
       let doc = item.key;
       let temp = dataList;
-      let index = dataList.findIndex(item => item.key == doc);
-      temp[index].favorite = '#FF4343';
+      let index = dataList.findIndex((item) => item.key == doc);
+      temp[index].favorite = "#FF4343";
 
-      await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
-      .then((snap) => {
-        fav = snap.data().favorites;
-        if (fav.indexOf(doc) == -1) {
-          fav.push(doc);
-          firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({favorites: fav});
-        }
-        else {
-          return;
-        }
-      })
-      .catch((error) => {
-        alert(error.message);
-      })
+      await firebase
+        .firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .get()
+        .then((snap) => {
+          fav = snap.data().favorites;
+          if (fav.indexOf(doc) == -1) {
+            fav.push(doc);
+            firebase
+              .firestore()
+              .collection("users")
+              .doc(firebase.auth().currentUser.uid)
+              .update({ favorites: fav });
+          } else {
+            return;
+          }
+        })
+        .catch((error) => {
+          showMessage({
+            message: error.message,
+            icon: "danger",
+            type: "danger",
+          });
+        });
 
       setDataList(temp);
     }, []);
@@ -152,7 +191,6 @@ export default function Dashboard({ navigation }) {
     const rStyle = useAnimatedStyle(() => ({
       transform: [{ scale: Math.max(scale.value, 0) }],
     }));
-    
 
     const doubleTapRef = useRef();
     const lastItemId = useRef(item.key);
@@ -167,28 +205,49 @@ export default function Dashboard({ navigation }) {
       <TouchableOpacity style={global.itemContainer}>
         <TapGestureHandler
           waitFor={doubleTapRef}
-          onActivated={() => navigation.navigate("DishStack", {doc: item.key, id: firebase.auth().currentUser.uid})}
+          onActivated={() =>
+            navigation.navigate("DishStack", {
+              doc: item.key,
+              id: firebase.auth().currentUser.uid,
+            })
+          }
         >
           <TapGestureHandler
             maxDelayMs={200}
-            ref={doubleTapRef} 
+            ref={doubleTapRef}
             numberOfTaps={2}
             onActivated={() => onDoubleTap()}
           >
             <View style={[global.list]}>
               <AnimatedImage
-                source={require('../../../../../assets/heart.png')}
-                style={[
-                  styles.heart,
-                  rStyle,
-                ]}
+                source={require("../../../../../assets/heart.png")}
+                style={[styles.heart, rStyle]}
               />
-              <Image source={{uri: (item.value.image ? item.value.image : 'https://imgur.com/hNwMcZQ.png')}} style={global.listImage}/>
-              <View style={{width: '100%', height: 85}}>
+              <Image
+                source={{
+                  uri: item.value.image
+                    ? item.value.image
+                    : "https://imgur.com/hNwMcZQ.png",
+                }}
+                style={global.listImage}
+              />
+              <View style={{ width: "100%", height: 85 }}>
                 <View>
-                  <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>{item.value.name}</Text>
-                  <Text style={{color: 'gray'}}>{item.value.difficulty}</Text>
-                  <Text style={{color: 'gray'}}>{parseFloat(((item.value.cooktime + item.value.preptime) / 60).toFixed(2))}+ hrs</Text>
+                  <Text
+                    style={{ color: "white", fontWeight: "bold", fontSize: 16 }}
+                  >
+                    {item.value.name}
+                  </Text>
+                  <Text style={{ color: "gray" }}>{item.value.difficulty}</Text>
+                  <Text style={{ color: "gray" }}>
+                    {parseFloat(
+                      (
+                        (item.value.cooktime + item.value.preptime) /
+                        60
+                      ).toFixed(2)
+                    )}
+                    + hrs
+                  </Text>
                 </View>
               </View>
             </View>
@@ -199,19 +258,24 @@ export default function Dashboard({ navigation }) {
             ratingCount={5}
             imageSize={16}
             readonly={true}
-            type={'custom'}
-            ratingBackgroundColor={'gray'}
-            tintColor={'#282828'}
+            type={"custom"}
+            ratingBackgroundColor={"gray"}
+            tintColor={"#282828"}
             startingValue={item.value.rating}
           />
-          <Text style={global.rating}>{item.value.rating} ({item.value.numratings})</Text>   
-          <TouchableOpacity style={{marginLeft: 'auto'}} onPress={() => favorite(item.key)}>
-            <Icon name='heart' color={liked} size={20} />
+          <Text style={global.rating}>
+            {item.value.rating} ({item.value.numratings})
+          </Text>
+          <TouchableOpacity
+            style={{ marginLeft: "auto" }}
+            onPress={() => favorite(item.key)}
+          >
+            <Icon name="heart" color={liked} size={20} />
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
   if (!userData) return null;
 
@@ -337,7 +401,7 @@ export default function Dashboard({ navigation }) {
           stickyHeaderIndices={[2]}
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: true },
+            { useNativeDriver: true }
           )}
           scrollEventThrottle={1}
           style={{ zIndex: 3 }}
@@ -408,9 +472,7 @@ export default function Dashboard({ navigation }) {
             {userData && userData.recipes.length > 0 && (
               <FlashList
                 data={dataList}
-                renderItem={({ item }) => (
-                  <Posts item={item}/>
-                )}
+                renderItem={({ item }) => <Posts item={item} />}
                 estimatedItemSize={10}
                 numColumns={2}
               />
@@ -498,9 +560,9 @@ const styles = StyleSheet.create({
   heart: {
     height: 75,
     width: 75,
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
     marginTop: -35,
     marginLeft: -22,
     zIndex: 10,

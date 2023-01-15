@@ -25,6 +25,7 @@ import Animated, {
   withDelay,
   withSpring,
 } from "react-native-reanimated";
+import { showMessage } from "react-native-flash-message";
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 

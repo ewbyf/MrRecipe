@@ -12,6 +12,7 @@ import { useState } from "react";
 import { firebase } from "../../../../../config";
 import Icon from "react-native-vector-icons/Ionicons";
 import BackArrow from "../../../../../components/BackArrow";
+import { showMessage } from "react-native-flash-message";
 
 export default function Register({ navigation }) {
   const [name, setName] = useState("");

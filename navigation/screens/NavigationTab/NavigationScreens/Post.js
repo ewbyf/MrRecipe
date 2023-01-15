@@ -15,6 +15,7 @@ import * as ImagePicker from "expo-image-picker";
 import { SelectList } from "react-native-dropdown-select-list";
 import Dialog from "react-native-dialog";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { showMessage } from "react-native-flash-message";
 
 export default function Post({ navigation }) {
   const [initializing, setInitializing] = useState(true);

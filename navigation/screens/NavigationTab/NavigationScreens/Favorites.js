@@ -15,6 +15,7 @@ import { FlashList } from "@shopify/flash-list";
 import { Rating } from "react-native-ratings";
 import Icon from "react-native-vector-icons/Ionicons";
 import { SearchBar } from "@rneui/themed";
+import { showMessage } from "react-native-flash-message";
 
 export default function Favorites({ navigation }) {
   const [initializing, setInitializing] = useState(true);

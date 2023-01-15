@@ -15,7 +15,6 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Rating } from "react-native-ratings";
 import {
   TapGestureHandler,
-  GestureHandlerRootView,
   ScrollView,
 } from "react-native-gesture-handler";
 import Animated, {
@@ -25,6 +24,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useRoute } from "@react-navigation/native";
+import { showMessage } from "react-native-flash-message";
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);

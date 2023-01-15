@@ -16,12 +16,16 @@ export default function App() {
       Proxima: require("./assets/fonts/ProximaNova-Regular.otf"),
       Pacifico: require("./assets/fonts/Pacifico-Regular.ttf"),
       Sora: require("./assets/fonts/Sora-Medium.ttf"),
+      RobotoBold: require("./assets/fonts/Roboto-Bold.ttf"),
+      Playfair: require("./assets/fonts/PlayfairDisplay-VariableFont_wght.ttf"),
+      OxygenBold: require("./assets/fonts/Oxygen-Bold.ttf"),
+      Oxygen: require("./assets/fonts/Oxygen-Regular.ttf"),
     });
-    setLoaded(true);
   };
 
   useEffect(() => {
     fetchFonts();
+    setLoaded(true);
   }, []);
 
   if (loaded) {

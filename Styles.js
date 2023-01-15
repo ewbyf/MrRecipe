@@ -25,9 +25,10 @@ export default StyleSheet.create({
   topbarTitle: {
     fontSize: 24,
     textAlign: "center",
-    fontWeight: "bold",
     color: "white",
     textAlign: "center",
+    fontFamily: 'RobotoBold'
+    
   },
   searchbar: {
     width: "90%",

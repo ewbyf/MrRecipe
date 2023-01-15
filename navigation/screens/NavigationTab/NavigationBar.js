@@ -117,7 +117,7 @@ export default function NavigationBar() {
                   size={25}
                 />
                 <Text
-                  style={{ fontSize: 11, color: focused ? "#FFDDA1" : "white" , fontFamily: 'Sora'}}
+                  style={{ fontSize: 12, color: focused ? "#FFDDA1" : "white" , fontFamily: 'Oxygen'}}
                 >
                   Search
                 </Text>

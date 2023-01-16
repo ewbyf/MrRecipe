@@ -391,7 +391,15 @@ export default function Post({ navigation }) {
                     </Text>
                   </TouchableOpacity>
                 </View>
-                <Text style={{ color: "gray", fontSize: 15 }}>or</Text>
+                <Text
+                  style={{
+                    color: "gray",
+                    fontSize: 15,
+                    fontFamily: "NunitoBold",
+                  }}
+                >
+                  or
+                </Text>
                 <View style={{ alignItems: "center", marginTop: 5 }}>
                   <TouchableOpacity onPress={takePhoto}>
                     <Text style={[styles.addText, { color: "#518BFF" }]}>
@@ -740,12 +748,12 @@ const styles = StyleSheet.create({
   button: {
     position: "absolute",
     top: "50%",
-    marginTop: 21,
+    marginTop: 19,
     right: 20,
   },
   buttonText: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "NunitoExtraBold",
   },
   photoSelect: {
     marginVertical: 20,
@@ -766,6 +774,7 @@ const styles = StyleSheet.create({
   title: {
     color: "#518BFF",
     fontSize: 15,
+    fontFamily: "NunitoExtraBold",
     fontWeight: "bold",
     marginBottom: 6,
   },
@@ -800,6 +809,7 @@ const styles = StyleSheet.create({
   addText: {
     fontSize: 16,
     color: "#494949",
+    fontFamily: "NunitoBold",
   },
   timeText: {
     fontSize: 14,

@@ -235,7 +235,7 @@ export default function Dashboard({ navigation }) {
               <View style={{ width: "100%", height: 85 }}>
                 <View>
                   <Text
-                    style={{ color: "white", fontWeight: "bold", fontSize: 16 }}
+                    style={global.recipeTitle}
                   >
                     {item.value.name}
                   </Text>
@@ -278,7 +278,21 @@ export default function Dashboard({ navigation }) {
     );
   };
 
-  if (!userData) return null;
+  if (!userData) {
+    return (
+      <View style={global.appContainer}>
+        <View style={global.topbar}>
+          <Text style={global.topbarTitle}>Profile</Text>
+        </View>
+
+        <View style={styles.dashboard}>
+          <View style={styles.postTitleContainer}>
+            <Text style={styles.postsTitle}>POSTS</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <GestureHandlerRootView style={global.appContainer}>
@@ -524,6 +538,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     marginBottom: 3,
+    fontFamily: 'NunitoExtraBold'
   },
   bioContainer: {
     flexDirection: "row",
@@ -557,6 +572,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginVertical: 10,
     textAlign: "center",
+    fontFamily: 'Helvetica'
   },
   heart: {
     height: 75,

@@ -64,7 +64,7 @@ export default function NavigationBar() {
     <View style={styles.appcontainer}>
       <Tab.Navigator
         initialRouteName="Recipes"
-        screenOptions={({ route }) => ({
+        screenOptions={() => ({
           headerShown: false,
           tabBarShowLabel: false,
           tabBarStyle: {
@@ -117,7 +117,7 @@ export default function NavigationBar() {
                   size={25}
                 />
                 <Text
-                  style={{ fontSize: 12, color: focused ? "#FFDDA1" : "white" , fontFamily: 'Oxygen'}}
+                  style={{ fontSize: 11, color: focused ? "#FFDDA1" : "white" , fontFamily: 'Sora'}}
                 >
                   Search
                 </Text>

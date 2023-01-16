@@ -262,11 +262,9 @@ export default function Favorites({ navigation }) {
                       <View style={{ width: "100%", height: 85 }}>
                         <View>
                           <Text
-                            style={{
-                              color: "white",
-                              fontWeight: "bold",
-                              fontSize: 16,
-                            }}
+                            style={
+                              global.recipeTitle
+                            }
                           >
                             {item.value.name}
                           </Text>
@@ -334,11 +332,7 @@ export default function Favorites({ navigation }) {
                       <View style={{ width: "100%", height: 85 }}>
                         <View>
                           <Text
-                            style={{
-                              color: "white",
-                              fontWeight: "bold",
-                              fontSize: 16,
-                            }}
+                            style={global.recipeTitle}
                           >
                             {item.value.name}
                           </Text>

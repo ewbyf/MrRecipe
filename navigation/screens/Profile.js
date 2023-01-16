@@ -247,7 +247,7 @@ export default function Profile({ navigation }) {
               <View style={{ width: "100%", height: 85 }}>
                 <View>
                   <Text
-                    style={{ color: "white", fontWeight: "bold", fontSize: 16 }}
+                    style={global.recipeTitle}
                   >
                     {item.value.name}
                   </Text>
@@ -542,6 +542,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     marginBottom: 3,
+    fontFamily: 'NunitoExtraBold'
   },
   bioContainer: {
     flexDirection: "row",

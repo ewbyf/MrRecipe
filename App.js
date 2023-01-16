@@ -13,37 +13,36 @@ export default function App() {
 
   const fetchFonts = async () => {
     await Font.loadAsync({
-      Proxima: require("./assets/fonts/ProximaNova-Regular.otf"),
+      Helvetica: require("./assets/fonts/Helvetica.otf"),
       Pacifico: require("./assets/fonts/Pacifico-Regular.ttf"),
       Sora: require("./assets/fonts/Sora-Medium.ttf"),
-      RobotoBold: require("./assets/fonts/Roboto-Bold.ttf"),
-      Playfair: require("./assets/fonts/PlayfairDisplay-VariableFont_wght.ttf"),
-      OxygenBold: require("./assets/fonts/Oxygen-Bold.ttf"),
-      Oxygen: require("./assets/fonts/Oxygen-Regular.ttf"),
+      Nunito: require("./assets/fonts/Nunito.ttf"),
+      NunitoBold: require("./assets/fonts/Nunito-Bold.ttf"),
+      NunitoExtraBold: require("./assets/fonts/Nunito-ExtraBold.ttf"),
     });
+    setLoaded(true);
   };
 
   useEffect(() => {
     fetchFonts();
-    setLoaded(true);
   }, []);
 
   if (loaded) {
     SplashScreen.hideAsync();
-  }
 
-  return (
-    <MenuProvider>
-      <NavigationContainer>
-        <MainStack />
-      </NavigationContainer>
-      <FlashMessage
-        position={{ top: "7%" }}
-        floating={true}
-        icon={"success"}
-        titleStyle={{ fontSize: 15 }}
-        animationDuration={400}
-      />
-    </MenuProvider>
-  );
+    return (
+      <MenuProvider>
+        <NavigationContainer>
+          <MainStack />
+        </NavigationContainer>
+        <FlashMessage
+          position={{ top: "7%" }}
+          floating={true}
+          icon={"success"}
+          titleStyle={{ fontSize: 15 }}
+          animationDuration={400}
+        />
+      </MenuProvider>
+    );
+  }
 }

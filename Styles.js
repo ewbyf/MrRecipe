@@ -27,8 +27,8 @@ export default StyleSheet.create({
     textAlign: "center",
     color: "white",
     textAlign: "center",
-    fontFamily: 'RobotoBold'
-    
+    fontWeight: "bold",
+    fontFamily: "NunitoExtraBold",
   },
   searchbar: {
     width: "90%",
@@ -104,5 +104,11 @@ export default StyleSheet.create({
   },
   author: {
     marginTop: "auto",
+  },
+  recipeTitle: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+    fontFamily: "NunitoExtraBold",
   },
 });

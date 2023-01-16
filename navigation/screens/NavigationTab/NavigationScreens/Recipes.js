@@ -291,7 +291,7 @@ export default function Recipes({ navigation }) {
               <View style={{ flexDirection: "row", width: "100%" }}>
                 <View style={{ flex: 1 }}>
                   <Text
-                    style={{ color: "white", fontWeight: "bold", fontSize: 16 }}
+                    style={global.recipeTitle}
                   >
                     {item.value.name}
                   </Text>
@@ -517,7 +517,7 @@ export default function Recipes({ navigation }) {
               <View style={{ width: "100%", height: 85 }}>
                 <View>
                   <Text
-                    style={{ color: "white", fontWeight: "bold", fontSize: 16 }}
+                    style={global.recipeTitle}
                   >
                     {item.value.name}
                   </Text>
@@ -569,7 +569,7 @@ export default function Recipes({ navigation }) {
   return (
     <GestureHandlerRootView style={global.appContainer}>
       <View style={global.topbar}>
-        <Text style={global.topbarTitle}>Mr. Recipe</Text>
+        <Text style={[global.topbarTitle, {fontFamily: 'Pacifico', fontWeight: 'normal', fontSize: 28}]}>Mr. Recipe</Text>
       </View>
       <ScrollView
         style={{ height: windowHeight, width: windowWidth }}
@@ -629,7 +629,7 @@ const styles = StyleSheet.create({
   titleText: {
     color: "white",
     fontSize: 26,
-    fontWeight: "bold",
+    fontFamily: 'NunitoExtraBold',
     paddingLeft: 20,
     paddingTop: 20,
   },

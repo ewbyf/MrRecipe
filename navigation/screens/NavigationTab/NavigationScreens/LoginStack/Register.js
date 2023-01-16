@@ -251,7 +251,7 @@ export default function Register({ navigation }) {
               registerUser();
             }}
           >
-            <Text style={styles.buttonText}>Sign up</Text>
+            <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -302,8 +302,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 20,
-    fontWeight: "bold",
     color: "white",
+    fontFamily: 'NunitoExtraBold',
   },
   icon: {
     position: "absolute",

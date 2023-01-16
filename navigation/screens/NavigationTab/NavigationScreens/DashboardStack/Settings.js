@@ -911,9 +911,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 20,
     bottom: "50%",
-    marginBottom: -11,
+    marginBottom: -14,
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: 'NunitoExtraBold'
   },
   settingsContainer: {
     flexDirection: "column",
@@ -944,6 +944,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginVertical: 6,
     paddingLeft: 30,
+    fontFamily: 'Helvetica'
   },
   field: {
     flexDirection: "row",
@@ -960,6 +961,7 @@ const styles = StyleSheet.create({
     color: "#518BFF",
     marginRight: 15,
     width: 90,
+    fontFamily: 'NunitoExtraBold'
   },
   input: {
     fontSize: 15,
@@ -992,14 +994,14 @@ const styles = StyleSheet.create({
   },
   signOutText: {
     fontSize: 17,
-    fontWeight: "bold",
     color: "#518BFF",
     textAlign: "center",
+    fontFamily: 'NunitoExtraBold'
   },
   deleteText: {
     fontSize: 17,
-    fontWeight: "bold",
     color: "#FF4343",
     textAlign: "center",
+    fontFamily: 'NunitoExtraBold'
   },
 });

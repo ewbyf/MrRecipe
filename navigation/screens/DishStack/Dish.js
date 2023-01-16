@@ -312,14 +312,12 @@ export default function Dish({ navigation }) {
           <View style={styles.timeContainer}>
             <View style={{ justifyContent: "space-between" }}>
               <Text style={styles.timeText}>
-                <Text style={{ color: "#518BFF", fontWeight: "bold" }}>
-                  Prep Time:
-                </Text>{" "}
+                <Text style={styles.nunitoText}>Prep Time:</Text>{" "}
                 {Math.floor(recipeData.preptime / 60)} hrs{" "}
                 {recipeData.preptime % 60} min
               </Text>
               <Text style={styles.timeText}>
-                <Text style={{ color: "#518BFF", fontWeight: "bold" }}>
+                <Text style={styles.nunitoText}>
                   Cook Time:
                 </Text>{" "}
                 {Math.floor(recipeData.cooktime / 60)} hrs{" "}
@@ -328,7 +326,11 @@ export default function Dish({ navigation }) {
             </View>
             <View>
               <Text style={styles.difficulty}>
-                <Text style={{ color: "#518BFF" }}>Difficulty:</Text>{" "}
+                <Text
+                  style={styles.nunitoText}
+                >
+                  Difficulty:
+                </Text>{" "}
                 {recipeData.difficulty}
               </Text>
               <View style={styles.ratingContainer}>
@@ -662,7 +664,7 @@ export default function Dish({ navigation }) {
                     style={{
                       color: "gray",
                       fontSize: 12.5,
-                      fontWeight: "normal",
+                      fontFamily: "NunitoExtraBold",
                     }}
                   >
                     {" "}
@@ -670,7 +672,7 @@ export default function Dish({ navigation }) {
                   </Text>
                 </Text>
               </TouchableOpacity>
-              <Text style={{ color: "gray", fontSize: 12.5, marginTop: 2.5 }}>
+              <Text style={{ color: "gray", fontSize: 12.5 }}>
                 {" "}
                 • {dayjs(item.timestamp.toDate()).fromNow()}
               </Text>
@@ -880,10 +882,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "right",
   },
+  nunitoText: { color: "#518BFF", fontFamily: "NunitoExtraBold" },
   title: {
     color: "#518BFF",
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "NunitoExtraBold",
   },
   recipeContainer: {
     marginBottom: 10,
@@ -907,6 +910,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     paddingVertical: 8,
+    fontFamily: 'NunitoExtraBold'
   },
   commentContainer: {
     color: "white",

@@ -118,15 +118,6 @@ export default function Dish({ navigation }) {
       );
   };
 
-  const deleteComment = (key) => {
-    firebase.firestore().collection("recipes").doc(route.params.doc).get()
-    .then((snap) => {
-      if (snap.exists) {
-        snap.data().comments; // need to finish
-      }
-    })
-  }
-
   const Heart = () => {
     const [liked, setLiked] = useState("gray");
 
@@ -528,6 +519,161 @@ export default function Dish({ navigation }) {
       setPosting(false);
     };
 
+    const deleteComment = async(key) => {
+      let temp = [];
+      await firebase
+        .firestore()
+        .collection("recipes")
+        .doc(route.params.doc)
+        .get()
+        .then((snap) => {
+          if (snap.exists) {
+            temp = snap.data().comments;
+            temp.splice(
+              temp.findIndex((item) => item.key == key),
+              1
+            );
+            firebase
+              .firestore()
+              .collection("recipes")
+              .doc(route.params.doc)
+              .update({
+                comments: temp,
+              });
+          }
+        });
+  
+      await firebase
+        .firestore()
+        .collection("users")
+        .doc(userData.uid)
+        .get()
+        .then((snap) => {
+          if (snap.exists) {
+            temp = snap.data().comments;
+            temp.splice(
+              temp.findIndex((item) => item.key == key),
+              1
+            );
+            firebase.firestore().collection("users").doc(userData.uid).update({
+              comments: temp,
+            });
+          }
+        });
+
+      temp = commentsData;
+      temp.splice(temp.findIndex(item => item.key == key), 1);
+      setCommentsData(temp);
+
+      showMessage({
+        message: "Comment successfully deleted!",
+        type: "success",
+      });
+    };
+
+    const CommentRender = ({ item }) => {
+      const [commenterData, setCommenterData] = useState();
+      const [loading, setLoading] = useState(true);
+  
+      useEffect(() => {
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(item.uid)
+          .get()
+          .then((snap) => {
+            if (snap.exists) {
+              setCommenterData(snap.data());
+            }
+            setLoading(false);
+          });
+      }, []);
+  
+      if (loading || !commenterData) return null;
+  
+      return (
+        <View style={{ minHeight: 40, marginTop: 15 }}>
+          <View style={{ flexDirection: "row" }}>
+            <TouchableOpacity
+              disabled={pressed}
+              onPress={() => {
+                if (item.uid == route.params.id) {
+                  setPressed(true);
+                  navigation.goBack(null);
+                } else {
+                  navigation.push("ProfileScreen", {
+                    doc: route.params.doc,
+                    id: item.uid,
+                  });
+                }
+              }}
+            >
+              <Image
+                source={{
+                  uri: commenterData.pfp
+                    ? commenterData.pfp
+                    : "https://imgur.com/hNwMcZQ.png",
+                }}
+                style={styles.smallPfp}
+              />
+            </TouchableOpacity>
+            <View>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <TouchableOpacity
+                  disabled={pressed}
+                  onPress={() => {
+                    if (item.uid == route.params.id) {
+                      setPressed(true);
+                      navigation.goBack(null);
+                    } else {
+                      navigation.push("ProfileScreen", {
+                        doc: route.params.doc,
+                        id: item.uid,
+                      });
+                    }
+                  }}
+                >
+                  <Text
+                    style={[styles.username, { fontSize: 15 }]}
+                    numberOfLines={1}
+                  >
+                    {commenterData.name}
+                    <Text
+                      style={{
+                        color: "gray",
+                        fontSize: 12.5,
+                        fontFamily: "NunitoExtraBold",
+                      }}
+                    >
+                      {" "}
+                      @{commenterData.username}
+                    </Text>
+                  </Text>
+                </TouchableOpacity>
+                <Text style={{ color: "gray", fontSize: 12.5 }}>
+                  {" "}
+                  • {dayjs(item.timestamp.toDate()).fromNow()}
+                </Text>
+                {userData &&
+                  (commenterData.uid == userData.uid ||
+                    authorData.uid == userData.uid) && (
+                    <TouchableOpacity
+                      style={{ marginLeft: 10 }}
+                      onPress={() => deleteComment(item.key)}
+                    >
+                      <Icon name="trash-outline" color="#FF4343" size={18} />
+                    </TouchableOpacity>
+                  )}
+              </View>
+              <Text style={{ color: "white", fontSize: 15, marginTop: 3 }}>
+                {item.comment}
+              </Text>
+            </View>
+          </View>
+        </View>
+      );
+    };
+
     const CommentList = () => {
       if (commentsData.length == 0) {
         return null;
@@ -581,104 +727,6 @@ export default function Dish({ navigation }) {
           />
         </View>
         <CommentList />
-      </View>
-    );
-  };
-
-  const CommentRender = ({ item }) => {
-    const [commenterData, setCommenterData] = useState();
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-      firebase
-        .firestore()
-        .collection("users")
-        .doc(item.uid)
-        .get()
-        .then((snap) => {
-          if (snap.exists) {
-            setCommenterData(snap.data());
-          }
-          setLoading(false);
-        });
-    }, []);
-
-    if (loading || !commenterData) return null;
-
-    return (
-      <View style={{ minHeight: 40, marginTop: 15 }}>
-        <View style={{ flexDirection: "row" }}>
-          <TouchableOpacity
-            disabled={pressed}
-            onPress={() => {
-              if (item.uid == route.params.id) {
-                setPressed(true);
-                navigation.goBack(null);
-              } else {
-                navigation.push("ProfileScreen", {
-                  doc: route.params.doc,
-                  id: item.uid,
-                });
-              }
-            }}
-          >
-            <Image
-              source={{
-                uri: commenterData.pfp
-                  ? commenterData.pfp
-                  : "https://imgur.com/hNwMcZQ.png",
-              }}
-              style={styles.smallPfp}
-            />
-          </TouchableOpacity>
-          <View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <TouchableOpacity
-                disabled={pressed}
-                onPress={() => {
-                  if (item.uid == route.params.id) {
-                    setPressed(true);
-                    navigation.goBack(null);
-                  } else {
-                    navigation.push("ProfileScreen", {
-                      doc: route.params.doc,
-                      id: item.uid,
-                    });
-                  }
-                }}
-              >
-                <Text
-                  style={[styles.username, { fontSize: 15 }]}
-                  numberOfLines={1}
-                >
-                  {commenterData.name}
-                  <Text
-                    style={{
-                      color: "gray",
-                      fontSize: 12.5,
-                      fontFamily: "NunitoExtraBold",
-                    }}
-                  >
-                    {" "}
-                    @{commenterData.username}
-                  </Text>
-                </Text>
-              </TouchableOpacity>
-              <Text style={{ color: "gray", fontSize: 12.5 }}>
-                {" "}
-                • {dayjs(item.timestamp.toDate()).fromNow()}
-              </Text>
-              {userData && (commenterData.uid == userData.uid || authorData.uid == userData.uid) && 
-              <TouchableOpacity style={{marginLeft: 10}} onPres={deleteComment(item.key)}>
-                <Icon name="trash-outline" color="#FF4343" size={18}/>
-              </TouchableOpacity>
-              }
-            </View>
-            <Text style={{ color: "white", fontSize: 15, marginTop: 3 }}>
-              {item.comment}
-            </Text>
-          </View>
-        </View>
       </View>
     );
   };
@@ -879,9 +927,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "right",
   },
-  nunitoText: { 
+  nunitoText: {
     color: "#518BFF",
-    fontFamily: "NunitoExtraBold"
+    fontFamily: "NunitoExtraBold",
   },
   title: {
     color: "#518BFF",

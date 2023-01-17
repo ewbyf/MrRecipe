@@ -60,17 +60,6 @@ export default function Dish({ navigation }) {
       });
   };
 
-  const fetchRecipe = async () => {
-    firebase
-      .firestore()
-      .collection("recipes")
-      .doc(route.params.doc)
-      .get()
-      .then((snapshot) => {
-        setRecipeData(snapshot.data());
-      });
-  };
-
   useEffect(() => {
     dayjs.extend(relativeTime);
     firebase
@@ -128,6 +117,15 @@ export default function Dish({ navigation }) {
         })
       );
   };
+
+  const deleteComment = (key) => {
+    firebase.firestore().collection("recipes").doc(route.params.doc).get()
+    .then((snap) => {
+      if (snap.exists) {
+        snap.data().comments; // need to finish
+      }
+    })
+  }
 
   const Heart = () => {
     const [liked, setLiked] = useState("gray");
@@ -670,6 +668,11 @@ export default function Dish({ navigation }) {
                 {" "}
                 • {dayjs(item.timestamp.toDate()).fromNow()}
               </Text>
+              {userData && (commenterData.uid == userData.uid || authorData.uid == userData.uid) && 
+              <TouchableOpacity style={{marginLeft: 10}} onPres={deleteComment(item.key)}>
+                <Icon name="trash-outline" color="#FF4343" size={18}/>
+              </TouchableOpacity>
+              }
             </View>
             <Text style={{ color: "white", fontSize: 15, marginTop: 3 }}>
               {item.comment}

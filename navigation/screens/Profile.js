@@ -25,6 +25,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useRoute } from "@react-navigation/native";
 import { showMessage } from "react-native-flash-message";
+import Dialog from "react-native-dialog";
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
@@ -35,6 +36,8 @@ export default function Profile({ navigation }) {
   const [userData, setUserData] = useState("");
   const [loading, setLoading] = useState(false);
   const [dataList, setDataList] = useState([]);
+  const [user, setUser] = useState();
+  const [deleteVisible, setDeleteVisible] = useState(false);
 
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -42,10 +45,31 @@ export default function Profile({ navigation }) {
     return new Promise((resolve) => setTimeout(resolve, timeout));
   };
 
-  const fetchData = async () => {
+  onAuthStateChanged = (userParam) => {
+    fetchData(userParam);
+    setUser(userParam);
+  };
+
+  useEffect(() => {
+    const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
+
+  const fetchData = async (userParam) => {
     var tempList = [];
     let fav = [];
     let ref = "";
+
+    if (userParam) {
+      await firebase
+      .firestore()
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .get()
+      .then((snap) => {
+        fav = snap.data().favorites;
+      });
+    }
 
     await firebase
       .firestore()
@@ -56,26 +80,215 @@ export default function Profile({ navigation }) {
         if (snapshot.exists) {
           setUserData(snapshot.data());
           ref = snapshot.data();
-          fav = snapshot.data().favorites;
         }
       });
 
-    await Promise.all(
-      ref.recipes.reverse().map(async (doc) => {
-        return firebase
+    if (ref.recipes) {
+      await Promise.all(
+        ref.recipes.reverse().map(async (doc) => {
+          return firebase
+            .firestore()
+            .collection("recipes")
+            .doc(doc)
+            .get()
+            .then((snap) => {
+              if (fav.indexOf(doc) >= 0) {
+                tempList.push({
+                  key: doc,
+                  value: snap.data(),
+                  favorite: "#FF4343",
+                });
+              } else {
+                tempList.push({ key: doc, value: snap.data(), favorite: "gray" });
+              }
+            })
+            .catch((error) => {
+              showMessage({
+                message: error.message,
+                icon: "danger",
+                type: "danger",
+              });
+            });
+        })
+      );
+    }
+    
+    setDataList(tempList);
+  };
+
+  useEffect(() => {
+    fetchData(user);
+    navigation.addListener("focus", () => {
+      setLoading(!loading);
+    });
+  }, [navigation, loading]);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchData(user);
+    wait(800).then(() => setRefreshing(false));
+  }, []);
+
+  const banAccount = async () => {
+    try {
+      if (userData.pfp) {
+        let imageRef = firebase.storage().refFromURL(userData.pfp);
+        imageRef.delete();
+      }
+
+      // Deletes comments
+      await firebase
+        .firestore()
+        .collection("users")
+        .doc(userData.uid)
+        .get()
+        .then(async (snap) => {
+          await snap.data().comments.map((item) => {
+            firebase
+              .firestore()
+              .collection("recipes")
+              .doc(item.recipe)
+              .get()
+              .then(async (snap2) => {
+                if (snap2.exists) {
+                  let temp = snap2.data().comments;
+                  temp.splice(
+                    temp.findIndex((i) => i.key == item.key),
+                    1
+                  );
+                  await firebase
+                    .firestore()
+                    .collection("recipes")
+                    .doc(item.recipe)
+                    .update({ comments: temp });
+                }
+              });
+          });
+
+          // Deletes ratings
+          await snap.data().ratings.map((doc) => {
+            firebase
+              .firestore()
+              .collection("recipes")
+              .doc(doc)
+              .get()
+              .then(async (snap2) => {
+                if (snap2.exists) {
+                  let temp = snap2.data().rated;
+                  let numratings = snap2.data().numratings - 1;
+                  let rating =
+                    (snap2.data().rating * snap2.data().numratings -
+                      temp[userData.uid]) /
+                    numratings;
+                  let weight =
+                    rating + 5 * (1 - Math.E ** (-numratings / 50));
+
+                  delete temp[userData.uid];
+
+                  await firebase
+                    .firestore()
+                    .collection("recipes")
+                    .doc(doc)
+                    .update({ rated: temp, numratings, rating, weight });
+                }
+              });
+          });
+
+          // Deletes recipes
+          await snap.data().recipes.map((doc) => {
+            firebase
+              .firestore()
+              .collection("recipes")
+              .doc(doc)
+              .get()
+              .then((snap2) => {
+                if (snap2.exists) {
+                  if (snap2.data().image) {
+                    let imageRef = firebase
+                      .storage()
+                      .refFromURL(snap2.data().image);
+                     imageRef.delete();
+                  }
+                }
+              });
+
+            firebase.firestore().collection("recipes").doc(doc).delete();
+          });
+        });
+
+      await firebase
+        .firestore()
+        .collection("users")
+        .doc(userData.uid)
+        .delete();
+
+      await firebase.firestore().collection("banned").add({
+        email: userData.email
+      });
+      setDeleteVisible(false);
+      navigation.navigate("NavigatorScreen");
+
+    } catch (error) {
+      switch (error.code) {
+        case "auth/wrong-password":
+          showMessage({
+            message: "Invalid password entered",
+            icon: "danger",
+            type: "danger",
+          });
+          break;
+        case "auth/too-many-requests":
+          showMessage({
+            message: "Too many requests. Try again later",
+            icon: "danger",
+            type: "danger",
+          });
+          break;
+        default:
+          showMessage({
+            message: error.message,
+            icon: "danger",
+            type: "danger",
+          });
+      }
+    }
+  };
+
+  const Posts = ({ item }) => {
+    const favorite = async (doc) => {
+      if (user) {
+        let fav = [];
+        let temp = [];
+        let color = "gray";
+        let index = -1;
+
+        temp = dataList;
+        index = dataList.findIndex((item) => item.key == doc);
+
+        await firebase
           .firestore()
-          .collection("recipes")
-          .doc(doc)
+          .collection("users")
+          .doc(firebase.auth().currentUser.uid)
           .get()
           .then((snap) => {
-            if (fav.indexOf(doc) >= 0) {
-              tempList.push({
-                key: doc,
-                value: snap.data(),
-                favorite: "#FF4343",
-              });
+            fav = snap.data().favorites;
+            if (fav.indexOf(doc) != -1) {
+              fav.splice(snap.data().favorites.indexOf(doc), 1);
+              firebase
+                .firestore()
+                .collection("users")
+                .doc(firebase.auth().currentUser.uid)
+                .update({ favorites: fav });
+              temp[index].favorite = "gray";
             } else {
-              tempList.push({ key: doc, value: snap.data(), favorite: "gray" });
+              fav.push(doc);
+              firebase
+                .firestore()
+                .collection("users")
+                .doc(firebase.auth().currentUser.uid)
+                .update({ favorites: fav });
+              temp[index].favorite = "#FF4343";
+              color = "#FF4343";
             }
           })
           .catch((error) => {
@@ -85,113 +298,69 @@ export default function Profile({ navigation }) {
               type: "danger",
             });
           });
-      })
-    );
-    setDataList(tempList);
-  };
 
-  useEffect(() => {
-    fetchData();
-    navigation.addListener("focus", () => {
-      setLoading(!loading);
-    });
-  }, [navigation, loading]);
-
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    fetchData();
-    wait(800).then(() => setRefreshing(false));
-  }, []);
-
-  const Posts = ({ item }) => {
-    const favorite = async (doc) => {
-      let fav = [];
-      let temp = [];
-      let color = "gray";
-      let index = -1;
-
-      temp = dataList;
-      index = dataList.findIndex((item) => item.key == doc);
-
-      await firebase
-        .firestore()
-        .collection("users")
-        .doc(route?.params?.id)
-        .get()
-        .then((snap) => {
-          fav = snap.data().favorites;
-          if (fav.indexOf(doc) != -1) {
-            fav.splice(snap.data().favorites.indexOf(doc), 1);
-            firebase
-              .firestore()
-              .collection("users")
-              .doc(route.params.id)
-              .update({ favorites: fav });
-            temp[index].favorite = "gray";
-          } else {
-            fav.push(doc);
-            firebase
-              .firestore()
-              .collection("users")
-              .doc(route.params.id)
-              .update({ favorites: fav });
-            temp[index].favorite = "#FF4343";
-            color = "#FF4343";
-          }
-        })
-        .catch((error) => {
-          showMessage({
-            message: error.message,
-            icon: "danger",
-            type: "danger",
-          });
+        setDataList(temp);
+        setLiked(color);
+      }
+      else {
+        showMessage({
+          message: "Must be signed in to favorite a recipe",
+          icon: "danger",
+          type: "danger",
         });
-
-      setDataList(temp);
-      setLiked(color);
+      }
     };
     const scale = useSharedValue(0);
 
     const onDoubleTap = useCallback(async () => {
-      setLiked("#FF4343");
-      scale.value = withSpring(1, undefined, (isFinished) => {
-        if (isFinished) {
-          scale.value = withDelay(500, withSpring(0));
-        }
-      });
-      let fav = [];
-      let doc = item.key;
-      let temp = dataList;
-      let index = dataList.findIndex((item) => item.key == doc);
-      temp[index].favorite = "#FF4343";
-
-      await firebase
-        .firestore()
-        .collection("users")
-        .doc(route.params.id)
-        .get()
-        .then((snap) => {
-          fav = snap.data().favorites;
-          if (fav.indexOf(doc) == -1) {
-            fav.push(doc);
-            firebase
-              .firestore()
-              .collection("users")
-              .doc(route.params.id)
-              .update({ favorites: fav });
-          } else {
-            return;
+      if (user) {
+        setLiked("#FF4343");
+        scale.value = withSpring(1, undefined, (isFinished) => {
+          if (isFinished) {
+            scale.value = withDelay(500, withSpring(0));
           }
-        })
-        .catch((error) => {
-          showMessage({
-            message: error.message,
-            icon: "danger",
-            type: "danger",
-          });
         });
+        let fav = [];
+        let doc = item.key;
+        let temp = dataList;
+        let index = dataList.findIndex((item) => item.key == doc);
+        temp[index].favorite = "#FF4343";
 
-      setDataList(temp);
+        await firebase
+          .firestore()
+          .collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .get()
+          .then((snap) => {
+            fav = snap.data().favorites;
+            if (fav.indexOf(doc) == -1) {
+              fav.push(doc);
+              firebase
+                .firestore()
+                .collection("users")
+                .doc(firebase.auth().currentUser.uid)
+                .update({ favorites: fav });
+            } else {
+              return;
+            }
+          })
+          .catch((error) => {
+            showMessage({
+              message: error.message,
+              icon: "danger",
+              type: "danger",
+            });
+          });
+
+        setDataList(temp);
+      }
+      else {
+        showMessage({
+          message: "Must be signed in to favorite a recipe",
+          icon: "danger",
+          type: "danger",
+        });
+      }
     }, []);
 
     const rStyle = useAnimatedStyle(() => ({
@@ -305,6 +474,27 @@ export default function Profile({ navigation }) {
 
   return (
     <View style={global.appContainer}>
+      
+      {/* Ban account pop up */}
+      <Dialog.Container visible={deleteVisible}>
+        <Dialog.Title>Ban Account</Dialog.Title>
+        <Dialog.Description>
+          Are you sure you want to ban this account? You cannot undo this
+          action.
+        </Dialog.Description>
+        <Dialog.Button
+          label="Cancel"
+          onPress={() => {
+            setDeleteVisible(false);
+          }}
+        />
+        <Dialog.Button
+          label="Ban"
+          style={{ color: "red" }}
+          onPress={() => banAccount()}
+        />
+      </Dialog.Container>
+
       {/* Header pop up */}
       <View style={styles.animationContainer}>
         <View style={{ flex: 1, height: "100%", justifyContent: "center" }}>
@@ -389,7 +579,13 @@ export default function Profile({ navigation }) {
             </Text>
           </Animated.View>
         </View>
-        <View style={{ flex: 1 }}></View>
+        <View style={{ flex: 1 }}>
+          {user && firebase.auth().currentUser.uid == "g3fKt7BxL2cMiz1yHGMzkiyPLGA3" && (
+            <TouchableOpacity style={{marginLeft: 'auto', marginRight: 25}} onPress={() => setDeleteVisible(true)}>
+              <Text style={{ fontSize: 18, color: '#FF4343', fontWeight: 'bold' }}>Ban</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <View style={global.topbar}>
@@ -520,6 +716,16 @@ const styles = StyleSheet.create({
   gear: {
     alignSelf: "flex-end",
     marginRight: 20,
+  },
+  dotsContainer: {
+    marginLeft: 'auto',
+    marginRight: 20,
+    justifyContent: 'center',
+  },
+  dots: {
+    color: "white",
+    fontSize: 26,
+    fontWeight: "bold",
   },
   dashboard: {
     flexDirection: "column",

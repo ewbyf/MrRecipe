@@ -27,7 +27,6 @@ export default StyleSheet.create({
     textAlign: "center",
     color: "white",
     textAlign: "center",
-    fontWeight: "bold",
     fontFamily: "NunitoExtraBold",
   },
   searchbar: {
@@ -107,7 +106,6 @@ export default StyleSheet.create({
   },
   recipeTitle: {
     color: "white",
-    fontWeight: "bold",
     fontSize: 16,
     fontFamily: "NunitoExtraBold",
   },

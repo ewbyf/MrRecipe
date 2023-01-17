@@ -317,20 +317,14 @@ export default function Dish({ navigation }) {
                 {recipeData.preptime % 60} min
               </Text>
               <Text style={styles.timeText}>
-                <Text style={styles.nunitoText}>
-                  Cook Time:
-                </Text>{" "}
+                <Text style={styles.nunitoText}>Cook Time:</Text>{" "}
                 {Math.floor(recipeData.cooktime / 60)} hrs{" "}
                 {recipeData.cooktime % 60} min
               </Text>
             </View>
             <View>
               <Text style={styles.difficulty}>
-                <Text
-                  style={styles.nunitoText}
-                >
-                  Difficulty:
-                </Text>{" "}
+                <Text style={styles.nunitoText}>Difficulty:</Text>{" "}
                 {recipeData.difficulty}
               </Text>
               <View style={styles.ratingContainer}>
@@ -882,7 +876,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "right",
   },
-  nunitoText: { color: "#518BFF", fontFamily: "NunitoExtraBold" },
+  nunitoText: { 
+    color: "#518BFF",
+    fontFamily: "NunitoExtraBold"
+  },
   title: {
     color: "#518BFF",
     fontSize: 18,
@@ -908,9 +905,8 @@ const styles = StyleSheet.create({
   commentsTitle: {
     color: "white",
     fontSize: 18,
-    fontWeight: "bold",
     paddingVertical: 8,
-    fontFamily: 'NunitoExtraBold'
+    fontFamily: "NunitoExtraBold",
   },
   commentContainer: {
     color: "white",

@@ -767,7 +767,6 @@ const styles = StyleSheet.create({
   title: {
     color: "#518BFF",
     fontSize: 15,
-    fontWeight: "bold",
     marginBottom: 6,
     fontFamily: "NunitoExtraBold",
   },

@@ -57,34 +57,36 @@ export default function Dashboard({ navigation }) {
           fav = snapshot.data().favorites;
         }
       });
-
-    await Promise.all(
-      ref.recipes.reverse().map(async (doc) => {
-        return firebase
-          .firestore()
-          .collection("recipes")
-          .doc(doc)
-          .get()
-          .then((snap) => {
-            if (fav.indexOf(doc) >= 0) {
-              tempList.push({
-                key: doc,
-                value: snap.data(),
-                favorite: "#FF4343",
+    
+    if (ref.recipes) {
+      await Promise.all(
+        ref.recipes.reverse().map(async (doc) => {
+          return firebase
+            .firestore()
+            .collection("recipes")
+            .doc(doc)
+            .get()
+            .then((snap) => {
+              if (fav.indexOf(doc) >= 0) {
+                tempList.push({
+                  key: doc,
+                  value: snap.data(),
+                  favorite: "#FF4343",
+                });
+              } else {
+                tempList.push({ key: doc, value: snap.data(), favorite: "gray" });
+              }
+            })
+            .catch((error) => {
+              showMessage({
+                message: error.message,
+                icon: "danger",
+                type: "danger",
               });
-            } else {
-              tempList.push({ key: doc, value: snap.data(), favorite: "gray" });
-            }
-          })
-          .catch((error) => {
-            showMessage({
-              message: error.message,
-              icon: "danger",
-              type: "danger",
             });
-          });
-      })
-    );
+        })
+      );
+    }
     setDataList(tempList);
   };
 

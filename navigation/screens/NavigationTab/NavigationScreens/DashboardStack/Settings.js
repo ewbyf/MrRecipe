@@ -957,7 +957,6 @@ const styles = StyleSheet.create({
   },
   fieldTitle: {
     fontSize: 16,
-    fontWeight: "bold",
     color: "#518BFF",
     marginRight: 15,
     width: 90,

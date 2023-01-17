@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/Ionicons";
 
 import { firebase } from "../../../config";
+import global from "../../../Styles"
 
 // Screens
 import RecipesScreen from "./NavigationScreens/Recipes";
@@ -32,8 +33,19 @@ export default function NavigationBar() {
       }}
       onPress={() => {
         if (user) {
-          onPress();
-        } else {
+          firebase.auth().currentUser.reload();
+          if (firebase.auth().currentUser.emailVerified) {
+            onPress();
+          }
+          else {
+            showMessage({
+              message: "Must be verified to post a recipe",
+              icon: "danger",
+              type: "danger",
+            });
+          }
+        }
+        else {
           showMessage({
             message: "Must be signed in to post a recipe",
             icon: "danger",
@@ -46,10 +58,9 @@ export default function NavigationBar() {
     </TouchableOpacity>
   );
 
-  function onAuthStateChanged(user) {
+  onAuthStateChanged = async(user) => {
+    await checkBanned(user);
     setUser(user);
-    if (!user) setButtonName("Login");
-    else setButtonName("Profile");
     if (initializing) setInitializing(false);
   }
 
@@ -58,7 +69,47 @@ export default function NavigationBar() {
     return subscriber;
   }, []);
 
-  if (initializing) return null;
+  const checkBanned = async(userParam) => {
+    if (userParam) {
+      await firebase
+        .firestore()
+        .collection("banned")
+        .where("email", "==", firebase.auth().currentUser.email)
+        .get()
+        .then((snap) => {
+          if (!snap.empty) {
+            firebase
+              .auth()
+              .currentUser.delete()
+              .then(() => {
+                firebase.auth().signOut();
+                showMessage({
+                  message: "Your account has been banned",
+                  icon: "danger",
+                  type: "danger",
+                });
+                setButtonName("Login");
+              });
+          }
+          else {
+            setButtonName("Profile");
+          }
+        });
+    }
+    else {
+      setButtonName("Login");
+    }
+  };
+
+  if (initializing) {
+    return (
+      <View style={global.appContainer}>
+        <View style={global.topbar}>
+          <Text style={[global.topbarTitle, {fontFamily: 'Pacifico', fontWeight: 'normal', fontSize: 28}]}>Mr. Recipe</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.appcontainer}>
@@ -91,7 +142,11 @@ export default function NavigationBar() {
                   size={25}
                 />
                 <Text
-                  style={{ fontSize: 11, color: focused ? "#FFDDA1" : "white" , fontFamily: 'Sora'}}
+                  style={{
+                    fontSize: 11,
+                    color: focused ? "#FFDDA1" : "white",
+                    fontFamily: "Sora",
+                  }}
                 >
                   Recipes
                 </Text>
@@ -117,7 +172,11 @@ export default function NavigationBar() {
                   size={25}
                 />
                 <Text
-                  style={{ fontSize: 11, color: focused ? "#FFDDA1" : "white" , fontFamily: 'Sora'}}
+                  style={{
+                    fontSize: 11,
+                    color: focused ? "#FFDDA1" : "white",
+                    fontFamily: "Sora",
+                  }}
                 >
                   Search
                 </Text>
@@ -160,7 +219,11 @@ export default function NavigationBar() {
                   size={25}
                 />
                 <Text
-                  style={{ fontSize: 11, color: focused ? "#FFDDA1" : "white" , fontFamily: 'Sora'}}
+                  style={{
+                    fontSize: 11,
+                    color: focused ? "#FFDDA1" : "white",
+                    fontFamily: "Sora",
+                  }}
                 >
                   Favorites
                 </Text>
@@ -186,7 +249,11 @@ export default function NavigationBar() {
                   size={25}
                 />
                 <Text
-                  style={{ fontSize: 11, color: focused ? "#FFDDA1" : "white" , fontFamily: 'Sora'}}
+                  style={{
+                    fontSize: 11,
+                    color: focused ? "#FFDDA1" : "white",
+                    fontFamily: "Sora",
+                  }}
                 >
                   {buttonName}
                 </Text>

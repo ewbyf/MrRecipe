@@ -23,10 +23,24 @@ export default function Register({ navigation }) {
   const usersDB = firebase.firestore().collection("users");
 
   const registerUser = async () => {
+    const snapshot2 = await firebase
+    .firestore()
+    .collection("banned")
+    .where("email", "==", email)
+    .get();
+
     const snapshot = await usersDB
       .where("username_lowercase", "==", username.toLowerCase())
       .get();
-    if (!snapshot.empty)
+    
+    if (!snapshot2.empty) {
+      showMessage({
+        message: "This email has been banned",
+        icon: "danger",
+        type: "danger",
+      });
+    }
+    else if (!snapshot.empty)
       showMessage({
         message: "Username already exists",
         icon: "danger",

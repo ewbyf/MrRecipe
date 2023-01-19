@@ -40,7 +40,8 @@
     "react-native-screens": "~3.18.0",
     "react-native-splash-screen": "^3.3.0",
     "react-native-vector-icons": "^9.2.0",
-    "reanimated-bottom-sheet": "^1.0.0-alpha.22"
+    "reanimated-bottom-sheet": "^1.0.0-alpha.22",
+    "expo-file-system": "~15.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

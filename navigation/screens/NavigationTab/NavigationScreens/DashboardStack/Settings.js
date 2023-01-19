@@ -139,7 +139,7 @@ export default function Settings({ navigation }) {
 
   const SaveButton = () => (
     <Text
-      disabled={inProgress}
+      disabled={inProgress || !changedSettings}
       onPress={async () => {
         setInProgress(true);
         await saveSettings();
@@ -155,7 +155,6 @@ export default function Settings({ navigation }) {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [3, 3],
-      quality: 1,
     });
 
     if (!result.canceled) {

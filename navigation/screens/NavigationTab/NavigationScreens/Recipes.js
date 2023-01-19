@@ -99,6 +99,7 @@ export default function Recipes({ navigation }) {
 
     await Promise.all(
       snapshot.docs.map((doc) => {
+        cacheImages(doc.data().image, doc.id);
         if (userParam && fav.indexOf(doc.id) >= 0) {
           tempList.push({
             key: doc.id,
@@ -113,6 +114,7 @@ export default function Recipes({ navigation }) {
 
     await Promise.all(
       snapshot2.docs.map((doc) => {
+        cacheImages(doc.data().image, doc.id);
         if (userParam && fav.indexOf(doc.id) >= 0) {
           tempList2.push({
             key: doc.id,

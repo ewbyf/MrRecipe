@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
+  Animated,
 } from "react-native";
 import global from "../../../Styles";
 import { AirbnbRating, Rating } from "react-native-ratings";
@@ -26,6 +27,9 @@ import Dialog from "react-native-dialog";
 import { showMessage } from "react-native-flash-message";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { RectButton } from "react-native-gesture-handler";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import React from "react";
 
 export default function Dish({ navigation }) {
   const route = useRoute();
@@ -196,7 +200,6 @@ export default function Dish({ navigation }) {
   const Body = () => {
     const [recipeRating, setRecipeRating] = useState();
     const [recipeNumRatings, setRecipeNumRatings] = useState();
-    const [currentRated, setCurrentRated] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -221,6 +224,7 @@ export default function Dish({ navigation }) {
         let newRating = 0;
         let numRatings = 0;
         let rated = {};
+        let currentRating = 0;
 
         await firebase
           .firestore()
@@ -230,28 +234,28 @@ export default function Dish({ navigation }) {
           .then((snap) => {
             numRatings = snap.data().numratings;
             rated = snap.data().rated;
+            currentRating = snap.data().rating;
           });
 
-        if (Object.keys(rated).includes(userData.uid) || currentRated) {
+        if (Object.keys(rated).includes(userData.uid)) {
           newRating =
-            (recipeData.rating * recipeData.numratings -
-              recipeData.rated[userData.uid] +
+            (currentRating * numRatings -
+              rated[userData.uid] +
               rating) /
-            recipeData.numratings;
+              numRatings;
           setRecipeRating(
             (recipeRating * recipeNumRatings - rated[userData.uid] + rating) /
               recipeNumRatings
           );
         } else {
           newRating =
-            (recipeData.rating * recipeData.numratings + rating) /
-            (recipeData.numratings + 1);
+            (currentRating * numRatings + rating) /
+            (numRatings + 1);
           numRatings++;
           setRecipeRating(
             (recipeRating * recipeNumRatings + rating) / (recipeNumRatings + 1)
           );
           setRecipeNumRatings(recipeNumRatings + 1);
-          setCurrentRated(true);
 
           firebase
             .firestore()
@@ -432,6 +436,9 @@ export default function Dish({ navigation }) {
     const [commentsData, setCommentsData] = useState();
     const [loading, setLoading] = useState(true);
     const [numComments, setNumComments] = useState();
+    const [lastSwipe, setLastSwipe] = useState();
+
+    let rowRefs = new Map();
 
     useEffect(() => {
       firebase
@@ -519,8 +526,10 @@ export default function Dish({ navigation }) {
       setPosting(false);
     };
 
-    const deleteComment = async(key) => {
+    const deleteComment = async (key, userid) => {
       let temp = [];
+      let index = -1;
+
       await firebase
         .firestore()
         .collection("recipes")
@@ -529,10 +538,10 @@ export default function Dish({ navigation }) {
         .then((snap) => {
           if (snap.exists) {
             temp = snap.data().comments;
-            temp.splice(
-              temp.findIndex((item) => item.key == key),
-              1
-            );
+            index = temp.findIndex((item) => item.key == key);
+            if (index >= 0) {
+              temp.splice(index, 1);
+            }
             firebase
               .firestore()
               .collection("recipes")
@@ -542,28 +551,35 @@ export default function Dish({ navigation }) {
               });
           }
         });
-  
-      await firebase
+
+      if (index >= 0) {
+        await firebase
         .firestore()
         .collection("users")
-        .doc(userData.uid)
+        .doc(userid)
         .get()
         .then((snap) => {
           if (snap.exists) {
             temp = snap.data().comments;
-            temp.splice(
-              temp.findIndex((item) => item.key == key),
-              1
-            );
-            firebase.firestore().collection("users").doc(userData.uid).update({
+            let index = temp.findIndex((item) => item.key == key);
+            if (index >= 0) {
+              temp.splice(index, 1);
+            }
+            firebase.firestore().collection("users").doc(userid).update({
               comments: temp,
             });
           }
         });
+      }
 
       temp = commentsData;
-      temp.splice(temp.findIndex(item => item.key == key), 1);
-      setCommentsData(temp);
+      index = temp.findIndex((item) => item.key == key);
+      if (index >= 0) {
+        temp.splice(index, 1);
+      }
+      setCommentsData([...temp]);
+
+      setNumComments(numComments - 1);
 
       showMessage({
         message: "Comment successfully deleted!",
@@ -574,7 +590,8 @@ export default function Dish({ navigation }) {
     const CommentRender = ({ item }) => {
       const [commenterData, setCommenterData] = useState();
       const [loading, setLoading] = useState(true);
-  
+      const [popup, setPopup] = useState(false);
+
       useEffect(() => {
         firebase
           .firestore()
@@ -588,89 +605,151 @@ export default function Dish({ navigation }) {
             setLoading(false);
           });
       }, []);
-  
+
       if (loading || !commenterData) return null;
-  
+
+      const renderRightActions = (progress, dragX) => {
+        if (userData && (commenterData.uid == userData.uid ||
+          authorData.uid == userData.uid)) {
+            const anim = dragX.interpolate({
+              inputRange: [0, 100],
+              outputRange: [20, 59],
+            });
+            return (
+              <RectButton style={styles.deleteButton} onPress={() => setPopup(true)}>
+                <Animated.Text
+                  style={[
+                    {
+                      transform: [{ translateX: anim }],
+                      paddingLeft: 2.5,
+                    },
+                  ]}
+                >
+                  <Icon name="trash-outline" color="white" size={26}/>
+                </Animated.Text>
+              </RectButton>
+            );
+        }
+        return null;
+      };
+
       return (
-        <View style={{ minHeight: 40, marginTop: 15 }}>
-          <View style={{ flexDirection: "row" }}>
-            <TouchableOpacity
-              disabled={pressed}
+        <Swipeable
+          renderRightActions={renderRightActions}
+          overshootRight={false}
+          onSwipeableWillOpen={() => {
+            [...rowRefs.entries()].forEach(([key, ref]) => {
+              if (key !== item.key && ref) ref.close();
+            });
+          }}
+          ref={(ref) => {
+            if (ref && !rowRefs.get(item.key)) {
+              rowRefs.set(item.key, ref);
+            }
+          }}
+        >
+          {/* Delete comment pop up */}
+          <Dialog.Container visible={popup}>
+            <Dialog.Title>Delete Comment</Dialog.Title>
+            <Dialog.Description>
+              Are you sure you want to delete this comment? You cannot undo this
+              action.
+            </Dialog.Description>
+            <Dialog.Button
+              label="Cancel"
               onPress={() => {
-                if (item.uid == route.params.id) {
-                  setPressed(true);
-                  navigation.goBack(null);
-                } else {
-                  navigation.push("ProfileScreen", {
-                    doc: route.params.doc,
-                    id: item.uid,
-                  });
-                }
+                setPopup(false);
               }}
-            >
-              <Image
-                source={{
-                  uri: commenterData.pfp
-                    ? commenterData.pfp
-                    : "https://imgur.com/hNwMcZQ.png",
+            />
+            <Dialog.Button
+              label="Delete"
+              style={{ color: "red" }}
+              onPress={() => deleteComment(item.key, item.uid)}
+            />
+          </Dialog.Container>
+          <View
+            style={{
+              minHeight: 40,
+              paddingVertical: 7.5,
+              backgroundColor: "#222222",
+            }}
+          >
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity
+                disabled={pressed}
+                onPress={() => {
+                  if (item.uid == route.params.id) {
+                    setPressed(true);
+                    navigation.goBack(null);
+                  } else {
+                    navigation.push("ProfileScreen", {
+                      doc: route.params.doc,
+                      id: item.uid,
+                    });
+                  }
                 }}
-                style={styles.smallPfp}
-              />
-            </TouchableOpacity>
-            <View>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <TouchableOpacity
-                  disabled={pressed}
-                  onPress={() => {
-                    if (item.uid == route.params.id) {
-                      setPressed(true);
-                      navigation.goBack(null);
-                    } else {
-                      navigation.push("ProfileScreen", {
-                        doc: route.params.doc,
-                        id: item.uid,
-                      });
-                    }
+              >
+                <Image
+                  source={{
+                    uri: commenterData.pfp
+                      ? commenterData.pfp
+                      : "https://imgur.com/hNwMcZQ.png",
+                  }}
+                  style={styles.smallPfp}
+                />
+              </TouchableOpacity>
+              <View>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <TouchableOpacity
+                    disabled={pressed}
+                    onPress={() => {
+                      if (item.uid == route.params.id) {
+                        setPressed(true);
+                        navigation.goBack(null);
+                      } else {
+                        navigation.push("ProfileScreen", {
+                          doc: route.params.doc,
+                          id: item.uid,
+                        });
+                      }
+                    }}
+                  >
+                    <Text
+                      style={[styles.username, { fontSize: 15 }]}
+                      numberOfLines={1}
+                    >
+                      {commenterData.name}
+                      <Text
+                        style={{
+                          color: "gray",
+                          fontSize: 12.5,
+                          fontFamily: "NunitoExtraBold",
+                        }}
+                      >
+                        {" "}
+                        @{commenterData.username}
+                      </Text>
+                    </Text>
+                  </TouchableOpacity>
+                  <Text style={{ color: "gray", fontSize: 12.5 }}>
+                    {" "}
+                    • {dayjs(item.timestamp.toDate()).fromNow()}
+                  </Text>
+                </View>
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: 15,
+                    marginTop: 3,
+                    paddingRight: 75,
                   }}
                 >
-                  <Text
-                    style={[styles.username, { fontSize: 15 }]}
-                    numberOfLines={1}
-                  >
-                    {commenterData.name}
-                    <Text
-                      style={{
-                        color: "gray",
-                        fontSize: 12.5,
-                        fontFamily: "NunitoExtraBold",
-                      }}
-                    >
-                      {" "}
-                      @{commenterData.username}
-                    </Text>
-                  </Text>
-                </TouchableOpacity>
-                <Text style={{ color: "gray", fontSize: 12.5 }}>
-                  {" "}
-                  • {dayjs(item.timestamp.toDate()).fromNow()}
+                  {item.comment}
                 </Text>
-                {userData &&
-                  (commenterData.uid == userData.uid ||
-                    authorData.uid == userData.uid) && (
-                    <TouchableOpacity
-                      style={{ marginLeft: 10 }}
-                      onPress={() => deleteComment(item.key)}
-                    >
-                      <Icon name="trash-outline" color="#FF4343" size={18} />
-                    </TouchableOpacity>
-                  )}
               </View>
-              <Text style={{ color: "white", fontSize: 15, marginTop: 3 }}>
-                {item.comment}
-              </Text>
             </View>
           </View>
-        </View>
+        </Swipeable>
       );
     };
 
@@ -680,7 +759,7 @@ export default function Dish({ navigation }) {
       }
 
       return (
-        <View style={{ height: "100%", marginBottom: 40 }}>
+        <View style={{ height: "100%", marginBottom: 40, marginTop: 7.5 }}>
           <FlashList
             data={commentsData.slice().reverse()}
             renderItem={({ item }) => <CommentRender item={item} />}
@@ -993,5 +1072,12 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  deleteButton: {
+    width: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
+    backgroundColor: "red",
   },
 });

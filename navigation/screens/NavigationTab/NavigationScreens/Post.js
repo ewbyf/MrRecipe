@@ -16,6 +16,7 @@ import { SelectList } from "react-native-dropdown-select-list";
 import Dialog from "react-native-dialog";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { showMessage } from "react-native-flash-message";
+import FastImage from "react-native-fast-image";
 
 export default function Post({ navigation }) {
   const [initializing, setInitializing] = useState(true);
@@ -411,7 +412,7 @@ export default function Post({ navigation }) {
             )}
             {image && (
               <View style={{ alignItems: "center" }}>
-                <Image
+                <FastImage
                   source={{ uri: image.uri }}
                   style={{
                     width: 350,

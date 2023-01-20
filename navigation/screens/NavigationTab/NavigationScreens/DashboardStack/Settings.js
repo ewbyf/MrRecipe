@@ -16,6 +16,7 @@ import * as ImagePicker from "expo-image-picker";
 import Dialog from "react-native-dialog";
 import { showMessage } from "react-native-flash-message";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import FastImage from 'react-native-fast-image';
 
 export default function Settings({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -707,14 +708,14 @@ export default function Settings({ navigation }) {
           <TouchableOpacity disabled={inProgress} onPress={() => choosePhoto()}>
             <View>
               {image && (
-                <Image
+                <FastImage
                   source={{ uri: image.uri }}
                   style={styles.profilePicture}
                 />
               )}
-              {loading && <Image style={styles.profilePicture} />}
+              {loading && <FastImage style={styles.profilePicture} />}
               {!loading && !image && (
-                <Image
+                <FastImage
                   source={{
                     uri: userData.pfp
                       ? userData.pfp

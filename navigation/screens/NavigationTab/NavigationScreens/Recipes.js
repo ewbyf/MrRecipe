@@ -26,6 +26,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { showMessage } from "react-native-flash-message";
+import FastImage from "react-native-fast-image";
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 
@@ -99,7 +100,6 @@ export default function Recipes({ navigation }) {
 
     await Promise.all(
       snapshot.docs.map((doc) => {
-        cacheImages(doc.data().image, doc.id);
         if (userParam && fav.indexOf(doc.id) >= 0) {
           tempList.push({
             key: doc.id,
@@ -114,7 +114,6 @@ export default function Recipes({ navigation }) {
 
     await Promise.all(
       snapshot2.docs.map((doc) => {
-        cacheImages(doc.data().image, doc.id);
         if (userParam && fav.indexOf(doc.id) >= 0) {
           tempList2.push({
             key: doc.id,
@@ -282,7 +281,7 @@ export default function Recipes({ navigation }) {
                 source={require("../../../../assets/heart.png")}
                 style={[styles.heart, rStyle]}
               />
-              <Image
+              <FastImage
                 source={{
                   uri: item.value.image
                     ? item.value.image
@@ -292,11 +291,7 @@ export default function Recipes({ navigation }) {
               />
               <View style={{ flexDirection: "row", width: "100%" }}>
                 <View style={{ flex: 1 }}>
-                  <Text
-                    style={global.recipeTitle}
-                  >
-                    {item.value.name}
-                  </Text>
+                  <Text style={global.recipeTitle}>{item.value.name}</Text>
                   <Text style={{ color: "gray" }}>{item.value.difficulty}</Text>
                   <Text style={{ color: "gray" }}>
                     {parseFloat(
@@ -508,7 +503,7 @@ export default function Recipes({ navigation }) {
                 source={require("../../../../assets/heart.png")}
                 style={[styles.heart, rStyle]}
               />
-              <Image
+              <FastImage
                 source={{
                   uri: item.value.image
                     ? item.value.image
@@ -518,11 +513,7 @@ export default function Recipes({ navigation }) {
               />
               <View style={{ width: "100%", height: 85 }}>
                 <View>
-                  <Text
-                    style={global.recipeTitle}
-                  >
-                    {item.value.name}
-                  </Text>
+                  <Text style={global.recipeTitle}>{item.value.name}</Text>
                   <Text style={{ color: "gray" }}>{item.value.difficulty}</Text>
                   <Text style={{ color: "gray" }}>
                     {parseFloat(
@@ -571,7 +562,14 @@ export default function Recipes({ navigation }) {
   return (
     <GestureHandlerRootView style={global.appContainer}>
       <View style={global.topbar}>
-        <Text style={[global.topbarTitle, {fontFamily: 'Pacifico', fontWeight: 'normal', fontSize: 28}]}>Mr. Recipe</Text>
+        <Text
+          style={[
+            global.topbarTitle,
+            { fontFamily: "Pacifico", fontWeight: "normal", fontSize: 28 },
+          ]}
+        >
+          Mr. Recipe
+        </Text>
       </View>
       <ScrollView
         style={{ height: windowHeight, width: windowWidth }}
@@ -631,7 +629,7 @@ const styles = StyleSheet.create({
   titleText: {
     color: "white",
     fontSize: 26,
-    fontFamily: 'NunitoExtraBold',
+    fontFamily: "NunitoExtraBold",
     paddingLeft: 20,
     paddingTop: 20,
   },

@@ -16,6 +16,7 @@ import { Rating } from "react-native-ratings";
 import Icon from "react-native-vector-icons/Ionicons";
 import { SearchBar } from "@rneui/themed";
 import { showMessage } from "react-native-flash-message";
+import FastImage from "react-native-fast-image";
 
 export default function Favorites({ navigation }) {
   const [initializing, setInitializing] = useState(true);
@@ -251,7 +252,7 @@ export default function Favorites({ navigation }) {
                     }
                   >
                     <View style={[global.list]}>
-                      <Image
+                      <FastImage
                         source={{
                           uri: item.value.image
                             ? item.value.image
@@ -321,7 +322,7 @@ export default function Favorites({ navigation }) {
                     }
                   >
                     <View style={[global.list]}>
-                      <Image
+                      <FastImage
                         source={{
                           uri: item.value.image
                             ? item.value.image

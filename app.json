@@ -21,19 +21,24 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "Allow Mr. Recipe to use your camera"
-      }
+      },
+      "bundleIdentifier": "com.cooly4477.RecipesApp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon1.png",
         "backgroundColor": "#50bbff"
       },
-      "softwareKeyboardLayoutMode":"pan"      
-      
+      "softwareKeyboardLayoutMode": "pan",
+      "package": "com.cooly4477.RecipesApp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "df14d600-5afe-4b6d-a38c-9660bdfb1e98"
+      }
     }
   }
 }
-

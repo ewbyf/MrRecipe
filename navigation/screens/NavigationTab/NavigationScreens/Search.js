@@ -28,6 +28,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { showMessage } from "react-native-flash-message";
+import FastImage from "react-native-fast-image";
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 
@@ -267,7 +268,7 @@ export default function Search({ navigation }) {
                 source={require("../../../../assets/heart.png")}
                 style={[styles.heart, rStyle]}
               />
-              <Image
+              <FastImage
                 source={{
                   uri: item.value.image
                     ? item.value.image
@@ -328,7 +329,7 @@ export default function Search({ navigation }) {
         onPress={() => navigation.navigate("ProfileScreen", { id: item.key })}
       >
         <View style={[global.list, { paddingTop: 10 }]}>
-          <Image
+          <FastImage
             source={{
               uri: item.value.pfp
                 ? item.value.pfp

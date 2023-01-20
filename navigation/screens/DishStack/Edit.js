@@ -16,6 +16,7 @@ import Dialog from "react-native-dialog";
 import { useRoute } from "@react-navigation/native";
 import { showMessage } from "react-native-flash-message";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import FastImage from "react-native-fast-image";
 
 export default function Edit({ navigation }) {
   const route = useRoute();
@@ -403,7 +404,7 @@ export default function Edit({ navigation }) {
           )}
           {image && (
             <View style={{ alignItems: "center" }}>
-              <Image
+              <FastImage
                 source={{ uri: image.uri ? image.uri : image }}
                 style={{
                   width: 350,

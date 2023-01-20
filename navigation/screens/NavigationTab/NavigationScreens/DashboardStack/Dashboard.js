@@ -24,6 +24,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { showMessage } from "react-native-flash-message";
+import FastImage from 'react-native-fast-image';
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
@@ -226,7 +227,7 @@ export default function Dashboard({ navigation }) {
                 source={require("../../../../../assets/heart.png")}
                 style={[styles.heart, rStyle]}
               />
-              <Image
+              <FastImage
                 source={{
                   uri: item.value.image
                     ? item.value.image

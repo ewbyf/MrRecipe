@@ -26,6 +26,7 @@ import Animated, {
 import { useRoute } from "@react-navigation/native";
 import { showMessage } from "react-native-flash-message";
 import Dialog from "react-native-dialog";
+import FastImage from "react-native-fast-image";
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
@@ -405,7 +406,7 @@ export default function Profile({ navigation }) {
                 source={require("../../assets/heart.png")}
                 style={[styles.heart, rStyle]}
               />
-              <Image
+              <FastImage
                 source={{
                   uri: item.value.image
                     ? item.value.image

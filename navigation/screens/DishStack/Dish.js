@@ -30,6 +30,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import React from "react";
+import FastImage from "react-native-fast-image";
 
 export default function Dish({ navigation }) {
   const route = useRoute();
@@ -355,7 +356,7 @@ export default function Dish({ navigation }) {
                   }
                 }}
               >
-                <Image
+                <FastImage
                   source={{
                     uri: authorData.pfp
                       ? authorData.pfp
@@ -689,7 +690,7 @@ export default function Dish({ navigation }) {
                   }
                 }}
               >
-                <Image
+                <FastImage
                   source={{
                     uri: commenterData.pfp
                       ? commenterData.pfp
@@ -775,7 +776,7 @@ export default function Dish({ navigation }) {
       <View>
         <Text style={styles.commentsTitle}>{numComments} Comments</Text>
         <View style={styles.commentContainer}>
-          <Image
+          <FastImage
             source={{
               uri:
                 userData && userData.pfp
@@ -913,7 +914,7 @@ export default function Dish({ navigation }) {
         showsVerticalScrollIndicator={false}
         style={{ padding: 15 }}
       >
-        <Image
+        <FastImage
           source={{
             uri: recipeData.image
               ? recipeData.image

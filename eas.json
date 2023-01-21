@@ -17,6 +17,12 @@
     "production": {}
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleId": "mrrecipe4477@gmail.com",
+        "ascAppId": "1666779736",
+        "appleTeamId": "337CFC87PA"
+      }
+    }
   }
 }

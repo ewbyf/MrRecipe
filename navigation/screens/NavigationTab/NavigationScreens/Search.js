@@ -4,7 +4,6 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Image,
   Keyboard,
   Platform,
   TouchableWithoutFeedback,
@@ -30,12 +29,12 @@ import Animated, {
 import { showMessage } from "react-native-flash-message";
 import FastImage from "react-native-fast-image";
 
-const AnimatedImage = Animated.createAnimatedComponent(Image);
+const AnimatedImage = Animated.createAnimatedComponent(FastImage);
 
 export default function Search({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
+  const [user, setUser] = useState({});
   const [loading, setLoading] = useState(false);
   const [press, setPress] = useState(false);
   const [dataList, setDataList] = useState([]);

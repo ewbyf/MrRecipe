@@ -2,7 +2,6 @@ import {
   StyleSheet,
   View,
   Text,
-  Image,
   TouchableOpacity,
   RefreshControl,
 } from "react-native";
@@ -26,7 +25,7 @@ import Animated, {
 import { showMessage } from "react-native-flash-message";
 import FastImage from 'react-native-fast-image';
 
-const AnimatedImage = Animated.createAnimatedComponent(Image);
+const AnimatedImage = Animated.createAnimatedComponent(FastImage);
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 export default function Dashboard({ navigation }) {

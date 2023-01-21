@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
-  Image,
 } from "react-native";
 import global from "../../../../Styles";
 import { FlashList } from "@shopify/flash-list";
@@ -27,30 +26,28 @@ import Animated, {
 } from "react-native-reanimated";
 import { showMessage } from "react-native-flash-message";
 import FastImage from "react-native-fast-image";
+import * as SplashScreen from "expo-splash-screen";
 
-const AnimatedImage = Animated.createAnimatedComponent(Image);
+const AnimatedImage = Animated.createAnimatedComponent(FastImage);
 
 export default function Recipes({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
+  const [user, setUser] = useState({});
 
-  const [dataList, setDataList] = useState([
-    { key: "1", value: { name: "a", rating: "a" } },
-    { key: "1", value: { name: "a", rating: 1 } },
-  ]);
-  const [recentList, setRecentList] = useState([
-    { key: "1", value: { name: "a", rating: 1 } },
-  ]);
+  const [dataList, setDataList] = useState([{value: {name: 'a', rating: 1}, key: "1"}, {value: {name: 'a', rating: 1}, key: "1"}]);
+  const [recentList, setRecentList] = useState([{key: '1', value: {name: 'a', rating: 1}}]);
 
   const windowWidth = Dimensions.get("window").width;
   const windowHeight = Dimensions.get("window").height;
 
   onAuthStateChanged = (userParam) => {
-    fetchData(userParam);
-    setUser(userParam);
-    if (initializing) setInitializing(false);
+    const start = async() => {
+      await fetchData(userParam);
+      setUser(userParam);
+      SplashScreen.hideAsync();
+    }
+    start();
   };
 
   useEffect(() => {
@@ -554,10 +551,6 @@ export default function Recipes({ navigation }) {
       </View>
     );
   };
-
-  if (initializing) {
-    return null;
-  }
 
   return (
     <GestureHandlerRootView style={global.appContainer}>

@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   Alert,
-  Image,
   TouchableOpacity,
 } from "react-native";
 import global from "../../../../../Styles";

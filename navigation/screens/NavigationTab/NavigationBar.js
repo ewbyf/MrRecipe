@@ -20,7 +20,7 @@ const Tab = createBottomTabNavigator();
 
 export default function NavigationBar() {
   const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
+  const [user, setUser] = useState({});
   const [buttonName, setButtonName] = useState("");
 
   const CustomTabBarButton = ({ children, onPress }) => (

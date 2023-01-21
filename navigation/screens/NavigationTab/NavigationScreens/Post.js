@@ -4,7 +4,6 @@ import {
   TouchableOpacity,
   Text,
   TextInput,
-  Image,
 } from "react-native";
 import global from "../../../../Styles";
 import { useState, useEffect } from "react";
@@ -20,7 +19,7 @@ import FastImage from "react-native-fast-image";
 
 export default function Post({ navigation }) {
   const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
+  const [user, setUser] = useState({});
   const [image, setImage] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");

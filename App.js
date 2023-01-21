@@ -5,19 +5,11 @@ import { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
-import * as FileSystem from "expo-file-system";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const [loaded, setLoaded] = useState(false);
-
-  const cacheImages = async(uri, doc) => {
-    await FileSystem.downloadAsync(
-      uri,
-      FileSystem.documentDirectory + doc.toString() + ".jpg"
-    )
-  }
 
   const fetchFonts = async () => {
     await Font.loadAsync({
@@ -36,7 +28,6 @@ export default function App() {
   }, []);
 
   if (loaded) {
-    SplashScreen.hideAsync();
 
     return (
       <MenuProvider>

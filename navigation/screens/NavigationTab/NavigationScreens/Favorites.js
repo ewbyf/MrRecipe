@@ -2,7 +2,6 @@ import {
   StyleSheet,
   View,
   Text,
-  Image,
   ScrollView,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -20,7 +19,7 @@ import FastImage from "react-native-fast-image";
 
 export default function Favorites({ navigation }) {
   const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState("");
+  const [user, setUser] = useState({});
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");

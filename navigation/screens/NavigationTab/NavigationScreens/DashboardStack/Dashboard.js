@@ -239,6 +239,7 @@ export default function Dashboard({ navigation }) {
                 <View>
                   <Text
                     style={global.recipeTitle}
+                    numberOfLines={1}
                   >
                     {item.value.name}
                   </Text>

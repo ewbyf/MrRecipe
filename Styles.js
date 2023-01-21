@@ -37,12 +37,14 @@ export default StyleSheet.create({
   },
   itemContainer: {
     width: Dimensions.get("window").width / 2 - 9,
-    height: Dimensions.get("window").height / 3.5 - 27,
+    height: Dimensions.get("window").height / 4 - 5,
+    minHeight: 210,
     borderRadius: 15,
     marginBottom: 6,
   },
   list: {
-    height: Dimensions.get("window").height / 3.5 - 27,
+    height: Dimensions.get("window").height / 4 - 5,
+    minHeight: 210,
     alignItems: "center",
     padding: 15,
     margin: 3,

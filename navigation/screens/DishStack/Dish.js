@@ -756,7 +756,10 @@ export default function Dish({ navigation }) {
 
     const CommentList = () => {
       if (commentsData.length == 0) {
-        return null;
+        return (
+          <View style={{marginBottom: 40}}>
+          </View>
+        );
       }
 
       return (

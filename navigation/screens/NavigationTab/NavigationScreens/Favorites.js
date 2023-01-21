@@ -266,6 +266,7 @@ export default function Favorites({ navigation }) {
                             style={
                               global.recipeTitle
                             }
+                            numberOfLines={1}
                           >
                             {item.value.name}
                           </Text>
@@ -334,6 +335,7 @@ export default function Favorites({ navigation }) {
                         <View>
                           <Text
                             style={global.recipeTitle}
+                            numberOfLines={1}
                           >
                             {item.value.name}
                           </Text>

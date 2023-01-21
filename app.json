@@ -20,7 +20,7 @@
     "ios": {
       "supportsTablet": false,
       "infoPlist": {
-        "NSCameraUsageDescription": "Allow Mr. Recipe to use your camera"
+        "NSCameraUsageDescription": "This lets you take pictures of your food to show off to others."
       },
       "bundleIdentifier": "com.cooly4477.RecipesApp",
       "buildNumber": "3"

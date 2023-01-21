@@ -280,6 +280,7 @@ export default function Search({ navigation }) {
                 <View>
                   <Text
                     style={global.recipeTitle}
+                    numberOfLines={1}
                   >
                     {item.value.name}
                   </Text>
@@ -340,6 +341,7 @@ export default function Search({ navigation }) {
           <View style={{ width: "100%", height: 85, marginTop: 10 }}>
             <Text
               style={[global.recipeTitle, {textAlign: 'center'}]}
+              numberOfLines={1}
             >
               {item.value.name}
             </Text>

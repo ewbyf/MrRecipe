@@ -165,11 +165,11 @@ export default function Post({ navigation }) {
   };
 
   const convertName = (text) => {
-    return text.replace(/[^0-9a-zA-Z!:&$,\/()#%+-]/g, "");
+    return text.replace(/[^0-9a-zA-Z!:&$,\/()#%+ -]/g, "");
   };
 
   const convertText = (text) => {
-    return text.replace(/[^0-9a-zA-Z.?:!&$,\/()#%+-]/g, "");
+    return text.replace(/[^0-9a-zA-Z.?:!&$,\/()#%+ -]/g, "");
   };
 
   const publish = async () => {
@@ -780,7 +780,8 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: "#151515",
-    paddingHorizontal: 10,
+    paddingLeft: 10,
+    paddingRight: 30,
     height: 40,
     borderRadius: 8,
     color: "white",

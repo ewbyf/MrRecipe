@@ -366,7 +366,7 @@ export default function Dish({ navigation }) {
                 />
                 <View style={{ marginLeft: 10 }}>
                   <Text style={styles.username} numberOfLines={1}>
-                    {authorData.username}
+                    {authorData.name}
                   </Text>
                   <Text style={{ color: "gray" }}>
                     {authorData.recipes.length}{" "}

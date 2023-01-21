@@ -23,7 +23,7 @@
         "NSCameraUsageDescription": "Allow Mr. Recipe to use your camera"
       },
       "bundleIdentifier": "com.cooly4477.RecipesApp",
-      "buildNumber": "2"
+      "buildNumber": "3"
     },
     "android": {
       "adaptiveIcon": {

@@ -288,7 +288,7 @@ export default function Recipes({ navigation }) {
               />
               <View style={{ flexDirection: "row", width: "100%" }}>
                 <View style={{ flex: 1 }}>
-                  <Text style={global.recipeTitle}>{item.value.name}</Text>
+                  <Text style={global.recipeTitle} numberOfLines={1}>{item.value.name}</Text>
                   <Text style={{ color: "gray" }}>{item.value.difficulty}</Text>
                   <Text style={{ color: "gray" }}>
                     {parseFloat(
@@ -510,7 +510,7 @@ export default function Recipes({ navigation }) {
               />
               <View style={{ width: "100%", height: 85 }}>
                 <View>
-                  <Text style={global.recipeTitle}>{item.value.name}</Text>
+                  <Text style={global.recipeTitle} numberOfLines={1}>{item.value.name}</Text>
                   <Text style={{ color: "gray" }}>{item.value.difficulty}</Text>
                   <Text style={{ color: "gray" }}>
                     {parseFloat(

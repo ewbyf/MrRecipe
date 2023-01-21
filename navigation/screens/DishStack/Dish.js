@@ -124,6 +124,7 @@ export default function Dish({ navigation }) {
 
   const Heart = () => {
     const [liked, setLiked] = useState("gray");
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
       if (userData) {
@@ -136,6 +137,7 @@ export default function Dish({ navigation }) {
             if (snap.data().favorites.indexOf(route.params.doc) != -1) {
               setLiked("#FF4343");
             }
+            setLoading(false)
           })
           .catch((error) => {
             showMessage({
@@ -144,6 +146,9 @@ export default function Dish({ navigation }) {
               type: "danger",
             });
           });
+      }
+      else {
+        setLoading(false);
       }
     }, []);
 
@@ -189,6 +194,8 @@ export default function Dish({ navigation }) {
         });
       }
     };
+
+    if (loading) return null;
 
     return (
       <TouchableOpacity onPress={() => favorite()}>

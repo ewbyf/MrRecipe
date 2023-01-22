@@ -23,7 +23,7 @@
         "NSCameraUsageDescription": "This lets you take pictures of your food to show off to others."
       },
       "bundleIdentifier": "com.cooly4477.RecipesApp",
-      "buildNumber": "3"
+      "buildNumber": "4"
     },
     "android": {
       "adaptiveIcon": {

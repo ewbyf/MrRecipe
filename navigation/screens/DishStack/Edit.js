@@ -230,6 +230,8 @@ export default function Edit({ navigation }) {
               .doc(route.params.doc)
               .update({
                 name,
+                name_lowercase: name.toLowerCase(),
+                name_array: name.toLowerCase().match(/\b(\w+)\b/g),
                 description,
                 difficulty,
                 cooktime,

@@ -2,7 +2,7 @@
   "expo": {
     "name": "RecipesApp",
     "slug": "RecipesApp",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon1.png",
     "userInterfaceStyle": "light",
@@ -23,7 +23,7 @@
         "NSCameraUsageDescription": "This lets you take pictures of your food to show off to others."
       },
       "bundleIdentifier": "com.cooly4477.RecipesApp",
-      "buildNumber": "4"
+      "buildNumber": "5"
     },
     "android": {
       "adaptiveIcon": {

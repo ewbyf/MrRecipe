@@ -133,7 +133,6 @@ export default function NavigationBar() {
                 style={{
                   alignItems: "center",
                   justifyContent: "center",
-                  top: 10,
                 }}
               >
                 <Icon
@@ -163,7 +162,6 @@ export default function NavigationBar() {
                 style={{
                   alignItems: "center",
                   justifyContent: "center",
-                  top: 10,
                 }}
               >
                 <Icon
@@ -210,7 +208,6 @@ export default function NavigationBar() {
                 style={{
                   alignItems: "center",
                   justifyContent: "center",
-                  top: 10,
                 }}
               >
                 <Icon
@@ -240,7 +237,6 @@ export default function NavigationBar() {
                 style={{
                   alignItems: "center",
                   justifyContent: "center",
-                  top: 10,
                 }}
               >
                 <Icon
@@ -282,6 +278,7 @@ const styles = StyleSheet.create({
     height: 90,
     borderRadius: 15,
     borderTopWidth: 0,
+    paddingBottom: 0,
   },
   shadow: {
     shadowColor: "black",

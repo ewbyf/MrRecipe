@@ -573,7 +573,7 @@ export default function Recipes({ navigation }) {
       >
         <View
           style={{
-            marginBottom: 250,
+            marginBottom: windowHeight <= 736 ? 400 : 250,
             width: windowWidth,
             height: windowHeight,
           }}

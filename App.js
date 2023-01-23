@@ -28,7 +28,6 @@ export default function App() {
   }, []);
 
   if (loaded) {
-
     return (
       <MenuProvider>
         <NavigationContainer>

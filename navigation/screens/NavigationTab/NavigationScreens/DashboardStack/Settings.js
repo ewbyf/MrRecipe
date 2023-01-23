@@ -41,6 +41,8 @@ export default function Settings({ navigation }) {
   const [signOut, setSignOut] = useState(false);
 
   const [inProgress, setInProgress] = useState(false);
+  const [reload, setReload] = useState(false);
+  const [verified, setVerified] = useState(false);
 
   useEffect(() => {
     firebase
@@ -56,6 +58,16 @@ export default function Settings({ navigation }) {
         }
       });
   }, []);
+
+  useEffect(() => {
+    firebase.auth().currentUser.reload();
+    if (firebase.auth().currentUser.emailVerified) {
+      setVerified(true);
+    } 
+    navigation.addListener("focus", () => {
+      setReload(!reload);
+    });
+  }, [navigation, reload]);
 
   const initialize = (snapshot) => {
     setName(snapshot.name);
@@ -193,50 +205,56 @@ export default function Settings({ navigation }) {
     if (firebase.auth().currentUser.emailVerified) {
       return true;
     } else {
-      Alert.alert(
-        "Verification Required",
-        "Do you need a verification email to be sent?",
-        [
-          { text: "Cancel" },
-          {
-            text: "Send",
-            onPress: () => {
-              firebase
-                .auth()
-                .currentUser.sendEmailVerification({
-                  handleCodeInApp: true,
-                  url: "https://mr-recipe-799e9.firebaseapp.com",
-                })
-                .then(() => {
-                  showMessage({
-                    message:
-                      "Verification email has been sent. Please check your junk mail",
-                    type: "success",
-                  });
-                })
-                .catch((error) => {
-                  switch (error.code) {
-                    case "auth/too-many-requests":
-                      showMessage({
-                        message: "Too many requests. Try again later",
-                        icon: "danger",
-                        type: "danger",
-                      });
-                      break;
-                    default:
-                      showMessage({
-                        message: error.message,
-                        icon: "danger",
-                        type: "danger",
-                      });
-                  }
-                });
-            },
-          },
-        ]
-      );
+      showMessage({
+        message: "Email must be verified to perform this action",
+        icon: "danger",
+        type: "danger",
+      });
     }
   };
+
+  const sendVerifcationEmail = async() => {
+    await firebase.auth().currentUser.reload();
+    if (firebase.auth().currentUser.emailVerified) {
+      showMessage({
+        message:
+          "Your email has already been verified",
+        type: "success",
+      });
+    }
+    else {
+      firebase
+      .auth()
+      .currentUser.sendEmailVerification({
+        handleCodeInApp: true,
+        url: "https://mr-recipe-799e9.firebaseapp.com",
+      })
+      .then(() => {
+        showMessage({
+          message:
+            "Verification email has been sent. Please check your junk mail",
+          type: "success",
+        });
+      })
+      .catch((error) => {
+        switch (error.code) {
+          case "auth/too-many-requests":
+            showMessage({
+              message: "Too many requests. Try again later",
+              icon: "danger",
+              type: "danger",
+            });
+            break;
+          default:
+            showMessage({
+              message: error.message,
+              icon: "danger",
+              type: "danger",
+            });
+        }
+      });
+    }
+  }
 
   const changeEmail = async () => {
     if (email != confirmEmail)
@@ -851,6 +869,19 @@ export default function Settings({ navigation }) {
         </View>
 
         <View style={{ marginVertical: 50 }}>
+          {!verified && <TouchableOpacity
+            style={[styles.button]}
+            disabled={inProgress}
+            onPress={() => sendVerifcationEmail()}
+          >
+            <Text style={[styles.signOutText, {color: "#86FF9E"}]}>Verify Email</Text>
+            <Icon
+              name="mail-outline"
+              color={"#86FF9E"}
+              size={22}
+              style={{ marginLeft: 10 }}
+            />
+          </TouchableOpacity>}
           <TouchableOpacity
             style={[styles.button]}
             disabled={inProgress}
@@ -893,7 +924,7 @@ export default function Settings({ navigation }) {
               Contact Support
             </Text>
             <Icon
-              name="mail-outline"
+              name="build-outline"
               color={"#FFDDA1"}
               size={22}
               style={{ marginLeft: 10 }}

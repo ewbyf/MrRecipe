@@ -74,7 +74,7 @@ export default function Search({ navigation }) {
       return arr;
     };
 
-    if (userParam) {
+    if (userParam && firebase.auth().currentUser) {
       await firebase
         .firestore()
         .collection("users")

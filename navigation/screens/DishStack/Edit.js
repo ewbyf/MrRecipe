@@ -190,6 +190,14 @@ export default function Edit({ navigation }) {
     return text.replace(/[^0-9]/g, "");
   };
 
+  const convertName = (text) => {
+    return text.replace(/[^0-9a-zA-Z!:&$,\/()#%+ -]/g, "");
+  };
+
+  const convertText = (text) => {
+    return text.replace(/[^0-9a-zA-Z.?:!&$,\/()#%+ -]/g, "");
+  };
+
   const publish = async () => {
     if (
       name &&
@@ -444,7 +452,7 @@ export default function Edit({ navigation }) {
               value={name}
               editable={!publishing}
               onChangeText={(title) => {
-                setName(title);
+                setName(convertName(title));
                 if (!changed) setChanged(true);
               }}
             ></TextInput>
@@ -620,7 +628,7 @@ export default function Edit({ navigation }) {
                 style={styles.input}
                 editable={!publishing}
                 onChangeText={(text) => {
-                  inputHandler(text, 0, "ingredients");
+                  inputHandler(convertText(text), 0, "ingredients");
                   if (!changed) setChanged(true);
                 }}
               />
@@ -638,7 +646,7 @@ export default function Edit({ navigation }) {
                   style={styles.input}
                   editable={!publishing}
                   onChangeText={(text) => {
-                    inputHandler(text, key + 1, "ingredients");
+                    inputHandler(convertText(text), key + 1, "ingredients");
                     if (!changed) setChanged(true);
                   }}
                 />
@@ -670,7 +678,7 @@ export default function Edit({ navigation }) {
                 value={instructions[0].value}
                 editable={!publishing}
                 onChangeText={(text) => {
-                  inputHandler(text, 0, "instructions");
+                  inputHandler(convertText(text), 0, "instructions");
                   if (!changed) setChanged(true);
                 }}
               />
@@ -698,7 +706,7 @@ export default function Edit({ navigation }) {
                   editable={!publishing}
                   style={[styles.input, { paddingLeft: 30 }]}
                   onChangeText={(text) => {
-                    inputHandler(text, key + 1, "instructions");
+                    inputHandler(convertText(text), key + 1, "instructions");
                     if (!changed) setChanged(true);
                   }}
                 />

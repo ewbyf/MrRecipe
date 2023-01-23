@@ -38,7 +38,7 @@ export default function Favorites({ navigation }) {
   }, []);
 
   const fetchData = async (userParam) => {
-    if (userParam) {
+    if (userParam && firebase.auth().currentUser) {
       let tempList = [];
       let fav = [];
       let deleted = 0;

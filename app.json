@@ -31,7 +31,8 @@
         "backgroundColor": "#50bbff"
       },
       "softwareKeyboardLayoutMode": "pan",
-      "package": "com.cooly4477.RecipesApp"
+      "package": "com.cooly4477.RecipesApp",
+      "versionCode": 2
     },
     "web": {
       "favicon": "./assets/favicon.png"

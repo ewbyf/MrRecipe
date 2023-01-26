@@ -22,6 +22,9 @@
         "appleId": "mrrecipe4477@gmail.com",
         "ascAppId": "1666779736",
         "appleTeamId": "337CFC87PA"
+      },
+      "android": {
+        "serviceAccountKeyPath": "../../Keys/play-integrity-szs9nmqpqwv68hm-3a12f3323d0a.json"
       }
     }
   }

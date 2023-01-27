@@ -12,10 +12,7 @@ import { firebase } from "../../config";
 import { FlashList } from "@shopify/flash-list";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Rating } from "react-native-ratings";
-import {
-  TapGestureHandler,
-  ScrollView,
-} from "react-native-gesture-handler";
+import { TapGestureHandler, ScrollView } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -62,13 +59,13 @@ export default function Profile({ navigation }) {
 
     if (userParam) {
       await firebase
-      .firestore()
-      .collection("users")
-      .doc(firebase.auth().currentUser.uid)
-      .get()
-      .then((snap) => {
-        fav = snap.data().favorites;
-      });
+        .firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .get()
+        .then((snap) => {
+          fav = snap.data().favorites;
+        });
     }
 
     await firebase
@@ -99,7 +96,11 @@ export default function Profile({ navigation }) {
                   favorite: "#FF4343",
                 });
               } else {
-                tempList.push({ key: doc, value: snap.data(), favorite: "gray" });
+                tempList.push({
+                  key: doc,
+                  value: snap.data(),
+                  favorite: "gray",
+                });
               }
             })
             .catch((error) => {
@@ -112,7 +113,7 @@ export default function Profile({ navigation }) {
         })
       );
     }
-    
+
     setDataList(tempList);
   };
 
@@ -180,8 +181,7 @@ export default function Profile({ navigation }) {
                     (snap2.data().rating * snap2.data().numratings -
                       temp[userData.uid]) /
                     numratings;
-                  let weight =
-                    rating + 5 * (1 - Math.E ** (-numratings / 50));
+                  let weight = rating + 5 * (1 - Math.E ** (-numratings / 50));
 
                   delete temp[userData.uid];
 
@@ -207,7 +207,7 @@ export default function Profile({ navigation }) {
                     let imageRef = firebase
                       .storage()
                       .refFromURL(snap2.data().image);
-                     imageRef.delete();
+                    imageRef.delete();
                   }
                 }
               });
@@ -216,18 +216,13 @@ export default function Profile({ navigation }) {
           });
         });
 
-      await firebase
-        .firestore()
-        .collection("users")
-        .doc(userData.uid)
-        .delete();
+      await firebase.firestore().collection("users").doc(userData.uid).delete();
 
       await firebase.firestore().collection("banned").add({
-        email: userData.email
+        email: userData.email,
       });
       setDeleteVisible(false);
       navigation.navigate("NavigatorScreen");
-
     } catch (error) {
       switch (error.code) {
         case "auth/wrong-password":
@@ -301,8 +296,7 @@ export default function Profile({ navigation }) {
 
         setDataList(temp);
         setLiked(color);
-      }
-      else {
+      } else {
         showMessage({
           message: "Must be signed in to favorite a recipe",
           icon: "danger",
@@ -353,8 +347,7 @@ export default function Profile({ navigation }) {
           });
 
         setDataList(temp);
-      }
-      else {
+      } else {
         showMessage({
           message: "Must be signed in to favorite a recipe",
           icon: "danger",
@@ -415,11 +408,7 @@ export default function Profile({ navigation }) {
               />
               <View style={{ width: "100%", height: 85 }}>
                 <View>
-                  <Text
-                    style={global.recipeTitle}
-                  >
-                    {item.value.name}
-                  </Text>
+                  <Text style={global.recipeTitle} numberOfLines={1}>{item.value.name}</Text>
                   <Text style={{ color: "gray" }}>{item.value.difficulty}</Text>
                   <Text style={{ color: "gray" }}>
                     {((item.value.cooktime + item.value.preptime) / 60).toFixed(
@@ -443,7 +432,10 @@ export default function Profile({ navigation }) {
             startingValue={item.value.rating}
           />
           <Text style={global.rating}>
-            {item.value.rating} ({item.value.numratings})
+            {item.value.rating >= 0
+              ? parseFloat(item.value.rating.toFixed(2))
+              : 0}{" "}
+            ({item.value.numratings})
           </Text>
           <TouchableOpacity
             style={{ marginLeft: "auto" }}
@@ -474,7 +466,6 @@ export default function Profile({ navigation }) {
 
   return (
     <View style={global.appContainer}>
-      
       {/* Ban account pop up */}
       <Dialog.Container visible={deleteVisible}>
         <Dialog.Title>Ban Account</Dialog.Title>
@@ -580,11 +571,20 @@ export default function Profile({ navigation }) {
           </Animated.View>
         </View>
         <View style={{ flex: 1 }}>
-          {user && firebase.auth().currentUser.uid == "g3fKt7BxL2cMiz1yHGMzkiyPLGA3" && (
-            <TouchableOpacity style={{marginLeft: 'auto', marginRight: 25}} onPress={() => setDeleteVisible(true)}>
-              <Text style={{ fontSize: 18, color: '#FF4343', fontWeight: 'bold' }}>Ban</Text>
-            </TouchableOpacity>
-          )}
+          {user &&
+            firebase.auth().currentUser.uid ==
+              "g3fKt7BxL2cMiz1yHGMzkiyPLGA3" && (
+              <TouchableOpacity
+                style={{ marginLeft: "auto", marginRight: 25 }}
+                onPress={() => setDeleteVisible(true)}
+              >
+                <Text
+                  style={{ fontSize: 18, color: "#FF4343", fontWeight: "bold" }}
+                >
+                  Ban
+                </Text>
+              </TouchableOpacity>
+            )}
         </View>
       </View>
 
@@ -718,9 +718,9 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   dotsContainer: {
-    marginLeft: 'auto',
+    marginLeft: "auto",
     marginRight: 20,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   dots: {
     color: "white",
@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     marginBottom: 3,
-    fontFamily: 'NunitoExtraBold'
+    fontFamily: "NunitoExtraBold",
   },
   bioContainer: {
     flexDirection: "row",

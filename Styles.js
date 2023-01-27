@@ -7,8 +7,8 @@ export default StyleSheet.create({
     backgroundColor: "#222222",
   },
   topbar: {
-    paddingTop: 30,
-    height: 110,
+    paddingTop: (Platform.OS == "ios" ? 30 : 0),
+    height: (Platform.OS == "ios" ? 110 : 90),
     flexDirection: "row",
     width: "100%",
     alignItems: "center",
@@ -16,10 +16,11 @@ export default StyleSheet.create({
     backgroundColor: "#518BFF",
   },
   searchTopbar: {
-    paddingTop: 50,
-    height: 130,
+    paddingTop: (Platform.OS == "ios" ? 50 : 0),
+    height: (Platform.OS == "ios" ? 130 : 110),
     width: "100%",
     alignItems: "center",
+    justifyContent: 'center',
     backgroundColor: "#518BFF",
   },
   topbarTitle: {

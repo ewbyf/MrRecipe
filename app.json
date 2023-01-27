@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "RecipesApp",
+    "name": "Mr. Recipe",
     "slug": "RecipesApp",
     "version": "1.0.1",
     "orientation": "portrait",
@@ -20,6 +20,7 @@
     "ios": {
       "supportsTablet": false,
       "infoPlist": {
+        "CFBundleDisplayName": "Mr. Recipe",
         "NSCameraUsageDescription": "This lets you take pictures of your food to show off to others."
       },
       "bundleIdentifier": "com.cooly4477.RecipesApp",

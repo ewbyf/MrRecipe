@@ -261,12 +261,7 @@ export default function Favorites({ navigation }) {
                       />
                       <View style={{ width: "100%", height: 85 }}>
                         <View>
-                          <Text
-                            style={
-                              global.recipeTitle
-                            }
-                            numberOfLines={1}
-                          >
+                          <Text style={global.recipeTitle} numberOfLines={1}>
                             {item.value.name}
                           </Text>
                           <Text style={{ color: "gray" }}>
@@ -295,7 +290,10 @@ export default function Favorites({ navigation }) {
                         startingValue={item.value.rating}
                       />
                       <Text style={global.rating}>
-                        {item.value.rating} ({item.value.numratings})
+                        {item.value.rating >= 0
+                          ? parseFloat(item.value.rating.toFixed(2))
+                          : 0}{" "}
+                        ({item.value.numratings})
                       </Text>
                       <TouchableOpacity
                         style={{ marginLeft: "auto" }}
@@ -332,10 +330,7 @@ export default function Favorites({ navigation }) {
                       />
                       <View style={{ width: "100%", height: 85 }}>
                         <View>
-                          <Text
-                            style={global.recipeTitle}
-                            numberOfLines={1}
-                          >
+                          <Text style={global.recipeTitle} numberOfLines={1}>
                             {item.value.name}
                           </Text>
                           <Text style={{ color: "gray" }}>
@@ -364,7 +359,10 @@ export default function Favorites({ navigation }) {
                         startingValue={item.value.rating}
                       />
                       <Text style={global.rating}>
-                        {item.value.rating} ({item.value.numratings})
+                        {item.value.rating >= 0
+                          ? parseFloat(item.value.rating.toFixed(2))
+                          : 0}{" "}
+                        ({item.value.numratings})
                       </Text>
                       <TouchableOpacity
                         style={{ marginLeft: "auto" }}

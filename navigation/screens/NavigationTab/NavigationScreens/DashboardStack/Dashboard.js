@@ -23,7 +23,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { showMessage } from "react-native-flash-message";
-import FastImage from 'react-native-fast-image';
+import FastImage from "react-native-fast-image";
 
 const AnimatedImage = Animated.createAnimatedComponent(FastImage);
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
@@ -57,7 +57,7 @@ export default function Dashboard({ navigation }) {
           fav = snapshot.data().favorites;
         }
       });
-    
+
     if (ref.recipes) {
       await Promise.all(
         ref.recipes.reverse().map(async (doc) => {
@@ -74,7 +74,11 @@ export default function Dashboard({ navigation }) {
                   favorite: "#FF4343",
                 });
               } else {
-                tempList.push({ key: doc, value: snap.data(), favorite: "gray" });
+                tempList.push({
+                  key: doc,
+                  value: snap.data(),
+                  favorite: "gray",
+                });
               }
             })
             .catch((error) => {
@@ -236,10 +240,7 @@ export default function Dashboard({ navigation }) {
               />
               <View style={{ width: "100%", height: 85 }}>
                 <View>
-                  <Text
-                    style={global.recipeTitle}
-                    numberOfLines={1}
-                  >
+                  <Text style={global.recipeTitle} numberOfLines={1}>
                     {item.value.name}
                   </Text>
                   <Text style={{ color: "gray" }}>{item.value.difficulty}</Text>
@@ -268,7 +269,10 @@ export default function Dashboard({ navigation }) {
             startingValue={item.value.rating}
           />
           <Text style={global.rating}>
-            {item.value.rating} ({item.value.numratings})
+            {item.value.rating >= 0
+              ? parseFloat(item.value.rating.toFixed(2))
+              : 0}{" "}
+            ({item.value.numratings})
           </Text>
           <TouchableOpacity
             style={{ marginLeft: "auto" }}
@@ -541,7 +545,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     marginBottom: 3,
-    fontFamily: 'NunitoExtraBold'
+    fontFamily: "NunitoExtraBold",
   },
   bioContainer: {
     flexDirection: "row",
@@ -575,7 +579,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginVertical: 10,
     textAlign: "center",
-    fontFamily: 'Helvetica'
+    fontFamily: "Helvetica",
   },
   heart: {
     height: 75,

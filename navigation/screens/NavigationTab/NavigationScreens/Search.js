@@ -309,7 +309,10 @@ export default function Search({ navigation }) {
             startingValue={item.value.rating}
           />
           <Text style={global.rating}>
-            {item.value.rating} ({item.value.numratings})
+            {item.value.rating >= 0
+              ? parseFloat(item.value.rating.toFixed(2))
+              : 0}{" "}
+              ({item.value.numratings})
           </Text>
           <TouchableOpacity
             style={{ marginLeft: "auto" }}
@@ -347,7 +350,7 @@ export default function Search({ navigation }) {
             <Text style={{ color: "gray", textAlign: "center" }}>
               @{item.value.username}
             </Text>
-            <Text style={{ color: "white" }} numberOfLines={3}>
+            <Text style={{ color: "white", textAlign: 'center' }} numberOfLines={3}>
               {item.value.bio}
             </Text>
           </View>

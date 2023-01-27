@@ -2,7 +2,7 @@
   "expo": {
     "name": "Mr. Recipe",
     "slug": "RecipesApp",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon1.png",
     "userInterfaceStyle": "light",
@@ -24,7 +24,7 @@
         "NSCameraUsageDescription": "This lets you take pictures of your food to show off to others."
       },
       "bundleIdentifier": "com.cooly4477.RecipesApp",
-      "buildNumber": "5"
+      "buildNumber": "6"
     },
     "android": {
       "adaptiveIcon": {
@@ -33,7 +33,7 @@
       },
       "softwareKeyboardLayoutMode": "pan",
       "package": "com.cooly4477.RecipesApp",
-      "versionCode": 2
+      "versionCode": 3
     },
     "web": {
       "favicon": "./assets/favicon.png"

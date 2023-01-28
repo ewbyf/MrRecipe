@@ -13,4 +13,4 @@ Mr. Recipe is a social media recipe app designed for chefs of all skill levels t
 **Android:** https://play.google.com/store/apps/details?id=com.cooly4477.RecipesApp&hl=en_US&gl=US
 
 # Images
-<img src="https://imgur.com/kPgtfkk.png" width=33%>&nbsp;<img src="https://imgur.com/J8yLfin.png" width=33%>&nbsp;<img src="https://imgur.com/LG3LOxM.png" width=33%>
+<img src="https://imgur.com/kPgtfkk.png" width=32.5%>&nbsp;<img src="https://imgur.com/J8yLfin.png" width=32.5%>&nbsp;<img src="https://imgur.com/LG3LOxM.png" width=32.5%>
